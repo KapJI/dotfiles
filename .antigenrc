@@ -1,0 +1,37 @@
+# Load oh-my-zsh library.
+antigen use oh-my-zsh
+
+# Load bundles from the default repo (oh-my-zsh).
+antigen bundle adb
+antigen bundle cargo
+antigen bundle colored-man-pages
+antigen bundle colorize
+antigen bundle dirhistory
+antigen bundle extract
+antigen bundle fasd
+antigen bundle fd
+antigen bundle fzf
+antigen bundle mosh
+antigen bundle pip
+antigen bundle ripgrep
+antigen bundle rust
+antigen bundle rustup
+antigen bundle safe-paste
+antigen bundle thefuck
+antigen bundle virtualenv
+antigen bundle zsh_reload
+antigen bundle zsh-interactive-cd
+
+# Load bundles from external repos.
+antigen bundle zdharma/fast-syntax-highlighting
+antigen bundle zsh-users/zsh-autosuggestions
+antigen bundle zsh-users/zsh-completions
+antigen bundle b4b4r07/enhancd
+antigen bundle wookayin/fzf-fasd
+antigen bundle MichaelAquilina/zsh-you-should-use
+
+# Select theme
+antigen theme romkatv/powerlevel10k
+
+# Tell Antigen that you're done.
+antigen apply

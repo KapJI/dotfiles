@@ -1,0 +1,2 @@
+_FASD_BACKENDS="native spotlight viminfo current"
+_FASD_FUZZY=5
