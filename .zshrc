@@ -7,7 +7,7 @@ fi
 
 # Environment vars
 export GOPATH=$(go env GOPATH)
-export PATH=$GOPATH/bin:$HOME/bin:/opt/homebrew/bin:$PATH
+export PATH=$GOPATH/bin:$HOME/bin:/usr/local/bin:/opt/homebrew/bin:$PATH
 
 # Aliases
 alias mosh="mosh -6"
