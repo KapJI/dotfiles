@@ -20,7 +20,8 @@ alias usage="du -h -d1 | sort -h"
 alias runp="lsof -i"
 alias vim="nvim"
 alias hgsl="hg sl"
-alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias dotfiles="git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
+alias dof="dotfiles"
 
 # fasd shortcuts to print best match
 function f1() {
