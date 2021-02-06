@@ -147,3 +147,11 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 
 # Enable broot
 source ${HOME}/.config/broot/launcher/bash/br
+
+if [ "$TERM" != "nuclide" ] && [ -t 0 ] && [ -z "$TMUX" ] && which tmux >/dev/null 2>&1; then
+    if tmux has-session -t auto >/dev/null 2>&1; then
+        tmux -2 attach -t auto
+    else
+        tmux -2 new-session -s auto
+    fi
+fi
