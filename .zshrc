@@ -1,0 +1,148 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Environment vars
+export GOPATH=$(go env GOPATH)
+export PATH=$GOPATH/bin:$HOME/bin:/opt/homebrew/bin:$PATH
+
+# Aliases
+alias mosh="mosh -6"
+alias ls="lsd"
+alias lt="ls --tree"
+alias cat="ccat"
+alias less="cless"
+alias please='sudo $(fc -ln -1)'
+alias usage="du -h -d1 | sort -h"
+alias runp="lsof -i"
+alias vim="nvim"
+alias hgsl="hg sl"
+alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+
+# fasd shortcuts to print best match
+function f1() {
+  fasd -lf $1 | tail -n1
+}
+
+function d1() {
+  fasd -ld $1 | tail -n1
+}
+
+# Open man page as PDF
+function manpdf() {
+ man -t "${1}" | open -f -a /System/Applications/Preview.app/
+}
+
+# Change working directory to the top-most Finder window location
+function cdf() { # short for `cdfinder`
+  cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
+}
+
+# ZSH_AUTOSUGGEST_USE_ASYNC="true" # causes errors
+
+# Configure colorize plugin
+ZSH_COLORIZE_TOOL=chroma
+
+# History size
+HISTSIZE=100000
+SAVEHIST=100000
+
+# Load Antigen
+source ~/.antigen.zsh
+# Load Antigen configurations
+antigen init ~/.antigenrc
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+POWERLEVEL9K_MODE='nerdfont-complete'
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Facebook hg prompt
+WANT_OLD_SCM_PROMPT="true"
+local fb_prompt_file=/opt/facebook/share/scm-prompt
+if [ -f "$fb_prompt_file" ]; then
+  source "$fb_prompt_file"
+else
+  echo "couldn't find FB SCM prompt file ${fb_prompt_file}"
+fi
+
+# Setup The Fuck
+eval $(thefuck --alias)
+
+# Turn off autocomplete beeps
+unsetopt LIST_BEEP
+
+# Setup Rust tools
+source $HOME/.cargo/env
+
+# Configure fzf to use fd
+export FZF_DEFAULT_COMMAND="fd --type file --color=always --hidden --exclude .git --exclude .hg --exclude node_modules"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_DEFAULT_OPTS="--ansi --height=40% --layout=reverse --preview-window 'right:60%' --preview 'if [ -d {} ]; then lsd --tree --depth=1 --color=always --icon=always {}; else head -n 100 {} | chroma --style=emacs --filename={}; fi'"
+_fzf_compgen_path() {
+  fd --hidden --follow --color=always --exclude ".git" --exclude ".hg" --exclude "node_modules" . "$1"
+}
+
+# Use fd to generate the list for directory completion
+_fzf_compgen_dir() {
+  fd --type d --hidden --follow --color=always --exclude ".git" --exclude ".hg" --exclude "node_modules" . "$1"
+}
+
+_fzf_compgen_unalias() {
+    tmpfile=$(mktemp /tmp/zsh-complete.XXXXXX)
+    alias > "$tmpfile"
+    fzf "$@" --preview 'ESCAPED=$(printf "%s=" {} | sed -e '"'"'s/[]\/$*.^[]/\\&/g'"'"'); cat '"$tmpfile"' | grep "^$ESCAPED"'
+    rm "$tmpfile"
+}
+
+_fzf_comprun() {
+  local command=$1
+  shift
+
+  case "$command" in
+    export|unset) fzf "$@" --preview "eval 'echo \$'{}" ;;
+    ssh|telnet)   fzf "$@" --preview 'echo {}' ;;
+    unalias)      _fzf_compgen_unalias "$@" ;;
+    *)            fzf "$@" ;;
+  esac
+}
+
+# Enable custom completion
+fpath=( ~/.zsh_completion "${fpath[@]}" )
+_BUCK_COMPLETION_MODES="mac opt-mac macpy"
+
+# Enhacd configuration
+ENHANCD_FILTER=fzf
+unalias "..."
+ENHANCD_DOT_ARG="..."
+ENHANCD_DISABLE_HOME=1
+
+# you-should-use
+YSU_MESSAGE_POSITION="after"
+YSU_IGNORED_ALIASES=("hgsl")
+COLOUR_NONE="$(tput sgr0)"
+COLOUR_BOLD="$(tput bold)"
+COLOUR_YELLOW="$(tput setaf 3)"
+COLOUR_PURPLE="$(tput setaf 5)"
+YSU_MESSAGE_FORMAT="${COLOUR_BOLD}${COLOUR_YELLOW}\
+Found existing %alias_type for ${COLOUR_PURPLE}\"%command\"${COLOUR_YELLOW}. \
+You can use ${COLOUR_PURPLE}\"%alias\"${COLOUR_YELLOW} instead.${COLOUR_NONE}"
+
+# Configure Ctrl+W word deletion style
+my-backward-delete-word() {
+    local WORDCHARS='.-'
+    zle backward-delete-word
+}
+zle -N my-backward-delete-word
+bindkey '^W' my-backward-delete-word
+
+# Bash style Ctrl+U
+bindkey \^U backward-kill-line
+
+# Enable Iterm2 shell integration
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# Enable broot
+source /Users/sayfutdinov/.config/broot/launcher/bash/br
