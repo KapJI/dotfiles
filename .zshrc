@@ -146,4 +146,4 @@ bindkey \^U backward-kill-line
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 # Enable broot
-source /Users/sayfutdinov/.config/broot/launcher/bash/br
+source ${HOME}/.config/broot/launcher/bash/br
