@@ -1,4 +1,5 @@
-My collection of dotfiles.
+# Dotfiles
+My collection of dotfiles. Feel free to use if you find something interesting here.
 
 # Setup
 ```
