@@ -2,31 +2,31 @@
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
 # Detect OS
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  MACOS=true
+    MACOS=true
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  if [ -f /etc/os-release ]; then
-    source /etc/os-release
-    case $ID in
-      centos)
-        CENTOS=true
-        ;;
-      debian|ubuntu)
-        DEBIAN_BASED=true
-        ;;
-      *)
-        echo "ERROR: running on unknown Linux distro: ${ID}!"
-        ;;
-    esac
-  else
-    echo "ERROR: can't detect Linux distro!"
-  fi
+    if [ -f /etc/os-release ]; then
+        source /etc/os-release
+        case $ID in
+            centos)
+                CENTOS=true
+                ;;
+            debian|ubuntu)
+                DEBIAN_BASED=true
+                ;;
+            *)
+                echo "ERROR: running on unknown Linux distro: ${ID}!"
+                ;;
+        esac
+    else
+        echo "ERROR: can't detect Linux distro!"
+    fi
 else
-  echo "ERROR: running on unknown OS: ${OSTYPE}!"
+    echo "ERROR: running on unknown OS: ${OSTYPE}!"
 fi
 
 # Environment vars
@@ -34,7 +34,7 @@ export GOPATH=$(go env GOPATH)
 
 _EXTRA_PATH="$GOPATH/bin:$HOME/bin:/usr/local/bin"
 if [ "$MACOS" = true ]; then
-  _EXTRA_PATH="$_EXTRA_PATH:/opt/homebrew/bin"
+    _EXTRA_PATH="$_EXTRA_PATH:/opt/homebrew/bin"
 fi
 export PATH="$_EXTRA_PATH:$PATH"
 
@@ -59,23 +59,23 @@ alias dof="dotfiles"
 
 # fasd shortcuts to print best match
 function f1() {
-  fasd -lf $1 | tail -n1
+    fasd -lf $1 | tail -n1
 }
 
 function d1() {
-  fasd -ld $1 | tail -n1
+    fasd -ld $1 | tail -n1
 }
 
 if [ "$MACOS" = true ]; then
-  # Open man page as PDF
-  function manpdf() {
-   man -t "${1}" | open -f -a /System/Applications/Preview.app/
-  }
+    # Open man page as PDF
+    function manpdf() {
+        man -t "${1}" | open -f -a /System/Applications/Preview.app/
+    }
 
-  # Change working directory to the top-most Finder window location
-  function cdf() { # short for `cdfinder`
-    cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
-  }
+    # Change working directory to the top-most Finder window location
+    function cdf() { # short for `cdfinder`
+        cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
+    }
 fi
 
 # ZSH_AUTOSUGGEST_USE_ASYNC="true" # causes errors
@@ -95,7 +95,7 @@ POWERLEVEL9K_MODE='nerdfont-complete'
 WANT_OLD_SCM_PROMPT="true"
 local fb_prompt_file=/opt/facebook/share/scm-prompt
 if [ -f "$fb_prompt_file" ]; then
-  source "$fb_prompt_file"
+    source "$fb_prompt_file"
 fi
 
 # Setup The Fuck
@@ -112,12 +112,12 @@ export FZF_DEFAULT_COMMAND="fd --type file --color=always --hidden --exclude .gi
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="--ansi --height=40% --layout=reverse --preview-window 'right:60%' --preview 'if [ -d {} ]; then lsd --tree --depth=1 --color=always --icon=always {}; else head -n 100 {} | chroma --style=emacs --filename={}; fi'"
 _fzf_compgen_path() {
-  fd --hidden --follow --color=always --exclude ".git" --exclude ".hg" --exclude "node_modules" . "$1"
+    fd --hidden --follow --color=always --exclude ".git" --exclude ".hg" --exclude "node_modules" . "$1"
 }
 
 # Use fd to generate the list for directory completion
 _fzf_compgen_dir() {
-  fd --type d --hidden --follow --color=always --exclude ".git" --exclude ".hg" --exclude "node_modules" . "$1"
+    fd --type d --hidden --follow --color=always --exclude ".git" --exclude ".hg" --exclude "node_modules" . "$1"
 }
 
 _fzf_compgen_unalias() {
@@ -128,23 +128,23 @@ _fzf_compgen_unalias() {
 }
 
 _fzf_comprun() {
-  local command=$1
-  shift
+    local command=$1
+    shift
 
-  case "$command" in
-    export|unset) fzf "$@" --preview "eval 'echo \$'{}" ;;
-    ssh|telnet)   fzf "$@" --preview 'echo {}' ;;
-    unalias)      _fzf_compgen_unalias "$@" ;;
-    *)            fzf "$@" ;;
-  esac
+    case "$command" in
+        export|unset) fzf "$@" --preview "eval 'echo \$'{}" ;;
+        ssh|telnet)   fzf "$@" --preview 'echo {}' ;;
+        unalias)      _fzf_compgen_unalias "$@" ;;
+        *)            fzf "$@" ;;
+    esac
 }
 
 # Enable custom completion
 fpath=( ~/.zsh_completion "${fpath[@]}" )
 if [ "$MACOS" = true ]; then
-  _BUCK_COMPLETION_MODES="mac opt-mac macpy"
+    _BUCK_COMPLETION_MODES="mac opt-mac macpy"
 else
-  _BUCK_COMPLETION_MODES="dev opt"
+    _BUCK_COMPLETION_MODES="dev opt"
 fi
 
 # Enhacd configuration
