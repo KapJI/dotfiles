@@ -5,9 +5,38 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# Detect OS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  MACOS=true
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  if [ -f /etc/os-release ]; then
+    source /etc/os-release
+    case $ID in
+      centos)
+        CENTOS=true
+        ;;
+      debian|ubuntu)
+        DEBIAN_BASED=true
+        ;;
+      *)
+        echo "ERROR: running on unknown Linux distro: ${ID}!"
+        ;;
+    esac
+  else
+    echo "ERROR: can't detect Linux distro!"
+  fi
+else
+  echo "ERROR: running on unknown OS: ${OSTYPE}!"
+fi
+
 # Environment vars
 export GOPATH=$(go env GOPATH)
-export PATH=$GOPATH/bin:$HOME/bin:/usr/local/bin:/opt/homebrew/bin:$PATH
+
+_EXTRA_PATH="$GOPATH/bin:$HOME/bin:/usr/local/bin"
+if [ "$MACOS" = true ]; then
+  _EXTRA_PATH="$_EXTRA_PATH:/opt/homebrew/bin"
+fi
+export PATH="$_EXTRA_PATH:$PATH"
 
 # Load Antigen (should come before aliases)
 source ~/antigen.zsh
@@ -37,15 +66,17 @@ function d1() {
   fasd -ld $1 | tail -n1
 }
 
-# Open man page as PDF
-function manpdf() {
- man -t "${1}" | open -f -a /System/Applications/Preview.app/
-}
+if [ "$MACOS" = true ]; then
+  # Open man page as PDF
+  function manpdf() {
+   man -t "${1}" | open -f -a /System/Applications/Preview.app/
+  }
 
-# Change working directory to the top-most Finder window location
-function cdf() { # short for `cdfinder`
-  cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
-}
+  # Change working directory to the top-most Finder window location
+  function cdf() { # short for `cdfinder`
+    cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
+  }
+fi
 
 # ZSH_AUTOSUGGEST_USE_ASYNC="true" # causes errors
 
@@ -65,8 +96,6 @@ WANT_OLD_SCM_PROMPT="true"
 local fb_prompt_file=/opt/facebook/share/scm-prompt
 if [ -f "$fb_prompt_file" ]; then
   source "$fb_prompt_file"
-else
-  echo "couldn't find FB SCM prompt file ${fb_prompt_file}"
 fi
 
 # Setup The Fuck
@@ -112,7 +141,11 @@ _fzf_comprun() {
 
 # Enable custom completion
 fpath=( ~/.zsh_completion "${fpath[@]}" )
-_BUCK_COMPLETION_MODES="mac opt-mac macpy"
+if [ "$MACOS" = true ]; then
+  _BUCK_COMPLETION_MODES="mac opt-mac macpy"
+else
+  _BUCK_COMPLETION_MODES="dev opt"
+fi
 
 # Enhacd configuration
 ENHANCD_FILTER=fzf
