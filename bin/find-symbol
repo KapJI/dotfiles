@@ -1,0 +1,15 @@
+#!/bin/csh
+#
+#recurse from current dir and output name of any .a files
+#that contain the desired symbol.
+set p = "."
+if ($#argv >= 2) then
+    set p = $argv[2]
+endif
+echo "Search for: $1 in $p"
+foreach i (`find $p -name '*.a'`)
+    nm --defined-only $i | grep $1
+    if ($status == 0) then
+        echo $i
+    endif
+end
