@@ -1624,6 +1624,7 @@
   }
 
   function prompt_facebook_hg() {
+    [[ "$(declare -Ff _dotfiles_scm_info)" ]] || return
     dir="$PWD"
     while : ; do
       [[ "$dir" = "/home" ]] && break
