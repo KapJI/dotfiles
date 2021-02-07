@@ -9,6 +9,11 @@ fi
 export GOPATH=$(go env GOPATH)
 export PATH=$GOPATH/bin:$HOME/bin:/usr/local/bin:/opt/homebrew/bin:$PATH
 
+# Load Antigen (should come before aliases)
+source ~/antigen.zsh
+# Load Antigen configurations
+antigen init ~/.antigenrc
+
 # Aliases
 alias mosh="mosh -6"
 alias ls="lsd"
@@ -50,11 +55,6 @@ ZSH_COLORIZE_TOOL=chroma
 # History size
 HISTSIZE=100000
 SAVEHIST=100000
-
-# Load Antigen
-source ~/.antigen.zsh
-# Load Antigen configurations
-antigen init ~/.antigenrc
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 POWERLEVEL9K_MODE='nerdfont-complete'
