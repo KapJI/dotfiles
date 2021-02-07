@@ -1,11 +1,11 @@
 # Dotfiles
 My collection of dotfiles. Feel free to use if you find something interesting here.
 
-# Setup
+## Setup
 ```
 curl -sSf https://raw.githubusercontent.com/KapJI/dotfiles/main/bin/install-config.sh | bash
 ```
-# Update
+## Update
 ```
 setup-config.sh update
 ```
