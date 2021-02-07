@@ -1,0 +1,128 @@
+#compdef buck
+
+# List completions for targets matching "$root/$PREFIX".
+_targets() {
+  local dir build_file targets expl
+# Extract the directory name from the build target prefix:
+#   unicorn/utils:mem -> unicorn/utils
+#   unicorn/utils/:mem -> unicorn/utils/
+#   unicorn/utils/test is a dir -> unicorn/utils/test
+#   unicorn/utils/mem is not a dir -> unicorn/utils (zsh will autocomplete to unicorn/utils:memory)
+#   unicorn/utils/ -> unicorn/utils/
+  if [[ $PREFIX = *':'* ]]; then
+    dir=${PREFIX%:*}
+  elif [[ -d $root/$PREFIX ]]; then
+    dir=$PREFIX
+  else
+    dir=${PREFIX%/*}
+  fi
+  build_file=$root/$dir/TARGETS
+  [[ -f $build_file ]] || return
+  # Best effort target name enumeration.
+  targets=$(sed -n "s/^ *name *= *['\"]\([a-zA-Z0-9_-]*\)['\"].*/\1/gp" $build_file)
+  targets=(${(f)targets})
+  _wanted targets expl 'build target' compadd -p "$dir" ':'$^targets
+}
+
+# Complete directory names and target names.
+_targets_and_directories() {
+  # Ignore leading "//" if present.
+  compset -P '//'
+  _alternative '_targets' 'directories:directory:_path_files -/ -W $root'
+}
+
+# Find buck root.
+local root=$PWD
+while [[ -n $root && ! -f $root/.buckversion ]]; do
+  root=${root%/*}
+done
+[[ -n $root ]] || { _message 'not a buck repository'; return }
+
+[[ -after '--' ]] && { _default; return }
+
+local -a commands=(
+  'audit:lists the inputs for the specified target'
+  'build:builds the specified target'
+  'cache:makes calls to the artifact cache'
+  'cachedelete:Delete artifacts from the local and remote cache'
+  'clean:deletes any generated files and caches'
+  'distbuild:attaches to a distributed build (experimental)'
+  'fetch:downloads remote resources to your local machine'
+  'fix:attempts to fix errors encountered in the previous build'
+  'help:shows this screen (or the help page of the specified command) and exits.'
+  'install:builds and installs an application'
+  'kill:kill buckd for the current project'
+  'killall:kill all buckd processes'
+  'project:generates project configuration files for an IDE'
+  'publish:builds and publishes a library to a central repository'
+  'query:provides facilities to query information about the target nodes graph'
+  'rage:debug and fix issues of Buck commands'
+  'root:prints the absolute path to the root of the current buck project'
+  'run:runs a target as a command'
+  'server:query and control the http server'
+  'suggest:suggests a refactoring for the specified build target'
+  'targets:prints the list of buildable targets'
+  'test:builds and runs the tests for the specified target'
+  'uninstall:uninstalls an APK'
+  'verify-caches:verify contents of internal Buck in-memory caches'
+)
+
+_arguments \
+  '(: -)--help[show help screen]' \
+  '(: -)--version[show version number]' \
+  '1: : _describe "command" commands' \
+  '*:: :->args'
+
+case $state in
+  args)
+    local -a common_args=(
+      '(: -)--help[show help screen]'
+      '*'{-c,--config}'[override .buckconfig option]:section.option=value'
+      '--no-cache[ignore local and remote cache]'
+      '(-j --num-threads)'{-j,--num-threads}'[control parallelism]:number of threads'
+      '(-v --verbose)'{-v,--verbose}'[verbosity of the output]:number between 0 (least) and 8 (most verbose)'
+    )
+
+    # Keeping default list of modes short for easier completion,
+    # but users can add their favorites with an environment variable.
+    local -a build_modes=(
+      'opt'
+      'dev'
+      'dbgo-asan-ubsan'
+    )
+    [[ -n "$_BUCK_COMPLETION_MODES" ]] && build_modes=($=_BUCK_COMPLETION_MODES)
+    build_modes=('@mode/'$^build_modes)
+
+    case $words[1] in
+      build)
+        ;&
+      test)
+        _arguments \
+          $common_args \
+          '--local[disable distributed build]' \
+          "--keep-going[don't stop after the first build error]" \
+          '--build-report[write build report to file]:file:_files' \
+          '--show-output[print output path]' \
+          '::build mode:($build_modes)' \
+          '*:targets:_targets_and_directories'
+        ;;
+      run)
+        _arguments \
+          $common_args \
+          '::build mode:($build_modes)' \
+          ':targets:_targets_and_directories'
+        ;;
+      query)
+        _arguments \
+          $common_args \
+          '--dot[print result as Dot graph]' \
+          '--json[output in JSON format]' \
+          '--output-attributes[list output attributes]' \
+          '--output-format[output format]' \
+          '--output-file[write output to file]:file:_files' \
+          '::build mode:($build_modes)' \
+          ':targets:_targets_and_directories'
+        ;;
+    esac
+    ;;
+esac
