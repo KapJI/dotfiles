@@ -181,6 +181,10 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 # Enable broot
 source ${HOME}/.config/broot/launcher/bash/br
 
+# Enable fasd
+eval "$(fasd --init auto)"
+
+# Auto attach to tmux session
 if [ "$TERM" != "nuclide" ] && [ -t 0 ] && [ -z "$TMUX" ] && which tmux >/dev/null 2>&1; then
     if tmux has-session -t auto >/dev/null 2>&1; then
         tmux -2 attach -t auto
