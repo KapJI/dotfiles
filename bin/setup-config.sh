@@ -128,7 +128,11 @@ function install_debian_packages() {
         ripgrep
         zsh
     )
-    sudo add-apt-repository ppa:aacebedo/fasd
+    if [ "$ID" = "ubuntu" ]; then
+        sudo add-apt-repository "deb http://ppa.launchpad.net/aacebedo/fasd/ubuntu/ eoan main"
+    else
+        sudo add-apt-repository ppa:aacebedo/fasd
+    fi
     sudo apt update
     sudo apt install "${apt_packages[@]}"
     sudo ln -s $(which fdfind) /usr/local/bin/fd
