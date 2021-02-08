@@ -31,6 +31,7 @@ fi
 
 # Environment vars
 export GOPATH=$(go env GOPATH)
+export GPG_TTY=$(tty)
 
 _EXTRA_PATH="$GOPATH/bin:$HOME/bin:/usr/local/bin"
 if [ "$MACOS" = true ]; then

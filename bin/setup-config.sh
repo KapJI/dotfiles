@@ -78,6 +78,7 @@ function install_macos_packages() {
         fzf
         git
         go
+        gpg2
         graphviz
         htop
         jq
@@ -85,6 +86,7 @@ function install_macos_packages() {
         ncdu
         neovim
         node
+        pinentry-mac
         ripgrep
         the_silver_searcher
         thefuck
@@ -159,6 +161,9 @@ function setup_macos() {
         sudo /usr/bin/sed -i '' -e '2s/^/auth       sufficient     pam_tid.so\'$'\n/' /etc/pam.d/sudo
         sudo chmod -w /etc/pam.d/sudo
     fi
+    # Protect secret directories
+    chmod -R 700 ~/.ssh
+    chmod -R 700 ~/.gnupg
 }
 
 function command_exists() {
