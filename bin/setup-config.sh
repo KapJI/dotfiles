@@ -129,12 +129,12 @@ function install_debian_packages() {
         zsh
     )
     if [ "$ID" = "ubuntu" ]; then
-        sudo add-apt-repository "deb http://ppa.launchpad.net/aacebedo/fasd/ubuntu/ eoan main"
+        sudo add-apt-repository -y "deb http://ppa.launchpad.net/aacebedo/fasd/ubuntu/ eoan main"
     else
-        sudo add-apt-repository ppa:aacebedo/fasd
+        sudo add-apt-repository -y ppa:aacebedo/fasd
     fi
     sudo apt update
-    sudo apt install "${apt_packages[@]}"
+    sudo apt install -y "${apt_packages[@]}"
     sudo ln -s $(which fdfind) /usr/local/bin/fd
     sudo pip3 install thefuck
     # Cargo needs to be installed before this
