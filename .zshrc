@@ -1,3 +1,13 @@
+# Auto attach to tmux session
+# Should come before instant prompt
+if [ "$TERM" != "nuclide" ] && [ -t 0 ] && [ -z "$TMUX" ] && command -v tmux >/dev/null 2>&1; then
+    if tmux has-session -t auto >/dev/null 2>&1; then
+        exec tmux -2 attach -t auto
+    else
+        exec tmux -2 new-session -s auto
+    fi
+fi
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -184,15 +194,6 @@ source ${HOME}/.config/broot/launcher/bash/br
 
 # Enable fasd
 eval "$(fasd --init auto)"
-
-# Auto attach to tmux session
-if [ "$TERM" != "nuclide" ] && [ -t 0 ] && [ -z "$TMUX" ] && command -v tmux >/dev/null 2>&1; then
-    if tmux has-session -t auto >/dev/null 2>&1; then
-        tmux -2 attach -t auto
-    else
-        tmux -2 new-session -s auto
-    fi
-fi
 
 # added by setup_fb4a.sh
 if [ "$MACOS" = true ]; then
