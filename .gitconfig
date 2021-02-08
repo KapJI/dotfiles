@@ -1,6 +1,7 @@
 [user]
     name = Ruslan Sayfutdinov
     email = ruslan@sayfutdinov.com
+    signingkey = 1F05A1BBC662FAC6
 [push]
     default = simple
 [alias]
@@ -13,3 +14,7 @@
     ui = auto
 [pull]
     rebase = true
+[commit]
+    gpgsign = true
+[tag]
+    forceSignAnnotated = true
