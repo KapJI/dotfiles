@@ -186,7 +186,7 @@ source ${HOME}/.config/broot/launcher/bash/br
 eval "$(fasd --init auto)"
 
 # Auto attach to tmux session
-if [ "$TERM" != "nuclide" ] && [ -t 0 ] && [ -z "$TMUX" ] && which tmux >/dev/null 2>&1; then
+if [ "$TERM" != "nuclide" ] && [ -t 0 ] && [ -z "$TMUX" ] && command -v tmux >/dev/null 2>&1; then
     if tmux has-session -t auto >/dev/null 2>&1; then
         tmux -2 attach -t auto
     else
