@@ -58,7 +58,6 @@ antigen init ~/.antigenrc
 alias mosh="mosh -6"
 alias ls="lsd"
 alias lt="ls --tree"
-alias cat="ccat"
 alias less="cless"
 alias please='sudo $(fc -ln -1)'
 alias usage="du -h -d1 | sort -h"
