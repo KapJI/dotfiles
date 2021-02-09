@@ -75,6 +75,7 @@ function install_macos_packages() {
         dos2unix
         fasd
         fd
+        fpp
         fzf
         git
         go
