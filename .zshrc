@@ -185,6 +185,9 @@ bindkey '^W' my-backward-delete-word
 # Bash style Ctrl+U
 bindkey \^U backward-kill-line
 
+# Smart case completion. Case sensitive if upper case letters are used.
+zstyle ':completion:*' matcher-list 'm:{[:lower:]}={[:upper:]}'
+
 # Enable Iterm2 shell integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
