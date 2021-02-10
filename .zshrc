@@ -8,6 +8,9 @@ if [ "$TERM" != "nuclide" ] && [ -t 0 ] && [ -z "$TMUX" ] && command -v tmux >/d
     fi
 fi
 
+# Should come before instant prompt
+export GPG_TTY=$(tty)
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -41,7 +44,6 @@ fi
 
 # Environment vars
 export GOPATH=$(go env GOPATH)
-export GPG_TTY=$(tty)
 
 _EXTRA_PATH="$GOPATH/bin:$HOME/bin:/usr/local/bin"
 if [ "$MACOS" = true ]; then
