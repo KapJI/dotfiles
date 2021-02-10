@@ -116,6 +116,9 @@ eval $(thefuck --alias)
 # Turn off autocomplete beeps
 unsetopt LIST_BEEP
 
+# Write to the history file immediately, not when the shell exits.
+setopt INC_APPEND_HISTORY
+
 # Setup Rust tools
 source $HOME/.cargo/env
 
@@ -188,7 +191,9 @@ bindkey '^W' my-backward-delete-word
 bindkey \^U backward-kill-line
 
 # Smart case completion. Case sensitive if upper case letters are used.
-zstyle ':completion:*' matcher-list 'm:{[:lower:]}={[:upper:]}'
+# Second rule enables completion at ".", "_" and "-". Example: f.b -> foo.bar
+# Third rule enables completion on the left. Example: bar -> foobar
+zstyle ':completion:*' matcher-list 'm:{[:lower:]}={[:upper:]}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 
 # Enable Iterm2 shell integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
