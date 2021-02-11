@@ -8,8 +8,8 @@
     st = status
     sl = "log --graph --pretty=format:'commit: %C(bold red)%h%Creset %C(red)<%H>%Creset %C(bold magenta)%d %Creset%ndate: %C(bold yellow)%cd %Creset%C(yellow)%cr%Creset%nauthor: %C(bold blue)%an%Creset %C(blue)<%ae>%Creset%n%C(cyan)%s%n%Creset'"
     prev = checkout HEAD^1
-    next = "!sh -c 'git --git-dir=$GIT_DIR --work-tree=$GIT_WORK_TREE log --reverse --pretty=%H master | awk \"/$(git --git-dir=$GIT_DIR --work-tree=$GIT_WORK_TREE rev-parse HEAD)/{getline;print}\" | xargs git --git-dir=$GIT_DIR --work-tree=$GIT_WORK_TREE checkout'"
-    fixup = "!f() { TARGET=$(git rev-parse "$1"); git commit --fixup=$TARGET ${@:2} && EDITOR=true git rebase -i --autostash --autosquash $TARGET^; }; f"
+    next = "!sh git-checkout-next.sh"
+    fixup = "!sh git-fixup.sh"
     unstash = stash pop
     cleanup = "!sh git-branch-cleanup.sh"
 [color]
