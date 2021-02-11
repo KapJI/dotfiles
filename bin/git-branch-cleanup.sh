@@ -1,5 +1,8 @@
 #!/bin/bash
 
+GREEN="$(tput setaf 2)$(tput bold)"
+NC="$(tput sgr 0)"
+
 git_extra_args=""
 if [ ! -z "$GIT_DIR" ]; then
     git_extra_args="$git_extra_args --git-dir=$GIT_DIR"
@@ -12,7 +15,7 @@ branches=($(sh -c "git $git_extra_args branch --merged" | egrep -v "(^\*|master|
 
 for branch in "${branches[@]}"; do
     while true; do
-        read -p "Delete branch '$branch'? [y/N] " answer
+        read -p "Delete branch ${GREEN}$branch${NC}? [y/N] " answer
         case "$answer" in
             [yY]|[yY][eE][sS])
                 sh -c "git $git_extra_args branch -d $branch"
