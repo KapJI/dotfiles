@@ -1,5 +1,16 @@
 #!/bin/bash
 
+## Usage
+# $ git commit -am 'bad commit'
+#
+# $ git commit -am 'good commit'
+#
+## Stage changes to correct the bad commit
+# $ git add .
+#
+## Fixup the bad commit. HEAD^ can be replaced by the SHA of the bad commit
+# $ git fixup HEAD^
+
 git_extra_args=""
 if [ ! -z "$GIT_DIR" ]; then
     git_extra_args="$git_extra_args --git-dir=$GIT_DIR"
