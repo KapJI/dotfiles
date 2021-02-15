@@ -11,7 +11,7 @@ if [ ! -z "$GIT_WORK_TREE" ]; then
     git_extra_args="$git_extra_args --work-tree=$GIT_WORK_TREE"
 fi
 
-branches=($(sh -c "git $git_extra_args branch --merged" | egrep -v "(^\*|master|main|dev)"))
+branches=($(sh -c "git $git_extra_args branch" | egrep -v "(^\*|master|main|dev)"))
 
 for branch in "${branches[@]}"; do
     while true; do
