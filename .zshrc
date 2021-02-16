@@ -45,7 +45,7 @@ fi
 # Environment vars
 export GOPATH=$(go env GOPATH)
 
-_EXTRA_PATH="$GOPATH/bin:$HOME/bin:/usr/local/bin"
+_EXTRA_PATH="$GOPATH/bin:$HOME/bin:$HOME/Library/Python/3.9/bin:/usr/local/bin"
 if [ "$MACOS" = true ]; then
     _EXTRA_PATH="$_EXTRA_PATH:/opt/homebrew/bin"
 fi
