@@ -65,6 +65,7 @@ alias please='sudo $(fc -ln -1)'
 alias usage="du -h -d1 | sort -h"
 alias runp="lsof -i"
 alias vim="nvim"
+alias sl="subl"
 alias hgsl="hg sl"
 alias dotfiles="git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
 alias dof="dotfiles"
