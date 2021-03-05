@@ -1,23 +1,3 @@
-# Auto attach to tmux session
-# Should come before instant prompt
-if [ "$TERM" != "nuclide" ] && [ -t 0 ] && [ -z "$TMUX" ] && command -v tmux >/dev/null 2>&1; then
-    if tmux has-session -t auto >/dev/null 2>&1; then
-        exec tmux -2 attach -t auto
-    else
-        exec tmux -2 new-session -s auto
-    fi
-fi
-
-# Should come before instant prompt
-export GPG_TTY=$(tty)
-
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 # Detect OS
 if [[ "$OSTYPE" == "darwin"* ]]; then
     MACOS=true
@@ -42,15 +22,37 @@ else
     echo "ERROR: running on unknown OS: ${OSTYPE}!"
 fi
 
-# Environment vars
-export GOPATH=$(go env GOPATH)
-
+# Set $PATH
+# Should come before running tmux
 _EXTRA_PATH="$GOPATH/bin:$HOME/bin:$HOME/.local/bin:/usr/local/bin"
 if [ "$MACOS" = true ]; then
     _EXTRA_PATH="$HOME/Library/Python/3.9/bin:$_EXTRA_PATH"
     _EXTRA_PATH="$_EXTRA_PATH:/opt/homebrew/bin"
 fi
 export PATH="$_EXTRA_PATH:$PATH"
+
+# Auto attach to tmux session
+# Should come before instant prompt
+if [ "$TERM" != "nuclide" ] && [ -t 0 ] && [ -z "$TMUX" ] && command -v tmux >/dev/null 2>&1; then
+    if tmux has-session -t auto >/dev/null 2>&1; then
+        exec tmux -2 attach -t auto
+    else
+        exec tmux -2 new-session -s auto
+    fi
+fi
+
+# Should come before instant prompt
+export GPG_TTY=$(tty)
+
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Environment vars
+export GOPATH=$(go env GOPATH)
 
 # Load Antigen (should come before aliases)
 source ~/antigen.zsh
