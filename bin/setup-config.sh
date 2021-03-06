@@ -88,6 +88,7 @@ function install_macos_packages() {
         neovim
         node
         pinentry-mac
+        pipx
         ripgrep
         the_silver_searcher
         thefuck
@@ -116,6 +117,7 @@ function install_macos_packages() {
     if [ ${#upgrade_packages[@]} -gt 0 ]; then
         HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade "${upgrade_packages[@]}"
     fi
+    sudo ln -s /usr/local/bin/pinentry-mac /usr/local/bin/pinentry-current
 }
 
 function install_debian_packages() {
@@ -123,13 +125,17 @@ function install_debian_packages() {
         fasd
         fd-find
         fzf
+        gnupg
         golang
         neovim
+        pinentry-tty
         python3-dev
         python3-pip
         python3-setuptools
         ripgrep
+        tmux
         zsh
+        htop
     )
     if [ "$ID" = "ubuntu" ]; then
         sudo add-apt-repository -y "deb http://ppa.launchpad.net/aacebedo/fasd/ubuntu/ eoan main"
@@ -139,6 +145,7 @@ function install_debian_packages() {
     sudo apt update
     sudo apt install -y "${apt_packages[@]}"
     sudo ln -s $(which fdfind) /usr/local/bin/fd
+    sudo ln -s /usr/bin/pinentry-tty /usr/local/bin/pinentry-current
     sudo pip3 install thefuck
     # Cargo needs to be installed before this
     cargo install lsd
