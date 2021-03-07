@@ -67,6 +67,7 @@ function install_packages() {
         broot --set-install-state installed
     fi
     install_python_packages
+    install_npm_packages
 }
 
 function install_python_packages() {
@@ -81,6 +82,18 @@ function install_python_packages() {
             pipx install "$package"
         else
             pipx upgrade "$package"
+        fi
+    done
+}
+
+function install_npm_packages() {
+    local npm_packages
+    npm_packages=(
+        git-branch-select
+    )
+    for package in "${pipx_packages[@]}"; do
+        if ! npm list --global "$package"; then
+            npm install --global "$package"
         fi
     done
 }
@@ -150,6 +163,7 @@ function install_debian_packages() {
         golang
         htop
         neovim
+        npm
         pinentry-tty
         python3
         python3-dev
