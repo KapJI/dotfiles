@@ -22,12 +22,15 @@ function config_update() {
 }
 
 function set_zsh_shell() {
+    local zsh_path current_shell
     if [ "$MACOS" = true ]; then
         zsh_path="/bin/zsh"
+        current_shell="$SHELL"
     else
         zsh_path="$(which zsh)"
+        current_shell="$(readlink -f $SHELL)"
     fi
-    if [ "$SHELL" != "$zsh_path" ]; then
+    if [ "$current_shell" != "$zsh_path" ]; then
         chsh -s "$zsh_path"
     fi
 }
@@ -76,6 +79,7 @@ function install_python_packages() {
 }
 
 function install_macos_packages() {
+    local brew_packages upgrade_packages install_packages
     if ! command_exists brew; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
@@ -129,6 +133,7 @@ function install_macos_packages() {
 }
 
 function install_debian_packages() {
+    local apt_packages
     apt_packages=(
         fasd
         fd-find
