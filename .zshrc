@@ -208,6 +208,11 @@ source ${HOME}/.config/broot/launcher/bash/br
 # Enable fasd
 eval "$(fasd --init auto)"
 
+# pipx completions
+# Doesn't work because of antigen issue:
+# https://github.com/zsh-users/antigen/issues/603
+eval "$(register-python-argcomplete pipx)"
+
 # added by setup_fb4a.sh
 if [ "$MACOS" = true ]; then
     export ANDROID_SDK=/opt/android_sdk
