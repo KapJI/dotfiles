@@ -53,7 +53,7 @@ function install_packages() {
         install_centos_packages
     fi
     # Install antigen
-    curl -L git.io/antigen > antigen.zsh
+    curl -L git.io/antigen > ~/antigen.zsh
     # Install vim-plug
     curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     # Install chroma. Go should be installed by now
