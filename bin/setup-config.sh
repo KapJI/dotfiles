@@ -87,15 +87,9 @@ function install_python_packages() {
 }
 
 function install_npm_packages() {
-    local npm_packages
-    npm_packages=(
-        git-branch-select
-    )
-    for package in "${npm_packages[@]}"; do
-        if ! npm list --global "$package"; then
-            npm install --global "$package"
-        fi
-    done
+    if ! npm list --global "git-branch-select"; then
+        npm install --global "git-branch-select"
+    fi
 }
 
 function install_macos_packages() {
