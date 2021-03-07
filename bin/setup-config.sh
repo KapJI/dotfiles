@@ -162,7 +162,7 @@ function setup_machine() {
     if [ "$MACOS" = true ]; then
         setup_macos
     elif [ "$DEBIAN_BASED" = true ]; then
-        set_debian
+        setup_debian
     fi
 }
 
