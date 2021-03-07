@@ -91,7 +91,7 @@ function install_npm_packages() {
     npm_packages=(
         git-branch-select
     )
-    for package in "${pipx_packages[@]}"; do
+    for package in "${npm_packages[@]}"; do
         if ! npm list --global "$package"; then
             npm install --global "$package"
         fi
