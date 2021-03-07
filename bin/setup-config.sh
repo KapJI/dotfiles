@@ -146,12 +146,6 @@ function install_debian_packages() {
         zsh
         htop
     )
-    # Current Ubuntu distro is not available in this PPA
-    if [ "$ID" = "ubuntu" ]; then
-        sudo add-apt-repository -y "deb http://ppa.launchpad.net/aacebedo/fasd/ubuntu/ eoan main"
-    else
-        sudo add-apt-repository -y ppa:aacebedo/fasd
-    fi
     sudo apt update
     sudo apt install -y "${apt_packages[@]}"
     python3 -m pip install --user pipx
