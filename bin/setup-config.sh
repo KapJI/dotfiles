@@ -16,7 +16,6 @@ function config_init() {
 function config_update() {
     set -x
     git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME pull
-    antigen update
     nvim +PlugUpgrade +PlugUpdate +qall
     # Nothing will run after this
     exec zsh
@@ -64,6 +63,16 @@ function install_packages() {
         broot --print-shell-function zsh > ${HOME}/.config/broot/launcher/bash/br
         broot --set-install-state installed
     fi
+    install_python_packages
+}
+
+function install_python_packages() {
+    if ! command_exists chroma; then
+        pipx install poetry
+    fi
+    if ! command_exists thefuck; then
+        pipx install thefuck
+    fi
 }
 
 function install_macos_packages() {
@@ -92,7 +101,6 @@ function install_macos_packages() {
         pipx
         ripgrep
         the_silver_searcher
-        thefuck
         tree
         wget
         zsh
@@ -118,7 +126,6 @@ function install_macos_packages() {
     if [ ${#upgrade_packages[@]} -gt 0 ]; then
         HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade "${upgrade_packages[@]}"
     fi
-    sudo ln -s /usr/local/bin/pinentry-mac /usr/local/bin/pinentry-current
 }
 
 function install_debian_packages() {
@@ -147,10 +154,7 @@ function install_debian_packages() {
     fi
     sudo apt update
     sudo apt install -y "${apt_packages[@]}"
-    sudo ln -s $(which fdfind) /usr/local/bin/fd
-    sudo ln -s /usr/bin/pinentry-tty /usr/local/bin/pinentry-current
     python3 -m pip install --user pipx
-    pipx install thefuck
     # Cargo needs to be installed before this
     cargo install lsd
     cargo install broot
@@ -163,6 +167,8 @@ function install_centos_packages() {
 function setup_machine() {
     if [ "$MACOS" = true ]; then
         setup_macos
+    elif [ "$DEBIAN_BASED" = true ]; then
+        set_debian
     fi
 }
 
@@ -176,6 +182,14 @@ function setup_macos() {
     # Protect secret directories
     chmod -R 700 ~/.ssh
     chmod -R 700 ~/.gnupg
+    # Create symlink to pinentry-mac
+    sudo ln -sfn /usr/local/bin/pinentry-mac /usr/local/bin/pinentry-current
+}
+
+function setup_debian() {
+    # Create symlinks
+    sudo ln -sfn $(which fdfind) /usr/local/bin/fd
+    sudo ln -sfn /usr/bin/pinentry-tty /usr/local/bin/pinentry-current
 }
 
 function command_exists() {
