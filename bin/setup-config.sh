@@ -79,6 +79,8 @@ function install_python_packages() {
     for package in "${pipx_packages[@]}"; do
         if ! command_exists "$package"; then
             pipx install "$package"
+        else
+            pipx upgrade "$package"
         fi
     done
 }
