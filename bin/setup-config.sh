@@ -70,12 +70,17 @@ function install_packages() {
 }
 
 function install_python_packages() {
-    if ! command_exists chroma; then
-        pipx install poetry
-    fi
-    if ! command_exists thefuck; then
-        pipx install thefuck
-    fi
+    local pipx_packages
+    pipx_packages=(
+        poetry
+        pre-commit
+        thefuck
+    )
+    for package in "${pipx_packages[@]}"; do
+        if ! command_exists "$package"; then
+            pipx install "$package"
+        fi
+    done
 }
 
 function install_macos_packages() {
