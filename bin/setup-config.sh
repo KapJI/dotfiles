@@ -84,6 +84,7 @@ function install_macos_packages() {
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
     brew_packages=(
+        ant
         broot
         cmake
         dos2unix
@@ -140,6 +141,7 @@ function install_debian_packages() {
         fzf
         gnupg
         golang
+        htop
         neovim
         pinentry-tty
         python3
@@ -149,7 +151,6 @@ function install_debian_packages() {
         ripgrep
         tmux
         zsh
-        htop
     )
     sudo apt update
     sudo apt install -y "${apt_packages[@]}"
