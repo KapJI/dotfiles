@@ -16,6 +16,7 @@ function config_init() {
 function config_update() {
     set -x
     git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME pull
+    antigen update
     nvim +PlugUpgrade +PlugUpdate +qall
     # Nothing will run after this
     exec zsh
@@ -129,6 +130,7 @@ function install_debian_packages() {
         golang
         neovim
         pinentry-tty
+        python3
         python3-dev
         python3-pip
         python3-setuptools
@@ -137,6 +139,7 @@ function install_debian_packages() {
         zsh
         htop
     )
+    # Current Ubuntu distro is not available in this PPA
     if [ "$ID" = "ubuntu" ]; then
         sudo add-apt-repository -y "deb http://ppa.launchpad.net/aacebedo/fasd/ubuntu/ eoan main"
     else
@@ -146,7 +149,8 @@ function install_debian_packages() {
     sudo apt install -y "${apt_packages[@]}"
     sudo ln -s $(which fdfind) /usr/local/bin/fd
     sudo ln -s /usr/bin/pinentry-tty /usr/local/bin/pinentry-current
-    sudo pip3 install thefuck
+    python3 -m pip install --user pipx
+    pipx install thefuck
     # Cargo needs to be installed before this
     cargo install lsd
     cargo install broot
