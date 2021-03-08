@@ -23,15 +23,17 @@ function config_update() {
 
 function set_zsh_shell() {
     local zsh_path current_shell
+    zsh_path="$(which zsh)"
     if [ "$MACOS" = true ]; then
-        zsh_path="/bin/zsh"
-        current_shell="$SHELL"
+        current_shell="$(dscl . -read /Users/$USER UserShell | awk  '{print $2}')"
+        if [ "$current_shell" != "$zsh_path" ]; then
+            sudo dscl . -create /Users/$USER UserShell /usr/local/bin/zsh
+        fi
     else
-        zsh_path="$(which zsh)"
         current_shell="$(readlink -f $SHELL)"
-    fi
-    if [ "$current_shell" != "$zsh_path" ]; then
-        chsh -s "$zsh_path"
+        if [ "$current_shell" != "$zsh_path" ]; then
+            chsh -s "$zsh_path"
+        fi
     fi
 }
 
