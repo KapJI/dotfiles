@@ -87,7 +87,12 @@ function install_python_packages() {
 }
 
 function install_npm_packages() {
-    npm config set prefix "~/.npm"
+    local npm_prefix
+    npm_prefix="$HOME/.npm"
+    npm config set prefix "${npm_prefix}"
+    if [ ! -d "${npm_prefix}/lib" ]; then
+        mkdir -p "${npm_prefix}/lib"
+    fi
     if ! npm list --global "git-branch-select"; then
         npm install --global "git-branch-select"
     fi
