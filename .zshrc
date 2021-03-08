@@ -22,6 +22,10 @@ else
     echo "ERROR: running on unknown OS: ${OSTYPE}!"
 fi
 
+# Environment vars
+# Used by $PATH
+export GOPATH=$(go env GOPATH)
+
 # Set $PATH
 # Should come before running tmux
 _EXTRA_PATH="$GOPATH/bin:$HOME/bin:$HOME/.local/bin"
@@ -51,9 +55,6 @@ export GPG_TTY=$(tty)
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
-
-# Environment vars
-export GOPATH=$(go env GOPATH)
 
 # Load Antigen (should come before aliases)
 source ~/antigen.zsh
