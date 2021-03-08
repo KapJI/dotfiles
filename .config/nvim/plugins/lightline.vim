@@ -1,25 +1,25 @@
 let s:xsmall_window_width = 60
 let s:small_window_width = 90
 let s:symbols = {
-\ 'branch': "\uf126",
-\ 'readonly': "\uf023",
-\ 'zoom': "\uf848",
-\ 'modified': '•',
-\ 'menu': "\uf85b",
-\ 'separator': {'left': "\ue0b0", 'right': "\ue0b2"},
-\ 'subseparator': {'left': "\ue0b1", 'right': "\ue0b3"},
+\   'branch': "\uf126",
+\   'readonly': "\uf023",
+\   'zoom': "\uf848",
+\   'modified': '•',
+\   'menu': "\uf85b",
+\   'separator': {'left': "\ue0b0", 'right': "\ue0b2"},
+\   'subseparator': {'left': "\ue0b1", 'right': "\ue0b3"},
 \ }
 let s:short_modes = {
-\ 'NORMAL':   'N',
-\ 'INSERT':   'I',
-\ 'VISUAL':   'V',
-\ 'V-LINE':   'L',
-\ 'V-BLOCK':  'B',
-\ 'COMMAND':  'C',
-\ 'SELECT':   'S',
-\ 'S-LINE':   'S-L',
-\ 'S-BLOCK':  'S-B',
-\ 'TERMINAL': 'T',
+\   'NORMAL':   'N',
+\   'INSERT':   'I',
+\   'VISUAL':   'V',
+\   'V-LINE':   'L',
+\   'V-BLOCK':  'B',
+\   'COMMAND':  'C',
+\   'SELECT':   'S',
+\   'S-LINE':   'S-L',
+\   'S-BLOCK':  'S-B',
+\   'TERMINAL': 'T',
 \ }
 let s:empty_file_name = '[No Name]'
 let g:lightline = {}
