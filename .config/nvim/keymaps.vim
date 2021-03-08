@@ -26,8 +26,8 @@ nnoremap <silent> <C-s> :w<CR>
 imap <C-s> <C-o><C-s>
 
 " Toggle fern
-nnoremap <silent> <C-b> :Fern . -drawer -toggle<CR>
-nnoremap <silent> <A-b> :Fern %:h -drawer -toggle<CR>
+nnoremap <silent> <C-i> :Fern . -drawer -toggle<CR>
+nnoremap <silent> <A-i> :Fern %:h -drawer -toggle<CR>
 
 " Toggle the terminal
 nnoremap <silent> <C-n> :call MonkeyTerminalToggle()<CR>
