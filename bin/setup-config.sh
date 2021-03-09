@@ -6,6 +6,14 @@ function config_init() {
     set -x
     # Request sudo in the beginning
     sudo true
+    # Fetch current version of configs
+    if git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME diff --quiet; then
+        git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME pull
+    else
+        RED='\033[0;31m'
+        NC='\033[0m' # No Color
+        printf "${RED}CONFIG REPO IS DIRTY! SKIPPING UPDATE!${NC}\n"
+    fi
     install_packages
     setup_machine
     # Set current user shell to zsh
@@ -15,7 +23,6 @@ function config_init() {
 
 function config_update() {
     set -x
-    git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME pull
     nvim +PlugUpgrade +PlugUpdate +qall
     # Nothing will run after this
     exec zsh
@@ -105,6 +112,8 @@ function install_macos_packages() {
     if ! command_exists brew; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
+    # This output is very noisy
+    set +x
     brew_packages=(
         ant
         broot
@@ -148,6 +157,8 @@ function install_macos_packages() {
             install_packages+=($package)
         fi
     done
+    # Enable verbose mode back
+    set -x
     sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/sbin
     if [ ${#install_packages[@]} -gt 0 ]; then
         HOMEBREW_NO_AUTO_UPDATE=1 brew install "${install_packages[@]}"
@@ -159,7 +170,7 @@ function install_macos_packages() {
 
 function add_eternal_terminal_repo() {
     if [ "$DEBIAN" = true ]; then
-        local et_keyring, et_sources_list
+        local et_keyring et_sources_list
         et_keyring="/usr/share/keyrings/et-archive-keyring.gpg"
         et_sources_list="/etc/apt/sources.list.d/et.list"
         if [ ! -f "${et_keyring}" ]; then
