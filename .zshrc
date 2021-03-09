@@ -62,18 +62,18 @@ source ~/antigen.zsh
 antigen init ~/.antigenrc
 
 # Aliases
-alias mosh="mosh -6"
+alias dof="git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
+alias hgsl="hg sl"
+alias less="cless"
 alias ls="lsd"
 alias lt="ls --tree"
-alias less="cless"
+alias mosh="mosh -6"
 alias please='sudo $(fc -ln -1)'
-alias usage="du -h -d1 | sort -h"
 alias runp="lsof -i"
-alias vim="nvim"
+alias sand="et sand:8080"
 alias sl="subl"
-alias hgsl="hg sl"
-alias dotfiles="git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
-alias dof="dotfiles"
+alias usage="du -h -d1 | sort -h"
+alias vim="nvim"
 
 # fasd shortcuts to print best match
 function f1() {
