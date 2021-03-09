@@ -5,7 +5,7 @@ My collection of dotfiles. Feel free to use if you find something interesting he
 ```
 curl -sSf https://raw.githubusercontent.com/KapJI/dotfiles/main/bin/install-config.sh | bash
 ```
-## Update
+## Upgrade configuration on current host
 ```
-setup-config.sh update
+setup-config.sh upgrade
 ```
