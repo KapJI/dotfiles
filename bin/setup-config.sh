@@ -22,6 +22,7 @@ function config_upgrade() {
 function run_setup() {
     local current_dir
     current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+    # Now we can run updated version after 'git pull'
     source "${current_dir}/setup_config/main.sh"
     setup_main
 }
