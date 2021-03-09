@@ -3,9 +3,9 @@ My collection of dotfiles. Feel free to use if you find something interesting he
 
 ## Setup
 ```
-curl -sSf https://raw.githubusercontent.com/KapJI/dotfiles/main/bin/install-config.sh | bash
+curl -sSf https://raw.githubusercontent.com/KapJI/dotfiles/main/bin/install_config | bash
 ```
 ## Upgrade configuration on current host
 ```
-setup-config.sh upgrade
+setup_config upgrade
 ```
