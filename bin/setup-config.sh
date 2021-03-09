@@ -101,7 +101,7 @@ function install_npm_packages() {
 }
 
 function install_macos_packages() {
-    local brew_packages upgrade_packages install_packages
+    local brew_packages upgrade_packages install_packages short_package
     if ! command_exists brew; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
@@ -131,6 +131,7 @@ function install_macos_packages() {
         tree
         wget
         zsh
+        mistertea/et/et
     )
     brew update
     # Find already installed packages
@@ -142,7 +143,8 @@ function install_macos_packages() {
     # Filter installed packages
     install_packages=()
     for package in "${brew_packages[@]}"; do
-        if [[ ! " ${upgrade_packages[@]} " =~ " ${package} " ]]; then
+        short_package="$(echo $package | awk -F '/' '{print $NF}')"
+        if [[ ! " ${upgrade_packages[@]} " =~ " ${short_package} " ]]; then
             install_packages+=($package)
         fi
     done
@@ -155,9 +157,28 @@ function install_macos_packages() {
     fi
 }
 
+function add_eternal_terminal_repo() {
+    if [ "$DEBIAN" = true ]; then
+        local et_keyring, et_sources_list
+        et_keyring="/usr/share/keyrings/et-archive-keyring.gpg"
+        et_sources_list="/etc/apt/sources.list.d/et.list"
+        if [ ! -f "${et_keyring}" ]; then
+            curl -sSL https://github.com/MisterTea/debian-et/raw/master/et.gpg \
+            | gpg --dearmor | sudo tee "${et_keyring}" > /dev/null
+        fi
+        if [ ! -f "${et_sources_list}" ]; then
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=${et_keyring}] https://github.com/MisterTea/debian-et/raw/master/debian-source/ buster main" \
+            | sudo tee "${et_sources_list}" > /dev/null
+        fi
+    elif [ "$UBUNTU" = true ]; then
+        sudo add-apt-repository ppa:jgmath2000/et -y -n
+    fi
+}
+
 function install_debian_packages() {
     local apt_packages
     apt_packages=(
+        et
         fasd
         fd-find
         fzf
@@ -175,6 +196,7 @@ function install_debian_packages() {
         tmux
         zsh
     )
+    add_eternal_terminal_repo
     sudo apt update
     sudo apt install -y "${apt_packages[@]}"
     python3 -m pip install --user pipx
@@ -244,8 +266,13 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
             centos)
                 CENTOS=true
                 ;;
-            debian|ubuntu)
+            debian)
                 DEBIAN_BASED=true
+                DEBIAN=true
+                ;;
+            ubuntu)
+                DEBIAN_BASED=true
+                UBUNTU=true
                 ;;
             *)
                 error "running on unknown Linux distro: ${ID}!"
