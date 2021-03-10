@@ -3,7 +3,8 @@
 function install_macos_packages() {
     local brew_packages upgrade_packages install_packages short_package
     if ! command_exists brew; then
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        brew_url="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
+        /bin/bash -c "$(curl -fsSL ${brew_url})"
     fi
     # This output is very noisy
     set +x
@@ -65,7 +66,8 @@ function setup_macos() {
     # Enable sudo by TouchID
     if ! grep -q "pam_tid.so" /etc/pam.d/sudo; then
         sudo chmod +w /etc/pam.d/sudo
-        sudo /usr/bin/sed -i '' -e '2s/^/auth       sufficient     pam_tid.so\'$'\n/' /etc/pam.d/sudo
+        sudo /usr/bin/sed -i '' -e '2s/^/auth       sufficient     pam_tid.so\'$'\n/' \
+            /etc/pam.d/sudo
         sudo chmod -w /etc/pam.d/sudo
     fi
     # Protect secret directories
@@ -73,4 +75,11 @@ function setup_macos() {
     chmod -R 700 ~/.gnupg
     # Create symlink to pinentry-mac
     sudo ln -sfn /usr/local/bin/pinentry-mac /usr/local/bin/pinentry-current
+    # Auto start pbcopy daemon on login
+    local current_dir
+    current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+    ln -sfn ${current_dir}/resources/local.pbcopy.plist ~/Library/LaunchAgents/local.pbcopy.plist
+    if ! launchctl list local.pbcopy; then
+        launchctl load ~/Library/LaunchAgents/local.pbcopy.plist
+    fi
 }
