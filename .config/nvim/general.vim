@@ -45,11 +45,11 @@ endfunction
 let g:clipboard = {
 \   'name': 'it2copy',
 \   'copy': {
-\     '+': ['it2copy'],
-\     '*': ['it2copy'],
+\     '+': 'it2copy',
+\     '*': 'it2copy',
 \   },
 \   'paste': {
-\     '+': ['true'],
-\     '*': ['true'],
+\     '+': 'true',
+\     '*': 'true',
 \    },
 \ }
