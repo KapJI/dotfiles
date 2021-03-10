@@ -75,11 +75,4 @@ function setup_macos() {
     chmod -R 700 ~/.gnupg
     # Create symlink to pinentry-mac
     sudo ln -sfn /usr/local/bin/pinentry-mac /usr/local/bin/pinentry-current
-    # Auto start pbcopy daemon on login
-    local current_dir
-    current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-    ln -sfn ${current_dir}/resources/local.pbcopy.plist ~/Library/LaunchAgents/local.pbcopy.plist
-    if ! launchctl list local.pbcopy; then
-        launchctl load ~/Library/LaunchAgents/local.pbcopy.plist
-    fi
 }
