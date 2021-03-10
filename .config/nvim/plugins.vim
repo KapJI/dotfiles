@@ -22,6 +22,7 @@ call plug#begin("~/.vim/plugged")
   " Plug 'airblade/vim-gitgutter'
   Plug 'mhinz/vim-signify'
   Plug 'markstory/vim-zoomwin'
+  Plug 'cespare/vim-toml'
   " Plug 'neoclide/coc.nvim', {'branch': 'release'}
   " let g:coc_global_extensions = ['coc-css', 'coc-html', 'coc-json', 'coc-prettier', 'coc-tsserver']
 call plug#end()
