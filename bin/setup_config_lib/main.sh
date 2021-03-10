@@ -148,6 +148,7 @@ function set_zsh_shell() {
 
 function complete_update() {
     nvim +PlugUpgrade +PlugUpdate +qall
+    tmux source-file ~/.tmux.conf
     # Nothing will run after this
     exec zsh
 }
