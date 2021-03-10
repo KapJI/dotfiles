@@ -24,18 +24,18 @@ function show_help() {
 # only accepts ESC backslash for ST.
 function print_osc() {
     if [[ $TERM == screen* ]] ; then
-        printf "\033Ptmux;\033\033]"
+        printf "\033Ptmux;\033\033]" > ${CURRENT_TTY}
     else
-        printf "\033]"
+        printf "\033]" > ${CURRENT_TTY}
     fi
 }
 
 # More of the tmux workaround described above.
 function print_st() {
     if [[ $TERM == screen* ]] ; then
-        printf "\a\033\\"
+        printf "\a\033\\" > ${CURRENT_TTY}
     else
-        printf "\a"
+        printf "\a" > ${CURRENT_TTY}
     fi
 }
 
@@ -56,7 +56,7 @@ while [ $# -gt 0 ]; do
             data=$(base64 < "$1")
             print_osc
             inosc=1
-            printf '1337;Copy=:%s' "$data"
+            printf '1337;Copy=:%s' "$data" > ${CURRENT_TTY}
             print_st
             inosc=0
             exit 0
@@ -72,7 +72,7 @@ done
 data=$(base64)
 print_osc
 inosc=1
-printf '1337;Copy=:%s' "$data"
+printf '1337;Copy=:%s' "$data" > ${CURRENT_TTY}
 print_st
 inosc=0
 
