@@ -29,7 +29,7 @@ export GOPATH=$(go env GOPATH)
 # Set $PATH
 # Should come before running tmux
 _EXTRA_PATH="$GOPATH/bin:$HOME/bin:$HOME/.local/bin"
-_EXTRA_PATH="$_EXTRA_PATH:/usr/local/bin:$HOME/.npm/bin"
+_EXTRA_PATH="$_EXTRA_PATH:/usr/local/bin:$HOME/.npm/bin:$HOME/.iterm2"
 if [ "$MACOS" = true ]; then
     _EXTRA_PATH="$HOME/Library/Python/3.9/bin:$_EXTRA_PATH"
     _EXTRA_PATH="$_EXTRA_PATH:/opt/homebrew/bin"
@@ -47,7 +47,8 @@ if [ "$TERM" != "nuclide" ] && [ -t 0 ] && [ -z "$TMUX" ] && command -v tmux >/d
 fi
 
 # Should come before instant prompt
-export GPG_TTY=$(tty)
+export CURRENT_TTY=$(tty)
+export GPG_TTY="$CURRENT_TTY"
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -70,7 +71,6 @@ alias lt="ls --tree"
 alias mosh="mosh -6"
 alias please='sudo $(fc -ln -1)'
 alias runp="lsof -i"
-alias sand="et sand:8080"
 alias sl="subl"
 alias usage="du -h -d1 | sort -h"
 alias vim="nvim"

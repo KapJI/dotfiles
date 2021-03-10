@@ -40,3 +40,16 @@ function! TabDo(command, ...)
   execute range . 'tabdo ' . a:command
   execute 'tabn ' . currTab
 endfunction
+
+" Use it2copy as clipboard provider.
+let g:clipboard = {
+\   'name': 'it2copy',
+\   'copy': {
+\     '+': ['it2copy'],
+\     '*': ['it2copy'],
+\   },
+\   'paste': {
+\     '+': ['true'],
+\     '*': ['true'],
+\    },
+\ }
