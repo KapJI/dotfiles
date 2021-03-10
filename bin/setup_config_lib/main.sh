@@ -51,6 +51,8 @@ function import_scripts() {
         source "${current_dir}/macos.sh"
     elif [ "$DEBIAN_BASED" = true ]; then
         source "${current_dir}/debian_based.sh"
+    elif [ "$CENTOS" = true ]; then
+        source "${current_dir}/centos.sh"
     fi
 }
 
@@ -68,13 +70,14 @@ function install_packages() {
         install_macos_packages
     elif [ "$DEBIAN_BASED" = true ]; then
         install_debian_packages
-    else
+    elif [ "$CENTOS" = true ]; then
         install_centos_packages
     fi
     # Install antigen
     curl -L git.io/antigen > ~/antigen.zsh
     # Install vim-plug
-    curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     # Install chroma. Go should be installed by now
     if ! command_exists chroma; then
         go get -u github.com/alecthomas/chroma/cmd/chroma
@@ -117,15 +120,13 @@ function install_npm_packages() {
     fi
 }
 
-function install_centos_packages() {
-    echo "install centos packages"
-}
-
 function setup_machine() {
     if [ "$MACOS" = true ]; then
         setup_macos
     elif [ "$DEBIAN_BASED" = true ]; then
         setup_debian
+    elif [ "$CENTOS" = true ]; then
+        setup_centos
     fi
 }
 

@@ -2,7 +2,7 @@
 
 function add_eternal_terminal_repo() {
     if [ "$DEBIAN" = true ]; then
-        local et_keyring et_sources_list
+        local et_keyring et_sources_list config_line
         et_keyring="/usr/share/keyrings/et-archive-keyring.gpg"
         et_sources_list="/etc/apt/sources.list.d/et.list"
         if [ ! -f "${et_keyring}" ]; then
@@ -10,8 +10,11 @@ function add_eternal_terminal_repo() {
             | gpg --dearmor | sudo tee "${et_keyring}" > /dev/null
         fi
         if [ ! -f "${et_sources_list}" ]; then
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=${et_keyring}] https://github.com/MisterTea/debian-et/raw/master/debian-source/ buster main" \
-            | sudo tee "${et_sources_list}" > /dev/null
+            config_line="deb [arch=$(dpkg --print-architecture) "
+            config_line+="signed-by=${et_keyring}] "
+            config_line+="https://github.com/MisterTea/debian-et/raw/master/debian-source/ "
+            config_line+="buster main"
+            echo "${config_line}" | sudo tee "${et_sources_list}" > /dev/null
         fi
     elif [ "$UBUNTU" = true ]; then
         sudo add-apt-repository ppa:jgmath2000/et -y -n
@@ -28,6 +31,7 @@ function install_debian_packages() {
         gnupg
         golang
         htop
+        ncat
         neovim
         npm
         pinentry-tty
