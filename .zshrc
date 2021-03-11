@@ -72,6 +72,7 @@ alias mosh="mosh -6"
 alias please='sudo $(fc -ln -1)'
 alias runp="lsof -i"
 alias sl="subl"
+alias sudo="sudo " # hack to make these aliases available for sudo
 alias usage="du -h -d1 | sort -h"
 alias vim="nvim"
 
