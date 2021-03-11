@@ -2,12 +2,13 @@ let s:xsmall_window_width = 60
 let s:small_window_width = 90
 let s:symbols = {
 \   'branch': "\uf126",
-\   'readonly': "\uf023",
-\   'zoom': "\uf848",
-\   'modified': '•',
 \   'menu': "\uf85b",
+\   'modified': '•',
+\   'readonly': "\uf023",
 \   'separator': {'left': "\ue0b0", 'right': "\ue0b2"},
 \   'subseparator': {'left': "\ue0b1", 'right': "\ue0b3"},
+\   'user': "\uf007",
+\   'zoom': "\uf848",
 \ }
 let s:short_modes = {
 \   'NORMAL':   'N',
@@ -25,7 +26,7 @@ let s:empty_file_name = '[No Name]'
 let g:lightline = {}
 let g:lightline.colorscheme = 'srcery'
 let g:lightline.active =  {
-\   'left': [['mode', 'paste'],
+\   'left': [['is_root', 'mode', 'paste'],
 \            ['zoom', 'filename']],
 \   'right': [['trailing', 'lineinfo'],
 \             ['percent'],
@@ -44,9 +45,11 @@ let g:lightline.component_function = {
 \   'percent':      'LightlinePercent',
 \ }
 let g:lightline.component_expand = {
-\   'trailing': 'LightlineTrailing',
+\   'is_root':      'LightlineIsRoot',
+\   'trailing':     'LightlineTrailing',
 \ }
 let g:lightline.component_type = {
+\   'is_root': 'error',
 \   'trailing': 'error',
 \ }
 let g:lightline.tabline = {
@@ -66,6 +69,11 @@ let g:lightline.separator = s:symbols.separator
 let g:lightline.subseparator = s:symbols.subseparator
 " lightline-trailing-whitespace
 let g:lightline#trailing_whitespace#indicator = '•'
+
+function! LightlineIsRoot()
+  if $USER !=# 'root' | return '' | endif
+  return s:symbols.user . " root"
+endfunction
 
 function! LightlineModeStatus()
   if &filetype ==# 'minimap'
