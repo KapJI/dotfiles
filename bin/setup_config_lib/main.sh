@@ -157,7 +157,9 @@ function set_zsh_shell() {
 
 function complete_update() {
     nvim +PlugUpgrade +PlugUpdate +qall
-    tmux source-file ~/.tmux.conf
+    if command_exists tmux; then
+        tmux source-file ~/.tmux.conf
+    fi
     # Nothing will run after this
     exec zsh
 }
