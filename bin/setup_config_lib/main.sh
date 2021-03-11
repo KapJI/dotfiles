@@ -93,17 +93,26 @@ function install_packages() {
 }
 
 function install_python_packages() {
-    local pipx_packages
+    local pipx_packages pipx_path
     pipx_packages=(
         poetry
         pre-commit
         thefuck
     )
+    if command_exists pipx; then
+        pipx_path="pipx"
+    else
+        if [ "$MACOS" = true ]; then
+            pipx_path="~/Library/Python/3.9/bin/pipx"
+        else
+            pipx_path="~/.local/bin/pipx"
+        fi
+    fi
     for package in "${pipx_packages[@]}"; do
         if ! command_exists "$package"; then
-            ~/.local/bin/pipx install "$package"
+            ${pipx_path} install "$package"
         else
-            ~/.local/bin/pipx upgrade "$package"
+            ${pipx_path} upgrade "$package"
         fi
     done
 }
