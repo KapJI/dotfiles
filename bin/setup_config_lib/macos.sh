@@ -18,8 +18,8 @@ function install_macos_packages() {
         fpp
         fzf
         git
+        gnupg
         go
-        gpg2
         graphviz
         htop
         jq
