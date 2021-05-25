@@ -62,6 +62,7 @@ function install_macos_packages() {
         sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/sbin
         HOMEBREW_NO_AUTO_UPDATE=1 brew install "${package}"
     done
+    sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/sbin
     if [ ${#upgrade_packages[@]} -gt 0 ]; then
         HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade "${upgrade_packages[@]}"
     fi
