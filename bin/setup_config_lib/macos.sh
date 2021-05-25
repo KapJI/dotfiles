@@ -6,6 +6,8 @@ function install_macos_packages() {
         brew_url="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
         /bin/bash -c "$(curl -fsSL ${brew_url})"
     fi
+    # Make sure CLI tools are installed.
+    xcode-select --install 2>/dev/null || true
     # This output is very noisy
     set +x
     brew_packages=(
