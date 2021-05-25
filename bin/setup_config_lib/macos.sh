@@ -58,10 +58,10 @@ function install_macos_packages() {
     done
     # Enable verbose mode back
     set -x
-    sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/sbin
-    if [ ${#install_packages[@]} -gt 0 ]; then
-        HOMEBREW_NO_AUTO_UPDATE=1 brew install "${install_packages[@]}"
-    fi
+    for package in "${install_packages[@]}"; do
+        sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/sbin
+        HOMEBREW_NO_AUTO_UPDATE=1 brew install "${package}"
+    done
     if [ ${#upgrade_packages[@]} -gt 0 ]; then
         HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade "${upgrade_packages[@]}"
     fi
