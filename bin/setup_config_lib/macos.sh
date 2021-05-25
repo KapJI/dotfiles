@@ -7,7 +7,10 @@ function install_macos_packages() {
         /bin/bash -c "$(curl -fsSL ${brew_url})"
     fi
     # Make sure CLI tools are installed.
-    xcode-select --install 2>/dev/null || true
+    while xcode-select --install 2>/dev/null; do
+        echo "Waiting before Apple CLI tools are installed..."
+        sleep 10
+    done
     # This output is very noisy
     set +x
     brew_packages=(
