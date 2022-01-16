@@ -24,7 +24,6 @@ function add_eternal_terminal_repo() {
 function install_debian_packages() {
     local apt_packages
     apt_packages=(
-        et
         fasd
         fd-find
         fzf
@@ -44,7 +43,10 @@ function install_debian_packages() {
         tmux
         zsh
     )
-    add_eternal_terminal_repo
+    if [ "$RASPBERRY_PI" != true ]; then
+        apt_packages+=(et)
+        add_eternal_terminal_repo
+    fi
     sudo apt update
     sudo apt install -y "${apt_packages[@]}"
     python3 -m pip install --user pipx

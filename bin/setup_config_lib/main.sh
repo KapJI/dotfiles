@@ -27,6 +27,9 @@ function detect_os() {
                 debian)
                     DEBIAN_BASED=true
                     DEBIAN=true
+                    if grep Raspberry /proc/cpuinfo; then
+                        RASPBERRY_PI=true
+                    fi
                     ;;
                 ubuntu)
                     DEBIAN_BASED=true
