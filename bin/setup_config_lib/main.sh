@@ -106,9 +106,9 @@ function install_python_packages() {
         pipx_path="pipx"
     else
         if [ "$MACOS" = true ]; then
-            pipx_path="~/Library/Python/3.9/bin/pipx"
+            pipx_path="$HOME/Library/Python/3.9/bin/pipx"
         else
-            pipx_path="~/.local/bin/pipx"
+            pipx_path="$HOME/.local/bin/pipx"
         fi
     fi
     for package in "${pipx_packages[@]}"; do
