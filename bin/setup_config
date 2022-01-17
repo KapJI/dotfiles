@@ -59,6 +59,5 @@ case $COMMAND in
         ;;
     *)
         error "Unknown command: $COMMAND"
-        usage
         ;;
 esac
