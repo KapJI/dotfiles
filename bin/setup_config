@@ -57,4 +57,8 @@ case $COMMAND in
     -h|--help)
         usage
         ;;
+    *)
+        error "Unknown command: $COMMAND"
+        usage
+        ;;
 esac
