@@ -1,7 +1,7 @@
 call plug#begin("~/.vim/plugged")
   Plug 'srcery-colors/srcery-vim'
   " {{ Fern plugins
-  Plug 'lambdalisue/fern.vim'
+  Plug 'lambdalisue/fern.vim', { 'branch': 'main' }
   Plug 'lambdalisue/fern-renderer-nerdfont.vim'
   Plug 'lambdalisue/fern-git-status.vim'
   Plug 'lambdalisue/fern-hijack.vim'
