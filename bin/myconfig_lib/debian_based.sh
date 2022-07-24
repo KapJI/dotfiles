@@ -21,6 +21,19 @@ function add_eternal_terminal_repo() {
     fi
 }
 
+function install_nvm() {
+    # Can be left by npm installed from apt.
+    rm -f "$HOME/.npmrc"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    if ! command_exists nvm; then
+        set +x
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+        set -x
+    fi
+}
+
 function install_debian_packages() {
     local apt_packages
     apt_packages=(
@@ -52,11 +65,7 @@ function install_debian_packages() {
     # Cargo needs to be installed before this
     cargo install lsd
     cargo install broot
-    if ! command_exists nvm; then
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
-        export NVM_DIR="$HOME/.nvm"
-        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-    fi
+    install_nvm
 }
 
 function setup_debian() {
