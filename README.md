@@ -7,5 +7,5 @@ curl -sSf https://raw.githubusercontent.com/KapJI/dotfiles/main/bin/install_conf
 ```
 ## Upgrade configuration on current host
 ```
-setup_config upgrade
+myconfig upgrade
 ```
