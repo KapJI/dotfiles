@@ -133,7 +133,11 @@ function install_npm_packages() {
     npm_prefix="$HOME/.npm"
     # Upgrade npm if it's failing
     if [ "$DEBIAN_BASED" = true ]; then
-        npm -v || nvm install stable
+        if ! npm -v; then
+            set +x
+            nvm install stable
+            set -x
+        fi
     fi
     npm config set prefix "${npm_prefix}"
     if [ ! -d "${npm_prefix}/lib" ]; then
