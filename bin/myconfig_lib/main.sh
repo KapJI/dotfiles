@@ -164,7 +164,8 @@ function set_zsh_shell() {
         fi
     else
         current_shell="$(readlink -f $SHELL)"
-        if [ "$current_shell" != "$zsh_path" ]; then
+        new_shell="$(readlink -f $zsh_path)"
+        if [ "$current_shell" != "$new_shell" ]; then
             chsh -s "$zsh_path"
         fi
     fi
