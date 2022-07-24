@@ -32,7 +32,6 @@ function install_debian_packages() {
         htop
         ncat
         neovim
-        npm
         pinentry-tty
         python3
         python3-dev
