@@ -59,6 +59,6 @@ function install_debian_packages() {
 
 function setup_debian() {
     # Create symlinks
-    sudo ln -sfn $(which fdfind) /usr/local/bin/fd
+    sudo ln -sfn $(command -v fdfind) /usr/local/bin/fd
     sudo ln -sfn /usr/bin/pinentry-tty /usr/local/bin/pinentry-current
 }

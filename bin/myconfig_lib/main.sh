@@ -156,7 +156,7 @@ function setup_machine() {
 
 function set_zsh_shell() {
     local zsh_path current_shell
-    zsh_path="$(which zsh)"
+    zsh_path="$(command -v zsh)"
     if [ "$MACOS" = true ]; then
         current_shell="$(dscl . -read /Users/$USER UserShell | awk  '{print $2}')"
         if [ "$current_shell" != "$zsh_path" ]; then
