@@ -92,6 +92,13 @@ function install_packages() {
     install_npm_packages
 }
 
+
+function cleanup_pipx() {
+    # When Python is upgraded pipx may start to fail:
+    # https://github.com/pypa/pipx/issues/278
+    rm -rf "$HOME/.local/pipx/shared"
+}
+
 function install_python_packages() {
     local pipx_packages pipx_path
     pipx_packages=(
@@ -113,10 +120,11 @@ function install_python_packages() {
     fi
     for package in "${pipx_packages[@]}"; do
         if ! command_exists "$package"; then
-            ${pipx_path} install "$package"
+            ${pipx_path} install "$package" || (cleanup_pipx && ${pipx_path} reinstall-all && ${pipx_path} install "$package")
         else
-            ${pipx_path} upgrade "$package"
+            ${pipx_path} upgrade "$package" || (cleanup_pipx && ${pipx_path} reinstall-all)
         fi
+
     done
 }
 
