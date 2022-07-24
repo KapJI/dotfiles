@@ -130,18 +130,21 @@ function install_python_packages() {
 
 function install_npm_packages() {
     local npm_prefix
-    npm_prefix="$HOME/.npm"
     # Upgrade npm if it's failing
     if [ "$DEBIAN_BASED" = true ]; then
         if ! npm -v; then
             set +x
+            echo "nvm install stable"
             nvm install stable
             set -x
         fi
     fi
-    npm config set prefix "${npm_prefix}"
-    if [ ! -d "${npm_prefix}/lib" ]; then
-        mkdir -p "${npm_prefix}/lib"
+    if [ "$MACOS" = true ]; then
+        npm_prefix="$HOME/.npm"
+        npm config set prefix "${npm_prefix}"
+        if [ ! -d "${npm_prefix}/lib" ]; then
+            mkdir -p "${npm_prefix}/lib"
+        fi
     fi
     if ! npm list --global "git-branch-select"; then
         npm install --global "git-branch-select"
