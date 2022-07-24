@@ -107,6 +107,9 @@ function install_python_packages() {
         else
             pipx_path="$HOME/.local/bin/pipx"
         fi
+        if [ ! -f "$pipx_path" ]; then
+            error "Can't find pipx"
+        fi
     fi
     for package in "${pipx_packages[@]}"; do
         if ! command_exists "$package"; then
