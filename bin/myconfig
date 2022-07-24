@@ -5,11 +5,27 @@ set -e
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+function check_sudo() {
+    if [[ $EUID -eq 0 ]]; then
+        error "Run as normal user"
+    fi
+    echo "Need sudo to run some commands as root:"
+    sudo -v
+}
+
 function config_init() {
+    [ -d "$HOME/.dotfiles" ] && error "Repo .dotfiles already exists"
+    check_sudo
+    set -x
+    git clone --bare https://github.com/KapJI/dotfiles.git $HOME/.dotfiles
+    git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME config --local status.showUntrackedFiles no
+    git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME checkout
+    set +x
     run_setup
 }
 
 function config_upgrade() {
+    check_sudo
     # Fetch current version of configs
     if git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME diff --quiet; then
         git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME pull
@@ -23,7 +39,7 @@ function run_setup() {
     local current_dir
     current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
     # Now we can run updated version after 'git pull'
-    source "${current_dir}/setup_config_lib/main.sh"
+    source "${current_dir}/myconfig_lib/main.sh"
     setup_main
 }
 

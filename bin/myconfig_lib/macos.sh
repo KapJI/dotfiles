@@ -77,8 +77,8 @@ function setup_macos() {
         sudo chmod -w /etc/pam.d/sudo
     fi
     # Protect secret directories
-    chmod -R 700 ~/.ssh
-    chmod -R 700 ~/.gnupg
+    chmod -R 700 $HOME/.ssh
+    chmod -R 700 $HOME/.gnupg
     # Create symlink to pinentry-mac
     sudo ln -sfn /usr/local/bin/pinentry-mac /usr/local/bin/pinentry-current
 }
