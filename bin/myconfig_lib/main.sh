@@ -131,6 +131,10 @@ function install_python_packages() {
 function install_npm_packages() {
     local npm_prefix
     npm_prefix="$HOME/.npm"
+    # Upgrade npm if it's failing
+    if [ "$DEBIAN_BASED" = true ]; then
+        npm -v || nvm install stable
+    fi
     npm config set prefix "${npm_prefix}"
     if [ ! -d "${npm_prefix}/lib" ]; then
         mkdir -p "${npm_prefix}/lib"
