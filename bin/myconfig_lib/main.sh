@@ -2,9 +2,6 @@
 
 function setup_main() {
     set -x
-    # Request sudo in the beginning
-    sudo true
-
     detect_os
     import_scripts
     install_packages
@@ -77,18 +74,18 @@ function install_packages() {
         install_centos_packages
     fi
     # Install antigen
-    curl -L git.io/antigen > ~/antigen.zsh
+    curl -L git.io/antigen > $HOME/antigen.zsh
     # Install vim-plug
-    curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+    curl -fLo $HOME/.local/share/nvim/site/autoload/plug.vim --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     # Install chroma. Go should be installed by now
     if ! command_exists chroma; then
         go get -u github.com/alecthomas/chroma/cmd/chroma
     fi
     # Configure broot
-    if [ ! -f "${HOME}/.config/broot/launcher/bash/br" ]; then
-        mkdir -p ${HOME}/.config/broot/launcher/bash
-        broot --print-shell-function zsh > ${HOME}/.config/broot/launcher/bash/br
+    if [ ! -f "$HOME/.config/broot/launcher/bash/br" ]; then
+        mkdir -p $HOME/.config/broot/launcher/bash
+        broot --print-shell-function zsh > $HOME/.config/broot/launcher/bash/br
         broot --set-install-state installed
     fi
     install_python_packages
@@ -148,7 +145,7 @@ function set_zsh_shell() {
     if [ "$MACOS" = true ]; then
         current_shell="$(dscl . -read /Users/$USER UserShell | awk  '{print $2}')"
         if [ "$current_shell" != "$zsh_path" ]; then
-            sudo dscl . -create /Users/$USER UserShell /usr/local/bin/zsh
+            sudo dscl . -create "/Users/$USER" UserShell "$zsh_path"
         fi
     else
         current_shell="$(readlink -f $SHELL)"
@@ -161,7 +158,7 @@ function set_zsh_shell() {
 function complete_update() {
     nvim +PlugUpgrade +PlugUpdate +qall
     if command_exists tmux; then
-        tmux source-file ~/.tmux.conf
+        tmux source-file $HOME/.tmux.conf
     fi
     # Nothing will run after this
     exec zsh

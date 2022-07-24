@@ -3,7 +3,7 @@ My collection of dotfiles. Feel free to use if you find something interesting he
 
 ## Setup
 ```
-curl -sSf https://raw.githubusercontent.com/KapJI/dotfiles/main/bin/install_config | bash
+curl -sSf https://raw.githubusercontent.com/KapJI/dotfiles/main/bin/myconfig | bash -s -- init
 ```
 ## Upgrade configuration on current host
 ```
