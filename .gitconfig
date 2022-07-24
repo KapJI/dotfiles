@@ -20,3 +20,5 @@
     gpgsign = true
 [tag]
     forceSignAnnotated = true
+[include]
+    path = ~/.gitconfig.local
