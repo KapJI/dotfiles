@@ -52,6 +52,9 @@ function install_debian_packages() {
     # Cargo needs to be installed before this
     cargo install lsd
     cargo install broot
+    if ! command_exists nvm; then
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
+    fi
 }
 
 function setup_debian() {
