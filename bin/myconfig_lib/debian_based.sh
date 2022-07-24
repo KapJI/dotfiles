@@ -54,6 +54,8 @@ function install_debian_packages() {
     cargo install broot
     if ! command_exists nvm; then
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
     fi
 }
 
