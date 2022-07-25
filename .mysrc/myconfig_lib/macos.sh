@@ -66,6 +66,17 @@ function install_macos_packages() {
     if [ ${#upgrade_packages[@]} -gt 0 ]; then
         HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade "${upgrade_packages[@]}"
     fi
+    install_copy_tool
+}
+
+function install_copy_tool() {
+    if ! $HOME/bin/copy > /dev/null; then
+        pushd "$HOME/.mysrc/copy"
+        make clean
+        make
+        make install
+        popd
+    fi
 }
 
 function setup_macos() {
