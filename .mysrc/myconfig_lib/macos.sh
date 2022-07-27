@@ -49,6 +49,7 @@ function install_macos_packages() {
     done))
     # Filter installed packages
     local install_packages=()
+    local package
     for package in "${brew_packages[@]}"; do
         local short_package="$(echo $package | awk -F '/' '{print $NF}')"
         if [[ ! " ${upgrade_packages[@]} " =~ " ${short_package} " ]]; then
