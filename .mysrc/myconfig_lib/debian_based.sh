@@ -2,15 +2,14 @@
 
 function add_eternal_terminal_repo() {
     if [ "$DEBIAN" = true ]; then
-        local et_keyring et_sources_list config_line
-        et_keyring="/usr/share/keyrings/et-archive-keyring.gpg"
-        et_sources_list="/etc/apt/sources.list.d/et.list"
+        local et_keyring="/usr/share/keyrings/et-archive-keyring.gpg"
+        local et_sources_list="/etc/apt/sources.list.d/et.list"
         if [ ! -f "${et_keyring}" ]; then
             curl -sSL https://github.com/MisterTea/debian-et/raw/master/et.gpg \
             | gpg --dearmor | sudo tee "${et_keyring}" > /dev/null
         fi
         if [ ! -f "${et_sources_list}" ]; then
-            config_line="deb [arch=$(dpkg --print-architecture) "
+            local config_line="deb [arch=$(dpkg --print-architecture) "
             config_line+="signed-by=${et_keyring}] "
             config_line+="https://github.com/MisterTea/debian-et/raw/master/debian-source/ "
             config_line+="buster main"
@@ -36,8 +35,7 @@ function install_nvm() {
 }
 
 function install_debian_packages() {
-    local apt_packages
-    apt_packages=(
+    local apt_packages=(
         fasd
         fd-find
         fzf

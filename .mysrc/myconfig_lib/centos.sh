@@ -1,8 +1,7 @@
 #!/bin/bash
 
 function install_centos_packages() {
-    local dnf_packages
-    dnf_packages=(
+    local dnf_packages=(
         htop
         ripgrep
     )

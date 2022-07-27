@@ -45,8 +45,7 @@ function detect_os() {
 }
 
 function import_scripts() {
-    local current_dir
-    current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+    local current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
     if [ "$MACOS" = true ]; then
         source "${current_dir}/macos.sh"
     elif [ "$DEBIAN_BASED" = true ]; then
@@ -100,12 +99,12 @@ function cleanup_pipx() {
 }
 
 function install_python_packages() {
-    local pipx_packages pipx_path
-    pipx_packages=(
+    local pipx_packages=(
         poetry
         pre-commit
         thefuck
     )
+    local pipx_path
     if command_exists pipx; then
         pipx_path="pipx"
     else
@@ -129,7 +128,6 @@ function install_python_packages() {
 }
 
 function install_npm_packages() {
-    local npm_prefix
     # Upgrade npm if it's failing
     if [ "$DEBIAN_BASED" = true ]; then
         if ! npm -v; then
@@ -140,7 +138,7 @@ function install_npm_packages() {
         fi
     fi
     if [ "$MACOS" = true ]; then
-        npm_prefix="$HOME/.npm"
+        local npm_prefix="$HOME/.npm"
         npm config set prefix "${npm_prefix}"
         if [ ! -d "${npm_prefix}/lib" ]; then
             mkdir -p "${npm_prefix}/lib"
@@ -162,8 +160,8 @@ function setup_machine() {
 }
 
 function set_zsh_shell() {
-    local zsh_path current_shell
-    zsh_path="$(command -v zsh)"
+    local zsh_path="$(command -v zsh)"
+    local current_shell
     if [ "$MACOS" = true ]; then
         current_shell="$(dscl . -read /Users/$USER UserShell | awk  '{print $2}')"
         if [ "$current_shell" != "$zsh_path" ]; then
