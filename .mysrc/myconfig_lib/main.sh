@@ -117,6 +117,7 @@ function install_python_packages() {
             error "Can't find pipx"
         fi
     fi
+    local package
     for package in "${pipx_packages[@]}"; do
         if ! command_exists "$package"; then
             ${pipx_path} install "$package" || (cleanup_pipx && ${pipx_path} reinstall-all && ${pipx_path} install "$package")
