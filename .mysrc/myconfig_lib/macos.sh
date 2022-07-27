@@ -1,9 +1,8 @@
 #!/bin/bash
 
 function install_macos_packages() {
-    local brew_packages upgrade_packages install_packages short_package
     if ! command_exists brew; then
-        brew_url="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
+        local brew_url="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
         /bin/bash -c "$(curl -fsSL ${brew_url})"
     fi
     # Make sure CLI tools are installed.
@@ -13,7 +12,7 @@ function install_macos_packages() {
     done
     # This output is very noisy
     set +x
-    brew_packages=(
+    local brew_packages=(
         ant
         broot
         cmake
@@ -43,15 +42,15 @@ function install_macos_packages() {
     )
     brew update
     # Find already installed packages
-    upgrade_packages=($(brew ls --versions "${brew_packages[@]}" |
+    local upgrade_packages=($(brew ls --versions "${brew_packages[@]}" |
     while read -r line; do
         package=$(echo $line | awk '{print $1;}')
         echo "$package"
     done))
     # Filter installed packages
-    install_packages=()
+    local install_packages=()
     for package in "${brew_packages[@]}"; do
-        short_package="$(echo $package | awk -F '/' '{print $NF}')"
+        local short_package="$(echo $package | awk -F '/' '{print $NF}')"
         if [[ ! " ${upgrade_packages[@]} " =~ " ${short_package} " ]]; then
             install_packages+=($package)
         fi
