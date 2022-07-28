@@ -87,7 +87,7 @@ function iterm_get() {
 function install_iterm_font() {
     local font_base_url="https://github.com/romkatv/powerlevel10k-media/raw/master"
     if [ "$TERM_PROGRAM" != "iTerm.app" ]; then
-        return
+        return 0
     fi
     [ -x "/usr/libexec/PlistBuddy" ]
     [ -x "/usr/bin/plutil" ]
@@ -99,7 +99,7 @@ function install_iterm_font() {
     local guid2="$(iterm_get '"New Bookmarks":0:"Guid"' 2>/dev/null)"
     local font="$(iterm_get '"New Bookmarks":0:"Normal Font"' 2>/dev/null)"
     [ "$guid1" = "$guid2" ]
-    [[ $font != "MesloLGS-NF-Regular "* ]] || return
+    [[ $font != "MesloLGS-NF-Regular "* ]] || return 0
     # Download fonts
     command mkdir -p "$HOME/Library/Fonts"
     local style
