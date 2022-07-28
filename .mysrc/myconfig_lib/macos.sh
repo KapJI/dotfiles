@@ -66,8 +66,15 @@ function install_macos_packages() {
     if [ ${#upgrade_packages[@]} -gt 0 ]; then
         HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade "${upgrade_packages[@]}"
     fi
+    install_subl_symlink
     install_copy_tool
     install_iterm_font
+}
+
+function install_subl_symlink() {
+    if [ ! -L /usr/local/bin/subl ]; then
+        ln -s "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" /usr/local/bin/subl
+    fi
 }
 
 function install_copy_tool() {
