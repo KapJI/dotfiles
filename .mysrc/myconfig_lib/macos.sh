@@ -130,6 +130,7 @@ function install_iterm_font() {
         '"Ambiguous Double Width"',bool,0
         '"Draw Powerline Glyphs"',bool,1
         '"Only The Default BG Color Uses Transparency"',bool,1
+        '"Show Mark Indicators"',bool,0
     )
     for row in "${settings[@]}"; do
         local oldIFS="$IFS"
