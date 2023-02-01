@@ -23,3 +23,5 @@
     forceSignAnnotated = true
 [include]
     path = ~/.gitconfig.local
+[init]
+	defaultBranch = main
