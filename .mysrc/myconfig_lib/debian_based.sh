@@ -45,6 +45,7 @@ function install_debian_packages() {
         ncat
         neovim
         pinentry-tty
+        pipx
         python3
         python3-dev
         python3-pip
@@ -60,7 +61,6 @@ function install_debian_packages() {
     fi
     sudo apt update
     sudo apt install -y "${apt_packages[@]}"
-    python3 -m pip install --user pipx
     # Cargo needs to be installed before this
     cargo install lsd
     cargo install broot
