@@ -28,7 +28,7 @@ function detect_os() {
                         RASPBERRY_PI=true
                     fi
                     ;;
-                ubuntu)
+                ubuntu|pop)
                     DEBIAN_BASED=true
                     UBUNTU=true
                     ;;
