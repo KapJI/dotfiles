@@ -8,7 +8,7 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
             centos)
                 CENTOS=true
                 ;;
-            debian|ubuntu)
+            debian|ubuntu|pop)
                 DEBIAN_BASED=true
                 ;;
             *)
