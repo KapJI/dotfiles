@@ -158,5 +158,8 @@ function setup_macos() {
     chmod -R 700 $HOME/.ssh
     chmod -R 700 $HOME/.gnupg
     # Create symlink to pinentry-mac
-    sudo ln -sfn /usr/local/bin/pinentry-mac /usr/local/bin/pinentry-current
+    if ! command_exists pinentry-mac; then
+        error "pinentry-mac must be installed by now!"
+    fis
+    sudo ln -sfn $(command -v pinentry-mac) /usr/local/bin/pinentry-current
 }
