@@ -159,8 +159,40 @@ function setup_machine() {
     elif [ "$CENTOS" = true ]; then
         setup_centos
     fi
+    import_gpg_key
     # Create missing folder for Rust completions.
     mkdir -p $HOME/.antigen/bundles/robbyrussell/oh-my-zsh/cache/completions
+}
+
+function import_gpg_key() {
+    local key_id="1F05A1BBC662FAC6"
+    if ! gpg --list-keys "$key_id" > /dev/null; then
+        echo ""
+        echo "    ##########################"
+        echo "    # GPG KEY NOT INSTALLED! #"
+        echo "    # COPY IT FROM 1PASSWORD #"
+        echo "    # TO ~/gpg.key           #"
+        echo "    ##########################"
+        echo ""
+        while true; do
+            read -p "Are you ready to proceed? [y/n] " yn
+            case $yn in
+                [Yy]* ) ;;
+                [Nn]* ) echo "Skipping..."; return;;
+                * ) echo "Please answer yes or no.";;
+            esac
+            [ -f "$HOME/gpg.key" ] && break
+            echo "File ~/gpg.key does not exist"
+        done
+        gpg --import "$HOME/gpg.key"
+        echo ""
+        echo "    ######################"
+        echo "    # DO NOT FORGET TO   #"
+        echo "    # REMOVE ~/gpg.key   #"
+        echo "    ######################"
+        echo ""
+        sleep 3
+    fi
 }
 
 function set_zsh_shell() {
