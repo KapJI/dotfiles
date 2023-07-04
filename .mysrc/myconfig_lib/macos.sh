@@ -159,6 +159,6 @@ function setup_macos() {
     # Create symlink to pinentry-mac
     if ! command_exists pinentry-mac; then
         error "pinentry-mac must be installed by now!"
-    fis
+    fi
     sudo ln -sfn $(command -v pinentry-mac) /usr/local/bin/pinentry-current
 }
