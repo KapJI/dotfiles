@@ -159,6 +159,8 @@ function setup_machine() {
     elif [ "$CENTOS" = true ]; then
         setup_centos
     fi
+    # Create missing folder for Rust completions.
+    mkdir -p $HOME/.antigen/bundles/robbyrussell/oh-my-zsh/cache/completions
 }
 
 function set_zsh_shell() {
