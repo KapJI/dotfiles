@@ -172,8 +172,10 @@ fi
 # Enhacd configuration
 ENHANCD_FILTER=fzf
 unalias "..."
-ENHANCD_DOT_ARG="..."
-ENHANCD_DISABLE_HOME=1
+ENHANCD_DOT_ARG="..." # Old version
+ENHANCD_ARG_DOUBLE_DOT="..." # New version
+ENHANCD_DISABLE_HOME=1 # Old version
+ENHANCD_ENABLE_HOME=false # New version
 
 # you-should-use
 YSU_MESSAGE_POSITION="after"
