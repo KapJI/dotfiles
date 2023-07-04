@@ -17,7 +17,6 @@ function install_macos_packages() {
         broot
         cmake
         dos2unix
-        fasd
         fd
         fpp
         fzf
