@@ -79,6 +79,7 @@ function install_packages() {
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     # Install chroma. Go should be installed by now
     if ! command_exists chroma; then
+        go env -w GO111MODULE=off
         go get -u github.com/alecthomas/chroma/cmd/chroma
     fi
     # Configure broot
