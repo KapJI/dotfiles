@@ -167,6 +167,7 @@ function setup_machine() {
 function import_gpg_key() {
     local key_id="1F05A1BBC662FAC6"
     if ! gpg --list-keys "$key_id" > /dev/null; then
+        set +x
         echo ""
         echo "    ##########################"
         echo "    # GPG KEY NOT INSTALLED! #"
@@ -191,6 +192,7 @@ function import_gpg_key() {
         echo "    # REMOVE ~/gpg.key   #"
         echo "    ######################"
         echo ""
+        set -x
         sleep 3
     fi
 }
