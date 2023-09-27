@@ -33,6 +33,7 @@ export GOPATH=$(go env GOPATH)
 # Should come before running tmux
 _EXTRA_PATH="$GOPATH/bin:$HOME/bin:$HOME/.local/bin"
 _EXTRA_PATH="$_EXTRA_PATH:/usr/local/bin:$HOME/.npm/bin:$HOME/.iterm2"
+_EXTRA_PATH="$_EXTRA_PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin"
 if [ "$MACOS" = true ]; then
     _EXTRA_PATH="$HOME/Library/Python/3.9/bin:$_EXTRA_PATH"
 fi
@@ -58,9 +59,6 @@ export GPG_TTY="$CURRENT_TTY"
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
-
-# Define config folder
-export ZDOTDIR=~/.config/zsh
 
 # Download plugin manager if we don't have it
 if ! [[ -e $ZDOTDIR/antidote ]]
@@ -248,19 +246,6 @@ if [ "$MACOS" = true ]; then
     export ANDROID_HOME=${ANDROID_SDK}
     export PATH=${PATH}:${ANDROID_SDK}/emulator:${ANDROID_SDK}/tools:${ANDROID_SDK}/tools/bin:${ANDROID_SDK}/platform-tools
 fi
-
-### Added by Zinit's installer
-# source "$HOME/.zinit/bin/zinit.zsh"
-# autoload -Uz _zinit
-# (( ${+_comps} )) && _comps[zinit]=_zinit
-
-# # Load a few important annexes, without Turbo
-# # (this is currently required for annexes)
-# zinit light-mode for \
-#     zinit-zsh/z-a-rust \
-#     zinit-zsh/z-a-as-monitor \
-#     zinit-zsh/z-a-patch-dl \
-#     zinit-zsh/z-a-bin-gem-node
 
 # This speeds up pasting w/ autosuggest
 # https://github.com/zsh-users/zsh-autosuggestions/issues/238
