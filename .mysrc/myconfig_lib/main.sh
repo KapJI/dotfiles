@@ -170,8 +170,8 @@ function setup_machine() {
     if [ -f "$HOME/.zshrc.zwc" ]; then
         rm -f "$HOME/.zshrc.zwc"
     fi
-    if [ -f "$HOME/.zsh_history" ]; then
-        mv "$HOME/.zsh_history" "$HOME/.config/zsh/"
+    if [ -f "$HOME/.zsh_history" ] && [ ! -f "$HOME/.config/zsh/.zsh_history" ]; then
+        mv "$HOME/.zsh_history" "$HOME/.config/zsh/.zsh_history"
     fi
     # Update antidote plugins
     if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
