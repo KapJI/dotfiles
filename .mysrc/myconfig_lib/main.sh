@@ -72,8 +72,6 @@ function install_packages() {
     elif [ "$CENTOS" = true ]; then
         install_centos_packages
     fi
-    # Install antigen
-    curl -L git.io/antigen > $HOME/antigen.zsh
     # Install vim-plug
     curl -fLo $HOME/.local/share/nvim/site/autoload/plug.vim --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -160,8 +158,9 @@ function setup_machine() {
         setup_centos
     fi
     import_gpg_key
-    # Create missing folder for Rust completions.
-    mkdir -p $HOME/.antigen/bundles/robbyrussell/oh-my-zsh/cache/completions
+    if [ -f "$HOME/antigen.zsh" ]; then
+        rm "$HOME/antigen.zsh"
+    fi
 }
 
 function import_gpg_key() {
