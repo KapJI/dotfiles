@@ -130,7 +130,7 @@ fi
 ZSH_COLORIZE_TOOL=chroma
 
 # History size
-HISTFILE="$ZDOTDIR/zsh/.zsh_history"
+HISTFILE="$ZDOTDIR/.zsh_history"
 HISTSIZE=100000
 SAVEHIST=100000
 
