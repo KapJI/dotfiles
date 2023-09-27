@@ -36,6 +36,7 @@ function install_nvm() {
 
 function install_debian_packages() {
     local apt_packages=(
+        build-essential
         fasd
         fd-find
         fzf
