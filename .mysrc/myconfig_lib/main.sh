@@ -160,9 +160,18 @@ function setup_machine() {
     import_gpg_key
     # Update nvim plugins
     nvim +PlugUpgrade +PlugUpdate +qall
-    # Remove legacy file
+    # Remove legacy files
     if [ -f "$HOME/antigen.zsh" ]; then
         rm "$HOME/antigen.zsh"
+    fi
+    if [ -f "$HOME/.zcompdump" ]; then
+        rm "$HOME/.zcompdump"
+    fi
+    if [ -f "$HOME/.zshrc.zwc" ]; then
+        rm -f "$HOME/.zshrc.zwc"
+    fi
+    if [ -f "$HOME/.zsh_history" ]; then
+        mv "$HOME/.zsh_history" "$HOME/.config/zsh/"
     fi
     # Update antidote plugins
     if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
