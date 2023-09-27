@@ -59,10 +59,37 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# Load Antigen (should come before aliases)
-source ~/antigen.zsh
-# Load Antigen configurations
-antigen init ~/.antigenrc
+# Define config folder
+export ZDOTDIR=~/.config/zsh
+
+# Download plugin manager if we don't have it
+if ! [[ -e $ZDOTDIR/antidote ]]
+then
+    git clone --depth=1 https://github.com/mattmc3/antidote.git ${ZDOTDIR:-~}/antidote
+fi
+
+# Make plugin folder names pretty
+zstyle ':antidote:bundle' use-friendly-names 'yes'
+
+# Source and load plugins found in ${ZDOTDIR}/.zsh_plugins.txt
+source $ZDOTDIR/antidote/antidote.zsh
+
+# Set oh-my-zsh variables
+ZSH=$(antidote path ohmyzsh/ohmyzsh)
+ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/oh-my-zsh"
+[[ -d "$ZSH_CACHE_DIR/completions" ]] || mkdir -p "$ZSH_CACHE_DIR/completions"
+
+# Enable custom completion
+fpath=("$ZSH_CACHE_DIR/completions" $fpath)
+fpath=("$HOME/.zsh_completion" $fpath)
+if [ "$MACOS" = true ]; then
+    _BUCK_COMPLETION_MODES="mac opt-mac macpy"
+else
+    _BUCK_COMPLETION_MODES="dev opt"
+fi
+
+# Load Antidote
+antidote load
 
 # Aliases
 alias dof="git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
@@ -163,14 +190,6 @@ _fzf_comprun() {
     esac
 }
 
-# Enable custom completion
-fpath=( ~/.zsh_completion "${fpath[@]}" )
-if [ "$MACOS" = true ]; then
-    _BUCK_COMPLETION_MODES="mac opt-mac macpy"
-else
-    _BUCK_COMPLETION_MODES="dev opt"
-fi
-
 # Enhacd configuration
 ENHANCD_FILTER=fzf
 
@@ -220,8 +239,6 @@ source ${HOME}/.config/broot/launcher/bash/br
 eval "$(fasd --init auto)"
 
 # pipx completions
-# Doesn't work because of antigen issue:
-# https://github.com/zsh-users/antigen/issues/603
 eval "$(register-python-argcomplete pipx)"
 
 # added by setup_fb4a.sh
@@ -266,3 +283,6 @@ __git_files () {
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Make sure there are no errors on shell load.
+true
