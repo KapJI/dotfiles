@@ -12,7 +12,7 @@ function add_eternal_terminal_repo() {
             local config_line="deb [arch=$(dpkg --print-architecture) "
             config_line+="signed-by=${et_keyring}] "
             config_line+="https://mistertea.github.io/debian-et/debian-source/ "
-            config_line+="bullseye main"
+            config_line+="$(lsb_release --codename --short) main"
             echo "${config_line}" | sudo tee "${et_sources_list}" > /dev/null
         fi
     elif [ "$UBUNTU" = true ]; then
