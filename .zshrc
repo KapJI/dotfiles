@@ -173,7 +173,11 @@ fi
 
 # Enhacd configuration
 ENHANCD_FILTER=fzf
-unalias "..."
+
+case $(type "...") in
+    (*alias*) unalias "...";;
+esac
+
 ENHANCD_DOT_ARG="..." # Old version
 ENHANCD_ARG_DOUBLE_DOT="..." # New version
 ENHANCD_DISABLE_HOME=1 # Old version
