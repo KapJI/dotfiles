@@ -158,8 +158,15 @@ function setup_machine() {
         setup_centos
     fi
     import_gpg_key
+    # Update nvim plugins
+    nvim +PlugUpgrade +PlugUpdate +qall
+    # Remove legacy file
     if [ -f "$HOME/antigen.zsh" ]; then
         rm "$HOME/antigen.zsh"
+    fi
+    # Update antidote plugins
+    if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
+        zsh -c 'source ~/.config/zsh/antidote/antidote.zsh; antidote update'
     fi
 }
 
@@ -214,7 +221,6 @@ function set_zsh_shell() {
 }
 
 function complete_update() {
-    nvim +PlugUpgrade +PlugUpdate +qall
     if command_exists tmux; then
         tmux source-file $HOME/.tmux.conf
     fi
