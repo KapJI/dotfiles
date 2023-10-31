@@ -37,6 +37,9 @@ _EXTRA_PATH="$_EXTRA_PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules
 if [ "$MACOS" = true ]; then
     _EXTRA_PATH="$HOME/Library/Python/3.9/bin:$_EXTRA_PATH"
 fi
+if [ "$DEBIAN_BASED" = true ]; then
+    _EXTRA_PATH="/snap/bin:$_EXTRA_PATH"
+fi
 export PATH="$_EXTRA_PATH:$PATH"
 
 # Auto attach to tmux session
