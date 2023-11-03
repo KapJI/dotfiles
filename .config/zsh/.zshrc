@@ -261,6 +261,9 @@ pastefinish() {
 zstyle :bracketed-paste-magic paste-init pasteinit
 zstyle :bracketed-paste-magic paste-finish pastefinish
 
+# Disable hashing for list of executables
+zstyle ":completion:*:commands" rehash 1
+
 # Fixed slow git autocompletion.
 __git_files () {
     _wanted files expl 'local files' _files
