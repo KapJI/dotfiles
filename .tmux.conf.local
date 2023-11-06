@@ -348,6 +348,10 @@ unbind C-a
 #set -g status-position top
 
 # set SSH_AUTH_SOCK on session login
+set -g update-environment "DBUS_SESSION_BUS_ADDRESS DESKTOP_SESSION DISPLAY \
+GNOME_KEYRING_CONTROL GNOME_KEYRING_PID GPG_AGENT_INFO GPG_AGENT_INFO \
+ORIGCOLORTERM ORIGTERM SESSION_MANAGER SSH_AGENT_PID SSH_CONNECTION \
+WINDOWID XAUTHORITY XDG_SESSION_COOKIE XDG_SESSION_PATH" # removes SSH_AUTH_SOCK
 set-environment -g 'SSH_AUTH_SOCK' ~/.ssh/ssh_auth_sock
 
 # -- tpm -----------------------------------------------------------------------
