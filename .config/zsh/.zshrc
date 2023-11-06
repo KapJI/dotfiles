@@ -273,5 +273,11 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+# Load local zshrc if exists
+local_zshrc="${ZDOTDIR}/.zshrc.local"
+if [[ -f $local_zshrc ]]; then
+    source $local_zshrc
+fi
+
 # Make sure there are no errors on shell load.
 true
