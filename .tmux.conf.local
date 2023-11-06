@@ -347,6 +347,9 @@ unbind C-a
 # move status line to top
 #set -g status-position top
 
+# set SSH_AUTH_SOCK on session login
+set-environment -g 'SSH_AUTH_SOCK' ~/.ssh/ssh_auth_sock
+
 # -- tpm -----------------------------------------------------------------------
 
 # while I don't use tpm myself, many people requested official support so here
