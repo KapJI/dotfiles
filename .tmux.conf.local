@@ -354,9 +354,6 @@ ORIGCOLORTERM ORIGTERM SESSION_MANAGER SSH_AGENT_PID SSH_CONNECTION \
 WINDOWID XAUTHORITY XDG_SESSION_COOKIE XDG_SESSION_PATH" # removes SSH_AUTH_SOCK
 set-environment -g 'SSH_AUTH_SOCK' ~/.ssh/ssh_auth_sock
 
-# drop sudo before detach
-bind K run-shell "tmux send-keys 'sudo -k' C-m" \; detach
-
 # -- tpm -----------------------------------------------------------------------
 
 # while I don't use tpm myself, many people requested official support so here
