@@ -41,7 +41,7 @@ export PATH="$_EXTRA_PATH:$PATH"
 
 # Auto attach to tmux session
 # Should come before instant prompt
-if [ "$TERM" != "nuclide" ] && [ -t 0 ] && [ -z "$TMUX" ] && command -v tmux >/dev/null 2>&1; then
+if [ -t 0 ] && [ -z "$TMUX" ] && command -v tmux >/dev/null 2>&1; then
     if tmux has-session -t auto >/dev/null 2>&1; then
         exec tmux -2 attach -t auto
     else
