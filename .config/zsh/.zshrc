@@ -39,6 +39,12 @@ if [ "$MACOS" = true ]; then
 fi
 export PATH="$_EXTRA_PATH:$PATH"
 
+# Update symlink for all tmux tabs
+if [ -S "$SSH_AUTH_SOCK" ]; then
+    ln -sf $SSH_AUTH_SOCK ~/.ssh/ssh_auth_sock
+fi
+export SSH_AUTH_SOCK="$HOME/.ssh/ssh_auth_sock"
+
 # Auto attach to tmux session
 # Should come before instant prompt
 if [ -t 0 ] && [ -z "$TMUX" ] && command -v tmux >/dev/null 2>&1; then
