@@ -180,6 +180,9 @@ function setup_machine() {
 }
 
 function import_gpg_key() {
+    if [ "$MACOS" != true ]; then
+        return
+    fi
     local key_id="1F05A1BBC662FAC6"
     if ! gpg --list-keys "$key_id" > /dev/null; then
         set +x
