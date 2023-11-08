@@ -37,10 +37,18 @@ _EXTRA_PATH="$_EXTRA_PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules
 export PATH="$_EXTRA_PATH:$PATH"
 
 # Update symlink for all tmux tabs
-if [ -S "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/ssh_auth_sock" ]; then
-    ln -sf $SSH_AUTH_SOCK ~/.ssh/ssh_auth_sock
+if [ "$MACOS" = true ]; then
+    # Start gpg-agent if not already running
+    if ! pgrep -u "$USER" gpg-agent > /dev/null 2>&1; then
+        gpgconf --launch gpg-agent
+    fi
+    export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+else
+    if [ -S "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/ssh_auth_sock" ]; then
+        ln -sf $SSH_AUTH_SOCK ~/.ssh/ssh_auth_sock
+    fi
+    export SSH_AUTH_SOCK="$HOME/.ssh/ssh_auth_sock"
 fi
-export SSH_AUTH_SOCK="$HOME/.ssh/ssh_auth_sock"
 
 # Auto attach to tmux session
 # Should come before instant prompt
