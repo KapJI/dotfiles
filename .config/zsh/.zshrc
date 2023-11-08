@@ -34,9 +34,6 @@ export GOPATH=$(go env GOPATH)
 _EXTRA_PATH="$GOPATH/bin:$HOME/bin:$HOME/.local/bin"
 _EXTRA_PATH="$_EXTRA_PATH:/usr/local/bin:$HOME/.npm/bin:$HOME/.iterm2"
 _EXTRA_PATH="$_EXTRA_PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin"
-if [ "$MACOS" = true ]; then
-    _EXTRA_PATH="$HOME/Library/Python/3.9/bin:$_EXTRA_PATH"
-fi
 export PATH="$_EXTRA_PATH:$PATH"
 
 # Update symlink for all tmux tabs
