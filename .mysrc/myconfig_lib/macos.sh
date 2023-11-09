@@ -160,13 +160,4 @@ function setup_macos() {
             /etc/pam.d/sudo
         sudo chmod -w /etc/pam.d/sudo
     fi
-    # Protect secret directories
-    chmod -R 700 $HOME/.ssh
-    chmod -R 700 $HOME/.gnupg
-    # Create symlink to pinentry-mac
-    if ! command_exists pinentry-mac; then
-        error "pinentry-mac must be installed by now!"
-    fi
-    $(brew --prefix)/bin/pinentry-touchid -fix
-    gpg-connect-agent reloadagent /bye
 }
