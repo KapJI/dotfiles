@@ -157,7 +157,6 @@ function setup_machine() {
     elif [ "$CENTOS" = true ]; then
         setup_centos
     fi
-    import_gpg_key
     # Update nvim plugins
     nvim +PlugUpgrade +PlugUpdate +qall
     # Remove legacy files
@@ -177,41 +176,22 @@ function setup_machine() {
     if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
         zsh -c 'source ~/.config/zsh/antidote/antidote.zsh; antidote update'
     fi
-}
-
-function import_gpg_key() {
-    if [ "$MACOS" != true ]; then
-        return
+    # Update allowed_signers
+    if [ ! -f "$HOME/.ssh/allowed_signers" ]; then
+      touch "$HOME/.ssh/allowed_signers"
     fi
-    local key_id="1F05A1BBC662FAC6"
-    if ! gpg --list-keys "$key_id" > /dev/null; then
-        set +x
-        echo ""
-        echo "    ##########################"
-        echo "    # GPG KEY NOT INSTALLED! #"
-        echo "    # COPY IT FROM 1PASSWORD #"
-        echo "    # TO ~/gpg.key           #"
-        echo "    ##########################"
-        echo ""
-        while true; do
-            read -p "Are you ready to proceed? [y/n] " yn
-            case $yn in
-                [Yy]* ) ;;
-                [Nn]* ) echo "Skipping..."; return;;
-                * ) echo "Please answer yes or no.";;
-            esac
-            [ -f "$HOME/gpg.key" ] && break
-            echo "File ~/gpg.key does not exist"
-        done
-        gpg --import "$HOME/gpg.key"
-        echo ""
-        echo "    ######################"
-        echo "    # DO NOT FORGET TO   #"
-        echo "    # REMOVE ~/gpg.key   #"
-        echo "    ######################"
-        echo ""
-        set -x
-        sleep 3
+    signingkey=$(git config --global user.signingkey)
+    if [ -n "$signingkey" ] && ! grep -q "$signingkey" "$HOME/.ssh/allowed_signers"; then
+      echo "ruslan@sayfutdinov.com $signingkey" >> "$HOME/.ssh/allowed_signers"
+    fi
+    # Protect secret directories
+    if [ -d "$HOME/.ssh" ]; then
+      chmod 700 "$HOME/.ssh"
+      find "$HOME/.ssh" -type f -exec chmod 600 {} \;
+    fi
+    if [ -d "$HOME/.gnupg" ]; then
+      chmod 700 "$HOME/.gnupg"
+      find "$HOME/.gnupg" -type f -exec chmod 600 {} \;
     fi
 }
 
