@@ -24,6 +24,7 @@ fi
 
 # Environment vars
 # Used by $PATH
+_ORIGINAL_PATH="$PATH"
 if [ "$MACOS" = true ]; then
     export PATH="/opt/homebrew/bin:$PATH"
 fi
@@ -31,10 +32,13 @@ export GOPATH=$(go env GOPATH)
 
 # Set $PATH
 # Should come before running tmux
-_EXTRA_PATH="$GOPATH/bin:$HOME/bin:$HOME/.local/bin"
-_EXTRA_PATH="$_EXTRA_PATH:/usr/local/bin:$HOME/.npm/bin:$HOME/.iterm2"
+_EXTRA_PATH="$HOME/bin:$HOME/.local/bin"
+if [ "$MACOS" = true ]; then
+    _EXTRA_PATH="$_EXTRA_PATH:/opt/homebrew/bin"
+fi
+_EXTRA_PATH="$_EXTRA_PATH:$GOPATH/bin:/usr/local/bin:$HOME/.npm/bin:$HOME/.iterm2"
 _EXTRA_PATH="$_EXTRA_PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin"
-export PATH="$_EXTRA_PATH:$PATH"
+export PATH="$_EXTRA_PATH:$_ORIGINAL_PATH"
 
 # Update symlink for all tmux tabs
 if [ "$MACOS" = true ]; then
