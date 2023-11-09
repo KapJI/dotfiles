@@ -10,8 +10,6 @@ function install_macos_packages() {
         echo "Waiting before Apple CLI tools are installed..."
         sleep 10
     done
-    # Add required taps
-    brew tap jorgelbg/tap
     # This output is very noisy
     set +x
     local brew_packages=(
@@ -32,8 +30,6 @@ function install_macos_packages() {
         ncdu
         neovim
         node
-        pinentry-mac
-        pinentry-touchid
         pipx
         ripgrep
         the_silver_searcher
