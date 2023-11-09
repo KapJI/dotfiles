@@ -1,7 +1,7 @@
 [user]
     name = Ruslan Sayfutdinov
     email = ruslan@sayfutdinov.com
-    signingkey = 1F05A1BBC662FAC6
+    signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFSSzANpPTrJh7njWtP8Pba96d60IWZADcXK2YZGK/AI
 [push]
     default = simple
     autoSetupRemote = true
@@ -17,6 +17,8 @@
     ui = auto
 [pull]
     rebase = true
+[gpg]
+    format = ssh
 [commit]
     gpgsign = true
 [tag]

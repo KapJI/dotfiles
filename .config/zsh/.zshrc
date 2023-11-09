@@ -40,14 +40,10 @@ _EXTRA_PATH="$_EXTRA_PATH:$GOPATH/bin:/usr/local/bin:$HOME/.npm/bin:$HOME/.iterm
 _EXTRA_PATH="$_EXTRA_PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin"
 export PATH="$_EXTRA_PATH:$_ORIGINAL_PATH"
 
-# Update symlink for all tmux tabs
 if [ "$MACOS" = true ]; then
-    # Start gpg-agent if not already running
-    if ! pgrep -u "$USER" gpg-agent > /dev/null 2>&1; then
-        gpgconf --launch gpg-agent
-    fi
-    export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+    export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 else
+    # Update symlink for all tmux tabs
     if [ -S "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/ssh_auth_sock" ]; then
         ln -sf $SSH_AUTH_SOCK ~/.ssh/ssh_auth_sock
     fi
