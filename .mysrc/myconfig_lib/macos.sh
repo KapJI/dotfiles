@@ -14,10 +14,12 @@ function install_macos_packages() {
     set +x
     local brew_packages=(
         ant
+        autoconf
         broot
         cmake
         dos2unix
         fd
+        ffmpeg
         fpp
         fzf
         git
@@ -27,10 +29,12 @@ function install_macos_packages() {
         htop
         jq
         lsd
+        make
         ncdu
         neovim
         node
         pipx
+        python3
         ripgrep
         the_silver_searcher
         tree
