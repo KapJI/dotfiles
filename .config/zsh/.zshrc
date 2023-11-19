@@ -40,12 +40,16 @@ _EXTRA_PATH="$_EXTRA_PATH:$GOPATH/bin:/usr/local/bin:$HOME/.npm/bin:$HOME/.iterm
 _EXTRA_PATH="$_EXTRA_PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin"
 export PATH="$_EXTRA_PATH:$_ORIGINAL_PATH"
 
+if [ ! -d "$HOME/.ssh" ]; then
+    mkdir -p "$HOME/.ssh"
+fi
+
 if [ "$MACOS" = true ]; then
     export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 else
     # Update symlink for all tmux tabs
     if [ -S "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/ssh_auth_sock" ]; then
-        ln -sf $SSH_AUTH_SOCK ~/.ssh/ssh_auth_sock
+        ln -sf $SSH_AUTH_SOCK "$HOME/.ssh/ssh_auth_sock"
     fi
     export SSH_AUTH_SOCK="$HOME/.ssh/ssh_auth_sock"
 fi
