@@ -66,7 +66,7 @@ function install_debian_packages() {
     cargo install lsd --locked
     # TODO: download from some repo if needed, e.g. https://packages.azlux.fr/
     # cargo install broot
-    cargo install zoxide --locked
+    curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
     install_nvm
 }
 
