@@ -63,9 +63,10 @@ function install_debian_packages() {
     sudo apt update
     sudo apt install -y "${apt_packages[@]}"
     # Cargo needs to be installed before this
-    cargo install lsd
+    cargo install lsd --locked
     # TODO: download from some repo if needed, e.g. https://packages.azlux.fr/
     # cargo install broot
+    cargo install zoxide --locked
     install_nvm
 }
 
