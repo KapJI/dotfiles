@@ -193,6 +193,18 @@ function setup_machine() {
       chmod 700 "$HOME/.gnupg"
       find "$HOME/.gnupg" -type f -exec chmod 600 {} \;
     fi
+    migrate_from_fasd
+}
+
+function migrate_from_fasd() {
+    if [ -f "$HOME/.cache/fasd" ]; then
+        zoxide import --from=z $HOME/.cache/fasd --merge
+        rm $HOME/.cache/fasd
+    fi
+    if [ -f "$HOME/.fasd" ]; then
+        zoxide import --from=z $HOME/.fasd --merge
+        rm $HOME/.fasd
+    fi
 }
 
 function set_zsh_shell() {

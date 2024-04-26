@@ -8,7 +8,6 @@ ohmyzsh/ohmyzsh path:plugins/ripgrep kind:fpath
 zdharma-continuum/fast-syntax-highlighting kind:defer
 zsh-users/zsh-completions path:src kind:fpath
 zsh-users/zsh-autosuggestions kind:defer
-wookayin/fzf-fasd
 MichaelAquilina/zsh-you-should-use
 
 # Initialise completions
@@ -20,7 +19,6 @@ ohmyzsh/ohmyzsh path:plugins/colored-man-pages
 ohmyzsh/ohmyzsh path:plugins/colorize
 ohmyzsh/ohmyzsh path:plugins/dirhistory
 ohmyzsh/ohmyzsh path:plugins/extract
-ohmyzsh/ohmyzsh path:plugins/fasd
 ohmyzsh/ohmyzsh path:plugins/fzf
 ohmyzsh/ohmyzsh path:plugins/rust
 ohmyzsh/ohmyzsh path:plugins/safe-paste

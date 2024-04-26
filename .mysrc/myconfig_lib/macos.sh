@@ -39,6 +39,7 @@ function install_macos_packages() {
         the_silver_searcher
         tree
         wget
+        zoxide
         zsh
         mistertea/et/et
     )

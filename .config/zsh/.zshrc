@@ -118,15 +118,6 @@ alias sudo="sudo " # hack to make these aliases available for sudo
 alias usage="du -h -d1 | sort -h"
 alias vim="nvim"
 
-# fasd shortcuts to print best match
-function f1() {
-    fasd -lf $1 | tail -n1
-}
-
-function d1() {
-    fasd -ld $1 | tail -n1
-}
-
 if [ "$MACOS" = true ]; then
     # Open man page as PDF
     function manpdf() {
@@ -249,8 +240,8 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 # Enable broot
 source ${HOME}/.config/broot/launcher/bash/br
 
-# Enable fasd
-eval "$(fasd --init auto)"
+# Enable zoxide
+eval "$(zoxide init zsh)"
 
 # pipx completions
 eval "$(register-python-argcomplete pipx)"
