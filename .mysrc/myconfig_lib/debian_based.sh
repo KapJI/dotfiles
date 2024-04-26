@@ -64,7 +64,8 @@ function install_debian_packages() {
     sudo apt install -y "${apt_packages[@]}"
     # Cargo needs to be installed before this
     cargo install lsd
-    cargo install broot
+    # TODO: download from some repo if needed, e.g. https://packages.azlux.fr/
+    # cargo install broot
     install_nvm
 }
 
