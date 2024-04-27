@@ -160,9 +160,6 @@ unsetopt LIST_BEEP
 # Write to the history file immediately, not when the shell exits.
 setopt INC_APPEND_HISTORY
 
-# Setup Rust tools
-source $HOME/.cargo/env
-
 # Configure fzf to use fd
 export FZF_DEFAULT_COMMAND="fd --type file --color=always --hidden --exclude .git --exclude .hg --exclude node_modules"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
