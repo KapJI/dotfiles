@@ -56,15 +56,6 @@ function import_scripts() {
 }
 
 function install_packages() {
-    # Install rustup
-    if ! command_exists rustup; then
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-    else
-        rustup update
-    fi
-    if ! command_exists cargo; then
-        source $HOME/.cargo/env
-    fi
     if [ "$MACOS" = true ]; then
         install_macos_packages
     elif [ "$DEBIAN_BASED" = true ]; then
