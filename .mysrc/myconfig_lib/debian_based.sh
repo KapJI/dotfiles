@@ -34,6 +34,27 @@ function install_nvm() {
     set -x
 }
 
+function install_lsd() {
+    local platform
+    case $(uname -m) in
+        aarch64)
+            platform="arm64"
+            ;;
+        x86_64)
+            platform="amd64"
+            ;;
+        *)
+            error "running on unknown architecture: $(uname -m)"
+            ;;
+    esac
+    curl -s https://api.github.com/repos/lsd-rs/lsd/releases/latest \
+        | grep "browser_download_url.*lsd_.*${platform}.deb" \
+        | cut -d : -f 2,3 \
+        | tr -d \" \
+        | wget -qi - -O /tmp/lsd.deb
+    sudo dpkg -i /tmp/lsd.deb
+}
+
 function install_debian_packages() {
     local apt_packages=(
         build-essential
@@ -43,7 +64,6 @@ function install_debian_packages() {
         gnupg
         golang
         htop
-        lsd
         ncat
         neovim
         pinentry-tty
@@ -66,8 +86,10 @@ function install_debian_packages() {
     # TODO: download from some repo if needed, e.g. https://packages.azlux.fr/
     # Cargo needs to be installed before this
     # cargo install broot
+    # Install zoxide
     curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
     install_nvm
+    install_lsd
 }
 
 function setup_debian() {
