@@ -73,6 +73,7 @@ function install_macos_packages() {
     install_copy_tool
     install_fasd
     install_iterm_font
+    install_rustup
 }
 
 function install_subl_symlink() {
@@ -95,6 +96,18 @@ function install_fasd() {
     if [ ! -x $HOME/bin/fasd ]; then
         curl -fsSL -o "$HOME/bin/fasd" "https://raw.githubusercontent.com/whjvenyl/fasd/master/fasd"
         chmod +x "$HOME/bin/fasd"
+    fi
+}
+
+function install_rustup() {
+    # Install rustup
+    if ! command_exists rustup; then
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    else
+        rustup update
+    fi
+    if ! command_exists cargo; then
+        source $HOME/.cargo/env
     fi
 }
 
