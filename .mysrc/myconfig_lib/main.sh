@@ -66,11 +66,6 @@ function install_packages() {
     # Install vim-plug
     curl -fLo $HOME/.local/share/nvim/site/autoload/plug.vim --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    # Install chroma. Go should be installed by now
-    if ! command_exists chroma; then
-        go env -w GO111MODULE=off
-        go get -u github.com/alecthomas/chroma/cmd/chroma
-    fi
     # Configure broot
     if [ ! -f "$HOME/.config/broot/launcher/bash/br" ]; then
         mkdir -p $HOME/.config/broot/launcher/bash
@@ -79,6 +74,7 @@ function install_packages() {
     fi
     install_python_packages
     install_npm_packages
+    install_chroma
 }
 
 
@@ -138,6 +134,53 @@ function install_npm_packages() {
     if ! npm list --global "git-branch-select"; then
         npm install --global "git-branch-select"
     fi
+}
+
+function install_chroma() {
+    OS=$(uname | tr '[:upper:]' '[:lower:]')
+    ARCH=$(uname -m)
+
+    case $ARCH in
+        "arm64") ARCH="arm64" ;;
+        "x86_64") ARCH="amd64" ;;
+        *) echo "Unsupported architecture: $ARCH"; return 1 ;;
+    esac
+     # Fetch the latest release from GitHub releases
+    LATEST_RELEASE_URL="https://github.com/alecthomas/chroma/releases/latest"
+    LATEST_VERSION=$(curl -sI "${LATEST_RELEASE_URL}" | grep -i location | awk -F"/" '{print $(NF)}' | tr -d '\r')
+
+    if [ -z "$LATEST_VERSION" ]; then
+        echo "Failed to fetch latest version number."
+        return 1
+    fi
+
+    # Construct the URL for the appropriate binary
+    URL="https://github.com/alecthomas/chroma/releases/download/${LATEST_VERSION}/chroma-${LATEST_VERSION#v}-${OS}-${ARCH}.tar.gz"
+
+    # Create target directory if it doesn't exist
+    TARGET_DIR="$HOME/go/bin"
+    mkdir -p "$TARGET_DIR"
+    # Temporary file for the downloaded binary
+    TEMP_FILE=$(mktemp)
+
+    # Download the binary
+    echo "Downloading Chroma ${LATEST_VERSION#v} for $OS-$ARCH..."
+    curl -Ls "$URL" -o "$TEMP_FILE"
+
+    # Check if the download was successful
+    if [ $? -ne 0 ]; then
+        echo "Failed to download the binary."
+        rm "$TEMP_FILE"
+        return 1
+    fi
+
+    # Unpack the binary to the target directory
+    echo "Unpacking Chroma to $TARGET_DIR..."
+    tar -xzf "$TEMP_FILE" -C "$TARGET_DIR"
+
+    # Clean up
+    rm "$TEMP_FILE"
+    echo "Chroma installed successfully to $TARGET_DIR."
 }
 
 function setup_machine() {
