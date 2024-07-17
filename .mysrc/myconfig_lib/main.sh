@@ -137,50 +137,50 @@ function install_npm_packages() {
 }
 
 function install_chroma() {
-    OS=$(uname | tr '[:upper:]' '[:lower:]')
-    ARCH=$(uname -m)
+    local os=$(uname | tr '[:upper:]' '[:lower:]')
+    local arch=$(uname -m)
 
-    case $ARCH in
-        "arm64") ARCH="arm64" ;;
-        "x86_64") ARCH="amd64" ;;
+    case $arch in
+        "arm64") arch="arm64" ;;
+        "x86_64") arch="amd64" ;;
         *) echo "Unsupported architecture: $ARCH"; return 1 ;;
     esac
      # Fetch the latest release from GitHub releases
-    LATEST_RELEASE_URL="https://github.com/alecthomas/chroma/releases/latest"
-    LATEST_VERSION=$(curl -sI "${LATEST_RELEASE_URL}" | grep -i location | awk -F"/" '{print $(NF)}' | tr -d '\r')
+    local latest_release_url="https://github.com/alecthomas/chroma/releases/latest"
+    local latest_version=$(curl -sI "${latest_release_url}" | grep -i location | awk -F"/" '{print $(NF)}' | tr -d '\r')
 
-    if [ -z "$LATEST_VERSION" ]; then
+    if [ -z "$latest_version" ]; then
         echo "Failed to fetch latest version number."
         return 1
     fi
 
     # Construct the URL for the appropriate binary
-    URL="https://github.com/alecthomas/chroma/releases/download/${LATEST_VERSION}/chroma-${LATEST_VERSION#v}-${OS}-${ARCH}.tar.gz"
+    local url="https://github.com/alecthomas/chroma/releases/download/${latest_version}/chroma-${latest_version#v}-${os}-${arch}.tar.gz"
 
     # Create target directory if it doesn't exist
-    TARGET_DIR="$HOME/go/bin"
-    mkdir -p "$TARGET_DIR"
+    local target_dir="$HOME/go/bin"
+    mkdir -p "$target_dir"
     # Temporary file for the downloaded binary
-    TEMP_FILE=$(mktemp)
+    local temp_file=$(mktemp)
 
     # Download the binary
-    echo "Downloading Chroma ${LATEST_VERSION#v} for $OS-$ARCH..."
-    curl -Ls "$URL" -o "$TEMP_FILE"
+    echo "Downloading Chroma ${latest_version#v} for $os-$arch..."
+    curl -Ls "$url" -o "$temp_file"
 
     # Check if the download was successful
     if [ $? -ne 0 ]; then
         echo "Failed to download the binary."
-        rm "$TEMP_FILE"
+        rm "$temp_file"
         return 1
     fi
 
     # Unpack the binary to the target directory
-    echo "Unpacking Chroma to $TARGET_DIR..."
-    tar -xzf "$TEMP_FILE" -C "$TARGET_DIR"
+    echo "Unpacking Chroma to $target_dir..."
+    tar -xzf "$temp_file" -C "$target_dir"
 
     # Clean up
-    rm "$TEMP_FILE"
-    echo "Chroma installed successfully to $TARGET_DIR."
+    rm "$temp_file"
+    echo "Chroma installed successfully to $target_dir."
 }
 
 function setup_machine() {
