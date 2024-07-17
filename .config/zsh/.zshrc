@@ -240,9 +240,6 @@ source ${HOME}/.config/broot/launcher/bash/br
 # Enable zoxide
 eval "$(zoxide init zsh)"
 
-# pipx completions
-eval "$(register-python-argcomplete pipx)"
-
 # added by setup_fb4a.sh
 if [ "$MACOS" = true ]; then
     export ANDROID_SDK=/opt/android_sdk
