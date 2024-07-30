@@ -82,9 +82,6 @@ function install_debian_packages() {
     fi
     sudo apt update
     sudo apt install -y "${apt_packages[@]}"
-    # TODO: download from some repo if needed, e.g. https://packages.azlux.fr/
-    # Cargo needs to be installed before this
-    # cargo install broot
     # Install zoxide
     curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
     install_nvm
