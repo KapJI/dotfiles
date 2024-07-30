@@ -175,6 +175,8 @@ WANT_OLD_SCM_PROMPT="true"
 local fb_prompt_file="/opt/facebook/share/scm-prompt"
 if [ -f "$fb_prompt_file" ]; then
     source "$fb_prompt_file"
+elif [ -z $ADMIN_SCRIPTS ]; then
+    source "$ADMIN_SCRIPTS/scm-prompt"
 fi
 
 # Setup The Fuck
