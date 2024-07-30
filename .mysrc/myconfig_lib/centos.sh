@@ -16,10 +16,6 @@ function install_centos_packages() {
     if ! command_exists et; then
         sudo feature install et
     fi
-    # install nvim
-    if ! command_exists nvim; then
-        sudo feature install neovim
-    fi
 }
 
 function setup_centos() {
