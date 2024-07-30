@@ -15,7 +15,6 @@ function install_macos_packages() {
     local brew_packages=(
         ant
         autoconf
-        broot
         cmake
         dos2unix
         fd

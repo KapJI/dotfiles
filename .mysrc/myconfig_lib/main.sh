@@ -66,13 +66,7 @@ function install_packages() {
     # Install vim-plug
     curl $CURL_CONFIG -fLo $HOME/.local/share/nvim/site/autoload/plug.vim --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    # Configure broot
-    if [ ! -f "$HOME/.config/broot/launcher/bash/br" ]; then
-        mkdir -p $HOME/.config/broot/launcher/bash
-        broot --print-shell-function zsh > $HOME/.config/broot/launcher/bash/br
-        broot --set-install-state installed
-    fi
-    install_python_packages
+    intall_python_packages
     install_npm_packages
     install_chroma
 }
