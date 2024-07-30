@@ -12,8 +12,9 @@ function install_centos_packages() {
         pipx
         readline-devel
         ripgrep
+        zoxide
     )
-    sudo dnf install -y "${dnf_packages[@]}"
+    sudo http_proxy="" https_proxy="" dnf install -y "${dnf_packages[@]}"
     if ! command_exists et; then
         sudo feature install et
     fi
@@ -24,6 +25,8 @@ function install_centos_packages() {
 
 function setup_proxy() {
     export CURL_CONFIG=$(fwdproxy-config curl)
+    export http_proxy="http://fwdproxy:8080"
+    export https_proxy="http://fwdproxy:8080"
 }
 
 function setup_centos() {
