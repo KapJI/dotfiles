@@ -22,8 +22,6 @@ function install_centos_packages() {
 
 function setup_proxy() {
     export CURL_CONFIG=$(fwdproxy-config curl)
-    export http_proxy="http://fwdproxy:8080"
-    export https_proxy="http://fwdproxy:8080"
 }
 
 function setup_centos() {
