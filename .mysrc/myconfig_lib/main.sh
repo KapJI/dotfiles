@@ -66,7 +66,7 @@ function install_packages() {
     # Install vim-plug
     curl $CURL_CONFIG -fLo $HOME/.local/share/nvim/site/autoload/plug.vim --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    intall_python_packages
+    install_python_packages
     install_npm_packages
     install_chroma
 }
