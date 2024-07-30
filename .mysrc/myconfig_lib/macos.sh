@@ -71,7 +71,6 @@ function install_macos_packages() {
     fi
     install_subl_symlink
     install_copy_tool
-    install_fasd
     install_iterm_font
     install_rustup
 }
@@ -89,13 +88,6 @@ function install_copy_tool() {
         make
         make install
         popd
-    fi
-}
-
-function install_fasd() {
-    if [ ! -x $HOME/bin/fasd ]; then
-        curl -fsSL -o "$HOME/bin/fasd" "https://raw.githubusercontent.com/whjvenyl/fasd/master/fasd"
-        chmod +x "$HOME/bin/fasd"
     fi
 }
 

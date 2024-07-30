@@ -58,7 +58,6 @@ function install_lsd() {
 function install_debian_packages() {
     local apt_packages=(
         build-essential
-        fasd
         fd-find
         fzf
         gnupg
