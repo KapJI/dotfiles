@@ -164,9 +164,15 @@ SAVEHIST=100000
 POWERLEVEL9K_MODE='nerdfont-complete'
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+# Facebook stuff
+local fb_config="/usr/facebook/ops/rc/master.zshrc"
+if [ -f "$fb_config" ]; then
+    source "$fb_config"
+fi
+
 # Facebook hg prompt
 WANT_OLD_SCM_PROMPT="true"
-local fb_prompt_file=/opt/facebook/share/scm-prompt
+local fb_prompt_file="/opt/facebook/share/scm-prompt"
 if [ -f "$fb_prompt_file" ]; then
     source "$fb_prompt_file"
 fi
@@ -179,6 +185,9 @@ unsetopt LIST_BEEP
 
 # Write to the history file immediately, not when the shell exits.
 setopt INC_APPEND_HISTORY
+
+# Allow tab completion in the middle of a word.
+setopt COMPLETE_IN_WORD
 
 # Configure fzf to use fd
 export FZF_DEFAULT_COMMAND="fd --type file --color=always --hidden --exclude .git --exclude .hg --exclude node_modules"
