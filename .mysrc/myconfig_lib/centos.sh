@@ -18,6 +18,8 @@ function install_centos_packages() {
         sudo feature install et
     fi
     cargo install lsd
+    # Update rust
+    env $(fwdproxy-config --format=sh curl) rustup update
 }
 
 function setup_proxy() {
