@@ -64,7 +64,7 @@ function install_packages() {
         install_centos_packages
     fi
     # Install vim-plug
-    curl -fLo $HOME/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+    curl $CURL_CONFIG -fLo $HOME/.local/share/nvim/site/autoload/plug.vim --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     # Configure broot
     if [ ! -f "$HOME/.config/broot/launcher/bash/br" ]; then
@@ -115,6 +115,10 @@ function install_python_packages() {
 }
 
 function install_npm_packages() {
+    # Don't install npm on centos
+    if [ "$CENTOS" = true ]; then
+        return
+    fi
     # Upgrade npm if it's failing
     if [ "$DEBIAN_BASED" = true ]; then
         if ! npm -v; then
@@ -147,7 +151,7 @@ function install_chroma() {
     esac
      # Fetch the latest release from GitHub releases
     local latest_release_url="https://github.com/alecthomas/chroma/releases/latest"
-    local latest_version=$(curl -sI "${latest_release_url}" | grep -i location | awk -F"/" '{print $(NF)}' | tr -d '\r')
+    local latest_version=$(curl $CURL_CONFIG -sI "${latest_release_url}" | grep -i location | awk -F"/" '{print $(NF)}' | tr -d '\r')
 
     if [ -z "$latest_version" ]; then
         echo "Failed to fetch latest version number."
@@ -165,7 +169,7 @@ function install_chroma() {
 
     # Download the binary
     echo "Downloading Chroma ${latest_version#v} for $os-$arch..."
-    curl -Ls "$url" -o "$temp_file"
+    curl $CURL_CONFIG -Ls "$url" -o "$temp_file"
 
     # Check if the download was successful
     if [ $? -ne 0 ]; then
@@ -242,6 +246,10 @@ function migrate_from_fasd() {
 }
 
 function set_zsh_shell() {
+    if [ "$CENTOS" = true ]; then
+        echo "Shell should be changed in 'i unix/shell'"
+        return
+    fi
     local zsh_path="$(command -v zsh)"
     local current_shell
     if [ "$MACOS" = true ]; then
