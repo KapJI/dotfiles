@@ -2,8 +2,13 @@
 
 function install_centos_packages() {
     local dnf_packages=(
-        fd
+        fd-find
+        fzf
         htop
+        gnupg
+        neovim
+        pinentry-tty
+        pipx
         readline-devel
         ripgrep
     )
