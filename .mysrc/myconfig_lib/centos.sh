@@ -2,17 +2,18 @@
 
 function install_centos_packages() {
     local dnf_packages=(
+        fd
         htop
+        readline-devel
         ripgrep
     )
-    sudo dnf install -y ripgrep
+    sudo dnf install -y "${dnf_packages[@]}"
     if ! command_exists et; then
         sudo feature install et
     fi
     # install nvim
     if ! command_exists nvim; then
-        sudo curl $(fwdproxy-config curl) -o /usr/local/bin/nvim -LO https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage
-        sudo chmod +x /usr/local/bin/nvim
+        sudo feature install neovim
     fi
 }
 
