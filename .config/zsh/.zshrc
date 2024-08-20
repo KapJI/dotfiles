@@ -195,6 +195,9 @@ setopt INC_APPEND_HISTORY
 # Allow tab completion in the middle of a word.
 setopt COMPLETE_IN_WORD
 
+# Enable extended history with timestamps
+setopt EXTENDED_HISTORY
+
 # Configure fzf to use fd
 export FZF_DEFAULT_COMMAND="fd --type file --color=always --hidden --exclude .git --exclude .hg --exclude node_modules"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
