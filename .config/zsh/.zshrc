@@ -76,7 +76,7 @@ else
   VSCODE_TASK=false
 fi
 
-if [[ $VSCODE_TASK == false ]] && [ -t 0 ] && [ -z "$TMUX" ] && command -v tmux >/dev/null 2>&1; then
+if [[ ${VSCODE_TASK:-} == false ]] && [ -t 0 ] && [ -z "$TMUX" ] && command -v tmux >/dev/null 2>&1; then
     if tmux has-session -t auto >/dev/null 2>&1; then
         exec tmux -2 attach -t auto
     else
@@ -104,6 +104,7 @@ fi
 # Make plugin folder names pretty
 zstyle ':antidote:bundle' use-friendly-names 'yes'
 
+
 # Source and load plugins found in ${ZDOTDIR}/.zsh_plugins.txt
 source $ZDOTDIR/antidote/antidote.zsh
 
@@ -123,6 +124,9 @@ fi
 
 # Load Antidote
 antidote load
+
+# Hack to disable cwd reporting in oh-my-zsh/lib/termsupport.zsh
+add-zsh-hook -d precmd omz_termsupport_cwd
 
 # Aliases
 alias dof="git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
