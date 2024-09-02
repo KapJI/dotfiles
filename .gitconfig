@@ -28,4 +28,4 @@
 [include]
     path = ~/.gitconfig.local
 [init]
-	defaultBranch = main
+    defaultBranch = main
