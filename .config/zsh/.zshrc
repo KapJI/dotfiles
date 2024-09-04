@@ -130,6 +130,7 @@ add-zsh-hook -d precmd omz_termsupport_cwd
 
 # Aliases
 alias dof="git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
+alias df="fd --hidden"
 alias hgsl="hg sl"
 alias less="cless"
 alias ls="lsd"
