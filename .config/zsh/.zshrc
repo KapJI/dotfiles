@@ -249,7 +249,7 @@ ENHANCD_ENABLE_HOME=false # New version
 
 # you-should-use
 YSU_MESSAGE_POSITION="after"
-YSU_IGNORED_ALIASES=("hgsl")
+YSU_IGNORED_ALIASES=("hgsl" "vi")
 COLOUR_NONE="$(tput sgr0)"
 COLOUR_BOLD="$(tput bold)"
 COLOUR_YELLOW="$(tput setaf 3)"
