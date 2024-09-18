@@ -202,6 +202,9 @@ setopt EXTENDED_HISTORY
 # Disable verification on history expanstion (e.g. !*)
 setopt NO_HIST_VERIFY
 
+# Match files beginning with a dot without explicitly specifying the dot
+setopt GLOBDOTS
+
 # Configure fzf to use fd
 export FZF_DEFAULT_COMMAND="fd --type file --color=always --hidden --exclude .git --exclude .hg --exclude node_modules"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
