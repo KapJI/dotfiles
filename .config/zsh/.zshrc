@@ -208,7 +208,8 @@ setopt GLOBDOTS
 # Configure fzf to use fd
 export FZF_DEFAULT_COMMAND="fd --type file --color=always --hidden --exclude .git --exclude .hg --exclude node_modules"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_DEFAULT_OPTS="--ansi --height=40% --layout=reverse --preview-window 'right:60%' --preview 'if [ -d {} ]; then lsd --tree --depth=1 --color=always --icon=always {}; elif [ -f {} ]; then head -n 100 {} | chroma --style=emacs --filename={}; else echo {}; fi'"
+export FZF_DEFAULT_OPTS="--ansi --height=50% --layout=reverse"
+# export FZF_DEFAULT_OPTS="--ansi --height=40% --layout=reverse --preview-window 'right:60%' --preview 'if [ -d {} ]; then lsd --tree --depth=1 --color=always --icon=always {}; elif [ -f {} ]; then head -n 100 {} | chroma --style=emacs --filename={}; else echo {}; fi'"
 
 _fzf_compgen_path() {
     fd --hidden --follow --color=always --exclude ".git" --exclude ".hg" --exclude "node_modules" . "$1"
@@ -239,16 +240,14 @@ _fzf_comprun() {
 }
 
 # Enhacd configuration
-ENHANCD_FILTER=fzf
-
 case $(type "...") in
     (*alias*) unalias "...";;
 esac
 
-ENHANCD_DOT_ARG="..." # Old version
-ENHANCD_ARG_DOUBLE_DOT="..." # New version
-ENHANCD_DISABLE_HOME=1 # Old version
-ENHANCD_ENABLE_HOME=false # New version
+ENHANCD_FILTER=fzf
+ENHANCD_ARG_DOUBLE_DOT="..."
+ENHANCD_ENABLE_HOME=false
+ENHANCD_USE_ABBREV=true
 
 # you-should-use
 YSU_MESSAGE_POSITION="after"
