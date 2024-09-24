@@ -13,3 +13,4 @@ default_branch=$(git remote show $default_repo | grep 'HEAD branch' | cut -d' ' 
 git fetch $default_repo
 git checkout $default_branch
 git rebase "$default_repo/$default_branch"
+git submodule update --recursive
