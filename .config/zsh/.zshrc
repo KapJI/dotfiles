@@ -169,6 +169,11 @@ SAVEHIST=100000
 EDITOR="nvim"
 ZVM_VI_EDITOR="nvim"
 
+# Restore fzf ctrl-r
+function zvm_after_init() {
+  zvm_bindkey viins "^R" fzf-history-widget
+}
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 POWERLEVEL9K_MODE='nerdfont-complete'
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
