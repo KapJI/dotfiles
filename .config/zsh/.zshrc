@@ -166,8 +166,8 @@ HISTSIZE=100000
 SAVEHIST=100000
 
 # Set editor for zsh-vi-mode
-EDITOR="nvim"
-ZVM_VI_EDITOR="nvim"
+export EDITOR="nvim"
+export ZVM_VI_EDITOR="nvim"
 
 # Restore fzf ctrl-r
 function zvm_after_init() {
