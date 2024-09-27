@@ -170,9 +170,9 @@ SAVEHIST=100000
 export EDITOR="nvim"
 export ZVM_VI_EDITOR="nvim"
 
-# Restore fzf ctrl-r
+# Initialise fzf here for compatibility with vi mode
 function zvm_after_init() {
-  zvm_bindkey viins "^R" fzf-history-widget
+  eval "$(fzf --zsh)"
 }
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
