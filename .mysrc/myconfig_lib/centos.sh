@@ -11,7 +11,6 @@ function install_centos_packages() {
         neovim
         PackageKit-command-not-found
         pinentry-tty
-        pipx
         readline-devel
         ripgrep
         zoxide

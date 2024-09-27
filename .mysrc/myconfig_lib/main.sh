@@ -70,42 +70,21 @@ function install_packages() {
     install_npm_packages
 }
 
-
-function cleanup_pipx() {
-    # When Python is upgraded pipx may start to fail:
-    # https://github.com/pypa/pipx/issues/278
-    rm -rf "$HOME/.local/pipx/shared"
-}
-
 function install_python_packages() {
-    local pipx_packages=(
+    if ! command_exists uv; then
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+    fi
+    local packages=(
+        mypy
         poetry
         pre-commit
-        Pygments
-        thefuck
+        pygments
     )
-    local pipx_path
-    if command_exists pipx; then
-        pipx_path="pipx"
-    else
-        if [ "$MACOS" = true ]; then
-            pipx_path="$HOME/Library/Python/3.9/bin/pipx"
-        else
-            pipx_path="$HOME/.local/bin/pipx"
-        fi
-        if [ ! -f "$pipx_path" ]; then
-            error "Can't find pipx"
-        fi
-    fi
     local package
-    for package in "${pipx_packages[@]}"; do
-        if ! command_exists "$package"; then
-            ${pipx_path} install "$package" || (cleanup_pipx && ${pipx_path} reinstall-all && ${pipx_path} install "$package")
-        else
-            ${pipx_path} upgrade "$package" || (cleanup_pipx && ${pipx_path} reinstall-all)
-        fi
-
+    for package in "${packages[@]}"; do
+        uv tool install --upgrade "$package"
     done
+    uv tool install --upgrade thefuck --python python3.11
 }
 
 function install_npm_packages() {
