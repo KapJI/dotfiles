@@ -1,17 +1,22 @@
 # Turn off all beeps
-unsetopt BEEP
+setopt NO_BEEP
 
-# Write to the history file immediately, not when the shell exits.
-setopt INC_APPEND_HISTORY
 
-# Allow tab completion in the middle of a word.
+# Allow tab completion in the middle of a word
 setopt COMPLETE_IN_WORD
 
-# Enable extended history with timestamps
-setopt EXTENDED_HISTORY
+# Share history between parallel sessions
+setopt SHARE_HISTORY
 
-# Disable verification on history expanstion (e.g. !*)
+# If a new command line being added to the history list duplicates an older one, 
+# the older command is removed from the list (even if it is not the previous event).
+setopt HIST_IGNORE_ALL_DUPS
+
+# Execute command with history expansion immediately (e.g. !*)
 setopt NO_HIST_VERIFY
+
+# When writing out the history file, older commands that duplicate newer ones are omitted
+setopt HIST_SAVE_NO_DUPS
 
 # Match files beginning with a dot without explicitly specifying the dot
 setopt GLOBDOTS
