@@ -61,7 +61,6 @@ function install_debian_packages() {
         ncat
         neovim
         pinentry-tty
-        pipx
         python3
         python3-dev
         python3-pip

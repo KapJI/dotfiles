@@ -32,7 +32,6 @@ function install_macos_packages() {
         ncdu
         neovim
         node
-        pipx
         python3
         ripgrep
         the_silver_searcher
