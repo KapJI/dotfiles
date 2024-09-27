@@ -17,6 +17,7 @@ function install_macos_packages() {
         autoconf
         cmake
         dos2unix
+        eza
         fd
         ffmpeg
         fpp
@@ -27,7 +28,6 @@ function install_macos_packages() {
         graphviz
         htop
         jq
-        lsd
         make
         ncdu
         neovim
@@ -68,6 +68,8 @@ function install_macos_packages() {
     if [ ${#upgrade_packages[@]} -gt 0 ]; then
         HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade "${upgrade_packages[@]}"
     fi
+    # Install command-not-found
+    brew tap homebrew/command-not-found
     install_subl_symlink
     install_copy_tool
     install_iterm_font

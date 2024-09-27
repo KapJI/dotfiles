@@ -3,11 +3,13 @@
 function install_centos_packages() {
     setup_proxy
     local dnf_packages=(
+        eza
         fd-find
         fzf
         htop
         gnupg
         neovim
+        PackageKit-command-not-found
         pinentry-tty
         pipx
         readline-devel
@@ -18,7 +20,6 @@ function install_centos_packages() {
     if ! command_exists et; then
         sudo feature install et
     fi
-    cargo install lsd
     # Update rust
     env $(fwdproxy-config --format=sh curl) rustup update
 }
