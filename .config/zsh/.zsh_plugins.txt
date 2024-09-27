@@ -2,11 +2,6 @@
 
 romkatv/powerlevel10k
 
-# Add OMZ completions plugins to `fpath`
-ohmyzsh/ohmyzsh path:plugins/adb kind:fpath
-ohmyzsh/ohmyzsh path:plugins/fd kind:fpath
-ohmyzsh/ohmyzsh path:plugins/ripgrep kind:fpath
-
 zdharma-continuum/fast-syntax-highlighting kind:defer
 zsh-users/zsh-completions path:src kind:fpath
 zsh-users/zsh-autosuggestions kind:defer
@@ -27,7 +22,6 @@ ohmyzsh/ohmyzsh path:plugins/extract
 ohmyzsh/ohmyzsh path:plugins/rust
 ohmyzsh/ohmyzsh path:plugins/safe-paste
 ohmyzsh/ohmyzsh path:plugins/thefuck
-ohmyzsh/ohmyzsh path:plugins/virtualenv
 ohmyzsh/ohmyzsh path:plugins/zsh-interactive-cd
 
 # Need compinit
