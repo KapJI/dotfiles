@@ -9,9 +9,3 @@ if [ "$MACOS" = true ]; then
         cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
     }
 fi
-
-if [ "$MACOS" = true ]; then
-    _BUCK_COMPLETION_MODES="mac opt-mac macpy"
-else
-    _BUCK_COMPLETION_MODES="dev opt"
-fi
