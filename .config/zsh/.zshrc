@@ -197,8 +197,8 @@ fi
 # Setup The Fuck
 eval $(thefuck --alias)
 
-# Turn off autocomplete beeps
-unsetopt LIST_BEEP
+# Turn off all beeps
+unsetopt BEEP
 
 # Write to the history file immediately, not when the shell exits.
 setopt INC_APPEND_HISTORY
