@@ -1,6 +1,8 @@
 #!/bin/bash
 
 function install_macos_packages() {
+    # Although not an installation but should come early
+    enable_sudo_touchid
     if ! command_exists brew; then
         local brew_url="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
         /bin/bash -c "$(curl -fsSL ${brew_url})"
@@ -165,7 +167,6 @@ function install_iterm_font() {
 
 function setup_macos() {
     disable_sonoma_cursor
-    enable_sudo_touchid
 }
 
 function disable_sonoma_cursor() {
