@@ -16,9 +16,11 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# Load plugins
+source "$ZDOTDIR/config.d/antidote.zsh"
+
 # Configure shell
 source "$ZDOTDIR/config.d/aliases.zsh"
-source "$ZDOTDIR/config.d/antidote.zsh"
 source "$ZDOTDIR/config.d/completion.zsh"
 source "$ZDOTDIR/config.d/env.zsh"
 source "$ZDOTDIR/config.d/fb.zsh"
