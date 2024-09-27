@@ -17,6 +17,7 @@ jeffreytse/zsh-vi-mode
 mattmc3/zephyr path:plugins/completion
 
 # OMZ
+getantidote/use-omz
 ohmyzsh/ohmyzsh path:lib
 ohmyzsh/ohmyzsh path:plugins/colored-man-pages
 ohmyzsh/ohmyzsh path:plugins/colorize
