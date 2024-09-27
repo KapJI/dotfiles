@@ -20,6 +20,20 @@ function add_eternal_terminal_repo() {
     fi
 }
 
+function add_eza_repo() {
+    local eza_keyring="/etc/apt/keyrings/gierens_eza.gpg"
+    local eza_sources_list="/etc/apt/sources.list.d/gierens_eza.list"
+    if [ ! -f "${eza_keyring}" ]; then
+        curl -sSL https://raw.githubusercontent.com/eza-community/eza/main/deb.asc \
+        | gpg --dearmor | sudo tee "${eza_keyring}" > /dev/null
+    fi
+    if [ ! -f "${eza_sources_list}" ]; then
+        echo "deb [signed-by=${eza_keyring}] http://deb.gierens.de stable main" \
+        | sudo tee "${eza_sources_list}" > /dev/null
+        sudo chmod 644 ${eza_keyring} ${eza_sources_list}
+    fi
+}
+
 function install_nvm() {
     # Can be left by npm installed from apt.
     rm -f "$HOME/.npmrc"
@@ -34,30 +48,11 @@ function install_nvm() {
     set -x
 }
 
-function install_lsd() {
-    local platform
-    case $(uname -m) in
-        aarch64)
-            platform="arm64"
-            ;;
-        x86_64)
-            platform="amd64"
-            ;;
-        *)
-            error "running on unknown architecture: $(uname -m)"
-            ;;
-    esac
-    curl -s https://api.github.com/repos/lsd-rs/lsd/releases/latest \
-        | grep "browser_download_url.*lsd_.*${platform}.deb" \
-        | cut -d : -f 2,3 \
-        | tr -d \" \
-        | wget -qi - -O /tmp/lsd.deb
-    sudo dpkg -i /tmp/lsd.deb
-}
-
 function install_debian_packages() {
     local apt_packages=(
         build-essential
+        command-not-found
+        eza
         fd-find
         fzf
         gnupg
@@ -80,12 +75,12 @@ function install_debian_packages() {
         apt_packages+=(et)
         add_eternal_terminal_repo
     fi
+    add_eza_repo
     sudo apt update
     sudo apt install -y "${apt_packages[@]}"
     # Install zoxide
     curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
     install_nvm
-    install_lsd
 }
 
 function setup_debian() {
