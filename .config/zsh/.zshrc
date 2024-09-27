@@ -32,7 +32,6 @@ source "$ZDOTDIR/config.d/os_specific.zsh"
 
 # Configure plugins and tools
 source "$ZDOTDIR/config.d/plugins/autosuggest.zsh"
-source "$ZDOTDIR/config.d/plugins/colorize.zsh"
 source "$ZDOTDIR/config.d/plugins/enhancd.zsh"
 source "$ZDOTDIR/config.d/plugins/fzf.zsh"
 source "$ZDOTDIR/config.d/plugins/omz.zsh"
