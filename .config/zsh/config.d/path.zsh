@@ -7,6 +7,7 @@ _EXTRA_PATH=(
     "/usr/local/bin"
     "$HOME/.npm/bin"
     "$HOME/.iterm2"
+    "$HOME/.cargo/bin"
     "$HOME/.yarn/bin"
     "$HOME/.config/yarn/global/node_modules/.bin"
 )
