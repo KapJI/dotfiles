@@ -84,7 +84,7 @@ function install_python_packages() {
     for package in "${packages[@]}"; do
         uv tool install --upgrade "$package"
     done
-    uv tool install --upgrade thefuck --python python3.11
+    uv tool install --upgrade thefuck --python python3.11 --with setuptools
 }
 
 function install_npm_packages() {
