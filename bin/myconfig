@@ -6,8 +6,8 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 function check_sudo() {
-    if [[ $EUID -eq 0 ]]; then
-        error "Run without sudo or root"
+    if [[ $EUID -eq 0 && $UNSAFE_MODE -ne 1 ]]; then
+        error "Run without sudo or root. Alternatively, pass UNSAFE_MODE=1"
     fi
     echo "Need sudo to run some commands as root:"
     sudo true
