@@ -1,7 +1,6 @@
 # Aliases
 alias fd="fd --hidden"
 alias hgsl="hg sl"
-alias less="cless"
 alias ls="eza --icons=always --group --all"
 alias lt="eza --icons=always --tree --all"
 alias l="eza --icons=always -l --group --all"
@@ -13,3 +12,9 @@ alias sudo="sudo " # hack to make these aliases available for sudo
 alias usage="du -h -d1 | sort -h"
 alias vim="nvim"
 alias czm="chezmoi"
+
+# https://github.com/sharkdp/bat
+alias bathelp='bat --plain --language=help'
+help() {
+    "$@" --help 2>&1 | bathelp
+}
