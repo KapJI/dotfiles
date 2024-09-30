@@ -1,5 +1,10 @@
-# Enable custom completion
+# Enable custom completions
 fpath=("$ZDOTDIR/custom_completion" $fpath)
+
+# Enable Homebrew completions
+if [ "$MACOS" = true ]; then
+    fpath=("$(brew --prefix)/share/zsh/site-functions" $fpath)
+fi
 
 # Smart case completion. Case sensitive if upper case letters are used.
 # Second rule enables completion at ".", "_" and "-". Example: f.b -> foo.bar
