@@ -14,6 +14,7 @@ zstyle ':completion:*:git-checkout:*' sort false
 
 # Set descriptions format without escape sequences (like '%F{red}%d%f')
 zstyle ':completion:*' format '[%d]'
+zstyle ':completion:*:corrections' format '[%d (errors: %e)]'
 
 # Remove -- separator between columns
 zstyle ':completion:*' list-separator ''
