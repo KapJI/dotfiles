@@ -14,7 +14,9 @@ alias vim="nvim"
 alias czm="chezmoi"
 
 # https://github.com/sharkdp/bat
-alias bathelp='bat --plain --language=help'
+alias bathelp='bat --theme=1337 --plain --language=help'
 help() {
     "$@" --help 2>&1 | bathelp
 }
+# Global alias
+alias -g -- --help='--help 2>&1 | bathelp'
