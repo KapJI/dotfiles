@@ -10,8 +10,5 @@ zstyle ':antidote:bundle' use-friendly-names 'yes'
 # Source and load plugins found in ${ZDOTDIR}/.zsh_plugins.txt
 source $ZDOTDIR/antidote/antidote.zsh
 
-# Enable custom completion
-fpath=("$HOME/.zsh_completion" $fpath)
-
 # Load Antidote
 antidote load

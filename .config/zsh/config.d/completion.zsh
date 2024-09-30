@@ -1,3 +1,6 @@
+# Enable custom completion
+fpath=("$ZDOTDIR/custom_completion" $fpath)
+
 # Smart case completion. Case sensitive if upper case letters are used.
 # Second rule enables completion at ".", "_" and "-". Example: f.b -> foo.bar
 # Third rule enables completion on the left. Example: bar -> foobar
