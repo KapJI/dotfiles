@@ -1,6 +1,7 @@
 # Facebook stuff
 local fb_config="/usr/facebook/ops/rc/master.zshrc"
 if [ -f "$fb_config" ]; then
+    FB_NO_ALIASES=1
     source "$fb_config"
 fi
 
