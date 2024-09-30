@@ -71,6 +71,9 @@ function install_packages() {
 }
 
 function install_python_packages() {
+    if command_exists pipx; then
+        pipx uninstall-all
+    fi
     if ! command_exists uv; then
         curl -LsSf https://astral.sh/uv/install.sh | sh
     fi
