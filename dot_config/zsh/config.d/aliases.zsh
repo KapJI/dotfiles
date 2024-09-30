@@ -1,5 +1,4 @@
 # Aliases
-alias dof="git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
 alias fd="fd --hidden"
 alias hgsl="hg sl"
 alias less="cless"
