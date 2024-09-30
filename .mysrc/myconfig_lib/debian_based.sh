@@ -77,6 +77,7 @@ function install_debian_packages() {
     add_eza_repo
     sudo apt update
     sudo apt install -y "${apt_packages[@]}"
+    sudo apt remove pipx
     # Install zoxide
     curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
     install_nvm
