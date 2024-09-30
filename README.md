@@ -1,10 +1,10 @@
 <h1 align="center">
-    <a name="top" title="dotfiles">~/.&nbsp;📂 Cross-platform dotfiles</a><br/><sup><sub>powered by  <a href="https://www.chezmoi.io/">chezmoi</a> 🏠</sub></sup>
+    <a name="top" title="dotfiles">Cross-platform dotfiles</a><br/><sup><sub>powered by  <a href="https://www.chezmoi.io/">chezmoi</a> 🏠</sub></sup>
 </h1>
 
 [![License][badge-license]][link-license]
 
-My collection of dotfiles. Feel free to use if you find something interesting here.
+My collection of dotfiles for MacOS, Linux and Windows. Feel free to use if you find something interesting here.
 
 ## Deploy with one command
 ```
