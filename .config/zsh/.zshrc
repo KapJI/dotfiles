@@ -40,9 +40,6 @@ source "$ZDOTDIR/config.d/plugins/vi_mode.zsh"
 source "$ZDOTDIR/config.d/plugins/ysu.zsh"
 source "$ZDOTDIR/config.d/plugins/zoxide.zsh"
 
-# Enable Iterm2 shell integration
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
 # Load local zshrc if exists
 local_zshrc="${ZDOTDIR}/.zshrc.local"
 if [[ -f $local_zshrc ]]; then
