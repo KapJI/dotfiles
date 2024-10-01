@@ -8,7 +8,7 @@ My collection of dotfiles for MacOS, Linux and Windows. Feel free to use if you 
 
 ## Deploy with one command
 ```
-sh -c "$(curl -fsLS git.io/chezmoi)" -- init --apply KapJI
+BINDIR="$HOME/.local/bin" sh -c "$(curl -fsLS git.io/chezmoi)" -- init --apply KapJI
 ```
 
 ## Update configuration on current host
