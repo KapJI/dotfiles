@@ -13,3 +13,6 @@ if [ "$MACOS" = true ]; then
     export ANDROID_HOME=${ANDROID_SDK}
     export PATH=${PATH}:${ANDROID_SDK}/emulator:${ANDROID_SDK}/tools:${ANDROID_SDK}/tools/bin:${ANDROID_SDK}/platform-tools
 fi
+
+# Theme for https://github.com/sharkdp/bat
+export BAT_THEME="1337"
