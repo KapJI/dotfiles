@@ -3,7 +3,7 @@ fpath=("$ZDOTDIR/custom_completion" $fpath)
 
 # Enable Homebrew completions
 if [ "$MACOS" = true ]; then
-    fpath=("$(brew --prefix)/share/zsh/site-functions" $fpath)
+    fpath+=("$(brew --prefix)/share/zsh/site-functions")
 fi
 
 # Smart case completion. Case sensitive if upper case letters are used.
