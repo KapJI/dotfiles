@@ -1,5 +1,5 @@
 <h1 align="center">
-    <a name="top" title="dotfiles">Cross-platform dotfiles</a><br/><sup><sub>powered by  <a href="https://www.chezmoi.io/">chezmoi</a> 🏠</sub></sup>
+    <a name="top" title="dotfiles">Dotfiles</a><br/><sup><sub>powered by  <a href="https://www.chezmoi.io/">chezmoi</a> 🏠</sub></sup>
 </h1>
 
 [![License][badge-license]][link-license]
