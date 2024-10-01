@@ -36,7 +36,7 @@ alias gsh="git show"
 alias gst="git status"
 
 # https://github.com/sharkdp/bat
-alias bathelp='bat --theme=1337 --plain --language=help'
+alias bathelp='bat --plain --language=help'
 help() {
     "$@" --help 2>&1 | bathelp
 }
