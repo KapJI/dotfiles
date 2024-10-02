@@ -3,7 +3,8 @@ $env:Path += ";$env:USERPROFILE\.local\bin"
 
 $env:VIRTUAL_ENV_DISABLE_PROMPT=1
 oh-my-posh init pwsh --config ~/Documents/ohmyposh-themes/thecyberden.omp.json | Invoke-Expression
-$env:POSH_GIT_ENABLED = $true
+$env:POSH_GIT_ENABLED=$true
+$env:BAT_PAGER="ov"
 # Import-Module -Name Terminal-Icons
 Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward

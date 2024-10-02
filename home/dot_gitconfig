@@ -42,3 +42,7 @@
     path = ~/.gitconfig.local
 [init]
     defaultBranch = main
+[pager]
+    diff = "ov --section-delimiter '^diff'"
+    log = "ov"
+    show = "ov --section-delimiter '^diff'"
