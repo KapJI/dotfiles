@@ -6,5 +6,8 @@ bin
 .tmux.conf
 .tmux.conf.local
 .zshenv
+{{ else }}
+AppData
+Documents
 {{ end }}
 
