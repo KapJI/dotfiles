@@ -7,8 +7,15 @@
 My collection of dotfiles for MacOS, Linux and Windows. Feel free to use if you find something interesting here.
 
 ## Deploy with one command
+
+### Unix
 ```
-BINDIR="$HOME/.local/bin" sh -c "$(curl -fsLS git.io/chezmoi)" -- init --apply KapJI
+sh -c "$(curl -fsLS git.io/chezmoi)" -b ~/.local/bin -- init --apply KapJI
+```
+
+### Windows
+```
+powershell "&{$(irm 'https://get.chezmoi.io/ps1')} -b ~/.local/bin" -- init --apply KapJI
 ```
 
 ## Update configuration on current host
