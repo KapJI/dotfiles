@@ -1,4 +1,5 @@
 .dotfiles
 .iterm2_shell_integration.zsh
 .p10k.zsh
+.zsh_completion
 .zsh_history
