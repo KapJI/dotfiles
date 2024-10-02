@@ -16,3 +16,4 @@ fi
 
 # Theme for https://github.com/sharkdp/bat
 export BAT_THEME="1337"
+export BAT_PAGER="ov"
