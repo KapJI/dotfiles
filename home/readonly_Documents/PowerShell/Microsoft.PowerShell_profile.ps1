@@ -15,6 +15,34 @@ Remove-Item -Force Alias:sl
 New-Alias sl subl
 New-Alias vim nvim
 New-Alias czm chezmoi
+# Git aliases from oh-my-zsh
+New-Alias g git
+# Add-Alias requires running `Install-Module -Name posh-alias`
+Add-Alias ga "git add"
+Add-Alias gb "git branch"
+Add-Alias gco "git checkout"
+Add-Alias gcl "git clone"
+Remove-Item -Force Alias:gc
+Add-Alias gc "git commit"
+Add-Alias gcam "git commit --all --message"
+Remove-Item -Force Alias:gcm
+Add-Alias gcm "git commit --message"
+Add-Alias gcn! "git commit --verbose --no-edit --amend"
+Add-Alias gd "git diff"
+Add-Alias gf "git fetch"
+Remove-Item -Force Alias:gl
+Add-Alias gl "git pull"
+Add-Alias gpra "git pull --rebase --autostash"
+Remove-Item -Force Alias:gp
+Add-Alias gp "git push"
+Add-Alias gpf! "git push --force"
+Add-Alias grb "git rebase"
+Add-Alias gr "git remote"
+Add-Alias grs "git restore"
+Add-Alias grm "git rm"
+Add-Alias gsh "git show"
+Add-Alias gst "git status"
+Add-Alias gsl "git sl"
 # fzf
 $env:FZF_DEFAULT_OPTS="--ansi --height=40% --layout=reverse"
 Import-Module posh-git
