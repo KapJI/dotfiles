@@ -1,0 +1,10 @@
+{{ if eq .chezmoi.os "windows" }}
+bin
+.config
+.iterm2
+.mysrc
+.tmux.conf
+.tmux.conf.local
+.zshenv
+{{ end }}
+
