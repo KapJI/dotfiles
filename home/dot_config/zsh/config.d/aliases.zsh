@@ -34,9 +34,18 @@ alias grs="git restore"
 alias grm="git rm"
 alias gsh="git show"
 alias gst="git status"
+alias gsl="git sl"
 
 # https://github.com/sharkdp/bat
 alias bathelp='bat --plain --language=help'
 help() {
     "$@" --help 2>&1 | bathelp
+}
+
+hg() {
+    if [[ "$1" == "diff" || "$1" == "show" ]]; then
+        command hg "$@" | delta
+    else
+        command hg "$@"
+    fi
 }
