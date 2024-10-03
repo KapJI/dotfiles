@@ -8,14 +8,6 @@
             "keys": "ctrl+v"
         },
         {
-            "command": 
-            {
-                "action": "switchToTab",
-                "index": 0
-            },
-            "keys": "ctrl+1"
-        },
-        {
             "command": "unbound",
             "keys": "ctrl+alt+2"
         },
@@ -52,28 +44,15 @@
             "keys": "ctrl+alt+9"
         },
         {
-            "command": 
+            "command":
             {
-                "action": "copy",
-                "singleLine": false
+                "action": "switchToTab",
+                "index": 0
             },
-            "keys": "ctrl+c"
+            "keys": "ctrl+1"
         },
         {
-            "command": "find",
-            "keys": "ctrl+shift+f"
-        },
-        {
-            "command": 
-            {
-                "action": "splitPane",
-                "split": "auto",
-                "splitMode": "duplicate"
-            },
-            "keys": "alt+shift+d"
-        },
-        {
-            "command": 
+            "command":
             {
                 "action": "switchToTab",
                 "index": 1
@@ -81,7 +60,7 @@
             "keys": "ctrl+2"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "switchToTab",
                 "index": 2
@@ -89,7 +68,7 @@
             "keys": "ctrl+3"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "switchToTab",
                 "index": 3
@@ -105,7 +84,7 @@
             "keys": "ctrl+5"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "switchToTab",
                 "index": 5
@@ -113,7 +92,7 @@
             "keys": "ctrl+6"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "switchToTab",
                 "index": 6
@@ -135,6 +114,27 @@
                 "index": 4294967295
             },
             "keys": "ctrl+9"
+        },
+        {
+            "command": 
+            {
+                "action": "copy",
+                "singleLine": false
+            },
+            "keys": "ctrl+c"
+        },
+        {
+            "command": 
+            {
+                "action": "splitPane",
+                "split": "auto",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+shift+d"
+        },
+        {
+            "command": "find",
+            "keys": "ctrl+shift+f"
         }
     ],
     "copyFormatting": "none",
@@ -172,40 +172,10 @@
                 "name": "Command Prompt"
             },
             {
-                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
-                "hidden": false,
-                "name": "Azure Cloud Shell",
-                "source": "Windows.Terminal.Azure"
-            },
-            {
-                "guid": "{395c8543-00fa-54d9-8931-1781cfde884e}",
-                "hidden": false,
-                "name": "Developer Command Prompt for VS 2022",
-                "source": "Windows.Terminal.VisualStudio"
-            },
-            {
-                "guid": "{1c9e4368-d577-5e6d-94e3-0884b2325eeb}",
-                "hidden": false,
-                "name": "Developer PowerShell for VS 2022",
-                "source": "Windows.Terminal.VisualStudio"
-            },
-            {
                 "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
                 "hidden": false,
                 "name": "PowerShell",
                 "source": "Windows.Terminal.PowershellCore"
-            },
-            {
-                "guid": "{914a9709-5b46-5003-9f1a-02b5c7d2c6ed}",
-                "hidden": false,
-                "name": "Developer Command Prompt for VS 2022 (2)",
-                "source": "Windows.Terminal.VisualStudio"
-            },
-            {
-                "guid": "{d17d4f21-4fa1-5e1f-8d22-6b2926ce6a27}",
-                "hidden": false,
-                "name": "Developer PowerShell for VS 2022 (2)",
-                "source": "Windows.Terminal.VisualStudio"
             },
             {
                 "commandline": "C:\\cygwin64\\bin\\bash.exe --login -i",
@@ -213,6 +183,18 @@
                 "hidden": false,
                 "icon": "C:\\cygwin64\\Cygwin-Terminal.ico",
                 "name": "Cygwin"
+            },
+            {
+                "guid": "{b6a86068-1047-5ae3-88e2-066d2753d826}",
+                "hidden": false,
+                "name": "Developer Command Prompt for VS 2022",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{be3320db-f32a-552b-a034-437458d2a8b8}",
+                "hidden": false,
+                "name": "Developer PowerShell for VS 2022",
+                "source": "Windows.Terminal.VisualStudio"
             }
         ]
     },
