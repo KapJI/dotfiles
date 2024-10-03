@@ -7,14 +7,15 @@
     autoSetupRemote = true
 [alias]
     c = commit
-    cam = commit --amend --message
+    cam = commit --all --message
     cl = clone
     cm = commit --message
     co = checkout
     d = diff
     f = fetch
-    l = pull
     p = push
+    l = pull
+    pra = pull --rebase --autostash
     rb = rebase
     r = remote
     rs = restore
