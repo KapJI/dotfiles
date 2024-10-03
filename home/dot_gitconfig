@@ -8,20 +8,20 @@
 [alias]
     c = commit
     cam = commit --amend --message
-    cm = commit --message
     cl = clone
+    cm = commit --message
     co = checkout
     d = diff
     f = fetch
-    p = push
     l = pull
+    p = push
     rb = rebase
     r = remote
     rs = restore
     sh = show
     st = status
     sl = "log --graph --pretty=format:'commit: %C(bold red)%h%Creset %C(red)<%H>%Creset %C(bold magenta)%d %Creset%ndate: %C(bold yellow)%cd %Creset%C(yellow)%cr%Creset%nauthor: %C(bold blue)%an%Creset %C(blue)<%ae>%Creset%n%C(cyan)%s%n%Creset'"
-    prev = checkout HEAD^1
+    prev = "checkout HEAD^1"
     next = "!sh ~/bin/git-checkout-next.sh"
     fixup = "!sh ~/bin/git-fixup.sh"
     unstash = stash pop
@@ -42,7 +42,17 @@
     path = ~/.gitconfig.local
 [init]
     defaultBranch = main
+[core]
+    pager = delta
 [pager]
-    diff = "ov --section-delimiter '^diff'"
-    log = "ov"
-    show = "ov --section-delimiter '^diff'"
+    diff = delta --pager 'ov --section-delimiter "^h"'
+    #log = "ov"
+    #show = "ov --section-delimiter '^diff'"
+[merge]
+    conflictstyle = diff3
+[delta]
+    file-modified-label = modified:
+    line-numbers = true
+    side-by-side = true
+[delta "interactive"]
+    keep-plus-minus-markers = false
