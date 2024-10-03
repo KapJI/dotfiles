@@ -44,10 +44,6 @@
     defaultBranch = main
 [core]
     pager = delta
-[pager]
-    diff = delta --pager 'ov --section-delimiter "^h"'
-    #log = "ov"
-    #show = "ov --section-delimiter '^diff'"
 [merge]
     conflictstyle = diff3
 [delta]
