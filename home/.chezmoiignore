@@ -1,6 +1,6 @@
 {{ if eq .chezmoi.os "windows" }}
 bin
-.config
+.config/zsh
 .iterm2
 .mysrc
 .tmux.conf
