@@ -26,6 +26,15 @@
     fixup = "!sh ~/bin/git-fixup.sh"
     unstash = stash pop
     cleanup = "!sh ~/bin/git-branch-cleanup.sh"
+    # hg compat
+    amend = commit --all --amend
+    histedit = rebase -i
+    shelve = stash
+    unshelve = stash pop
+    uncommit = reset --soft HEAD^
+    unamend = reset HEAD@{1}
+    undo = reset --hard HEAD@{1}
+    backout = revert
 [color]
     ui = auto
 [pull]
