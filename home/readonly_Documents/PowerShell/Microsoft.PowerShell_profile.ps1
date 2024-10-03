@@ -1,11 +1,12 @@
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
-$env:Path += ";$env:USERPROFILE\.local\bin"
+if ($env:PATH -notlike "*$env:USERPROFILE\.local\bin*") {
+    $env:Path += ";$env:USERPROFILE\.local\bin"
+}
 
-$env:VIRTUAL_ENV_DISABLE_PROMPT=1
+$env:VIRTUAL_ENV_DISABLE_PROMPT = 1
 oh-my-posh init pwsh --config ~/Documents/ohmyposh-themes/thecyberden.omp.json | Invoke-Expression
-$env:POSH_GIT_ENABLED=$true
-$env:BAT_PAGER="ov"
-# Import-Module -Name Terminal-Icons
+$env:POSH_GIT_ENABLED = $true
+$env:BAT_PAGER = "ov"
 Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 Set-PSReadLineKeyHandler -Key Ctrl+u -Function BackwardDeleteLine
@@ -47,6 +48,7 @@ Add-Alias gsl "git sl"
 # fzf
 $env:FZF_DEFAULT_OPTS="--ansi --height=40% --layout=reverse"
 Import-Module posh-git
+Import-Module Terminal-Icons
 Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+f' -PSReadlineChordReverseHistory 'Ctrl+r'
 
 function head {
@@ -71,6 +73,7 @@ function tail {
     if ($Path -ne "") {
         Get-Content $Path -Tail $n
     } else {
+        # If no path is provided, read from stdin
         $input | Select-Object -Last $n
     }
 }
@@ -81,5 +84,9 @@ function df {
 
 function which ($command) {
     Get-Command -Name $command -ErrorAction SilentlyContinue |
-      Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
+    Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
+}
+
+function fd {
+    fd.exe --hidden $args
 }
