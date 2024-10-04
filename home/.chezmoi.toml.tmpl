@@ -7,6 +7,10 @@
 [diff]
     pager = "delta"
 
+[merge]
+    command = "nvim"
+    args = ["-d", "{{`{{ .Destination }}`}}", "{{`{{ .Source }}", "{{ .Target }}`}}"]
+
 [data]
     full_name = "Ruslan Sayfutdinov"
     {{- $work_machine := promptBoolOnce . "work_machine" "Is this a work machine" }}
