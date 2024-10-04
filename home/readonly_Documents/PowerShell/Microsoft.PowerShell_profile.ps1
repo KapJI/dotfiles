@@ -17,6 +17,7 @@ Remove-Item -Force Alias:sl
 New-Alias sl subl
 New-Alias vim nvim
 New-Alias czm chezmoi
+Add-Alias czmcd "cd $(chezmoi source-path)"
 # Git aliases from oh-my-zsh
 New-Alias g git
 # Add-Alias requires running `Install-Module -Name posh-alias`
