@@ -62,9 +62,14 @@
 [diff]
     colorMoved = default
     colorMovedWS = allow-indentation-change
+[interactive]
+    diffFilter = delta --color-only --pager less
 [delta]
     file-modified-label = modified:
+    hunk-header-decoration-style = yellow box
+    hunk-header-style = syntax
     line-numbers = true
+    map-styles = "bold purple => syntax #33194d, bold cyan => syntax #4d2673"
     side-by-side = true
 [delta "interactive"]
     keep-plus-minus-markers = false
