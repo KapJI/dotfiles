@@ -1,7 +1,7 @@
 [user]
-    name = Ruslan Sayfutdinov
+    name = {{ .full_name }}
     email = {{ .git_email }} 
-    signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFSSzANpPTrJh7njWtP8Pba96d60IWZADcXK2YZGK/AI
+    signingkey = {{ .git_signingkey }}
 [push]
     default = simple
     autoSetupRemote = true

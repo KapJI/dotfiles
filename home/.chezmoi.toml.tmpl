@@ -2,9 +2,11 @@
     pager = "delta"
 
 [data]
+    full_name = "Ruslan Sayfutdinov"
     {{- $work_machine := promptBoolOnce . "work_machine" "Is this a work machine" }}
     work_machine = {{ $work_machine }}
     {{- $git_email := promptStringOnce . "git_email" "Email address for Git" }}
-    git_email = {{ $git_email | quote }}
+    git_email = "{{ $git_email }}"
     {{- $hg_email := promptStringOnce . "hg_email" "Email address for Hg" $git_email }}
-    hg_email = {{ $hg_email | quote }}
+    hg_email = "{{ $hg_email }}"
+    git_signingkey = "{{ (gitHubKeys "KapJI" | first).Key }}"
