@@ -11,6 +11,7 @@ alias sudo="sudo " # hack to make these aliases available for sudo
 alias usage="du -h -d1 | sort -h"
 alias vim="nvim"
 alias czm="chezmoi"
+alias czmcd="cd $(chezmoi source-path)"
 
 # Git aliases from oh-my-zsh
 alias g="git"
