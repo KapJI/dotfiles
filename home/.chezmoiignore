@@ -1,3 +1,6 @@
+{{ if not .work_machine }}
+.config/zsh/config.d/fb.zsh
+{{ end }}
 {{ if eq .chezmoi.os "windows" }}
 bin
 .config/1Password
