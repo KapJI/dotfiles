@@ -5,6 +5,7 @@
 bin
 .config/1Password
 .config/zsh
+.hgrc
 .iterm2
 .mysrc
 .tmux.conf
@@ -13,5 +14,6 @@ bin
 {{ else }}
 AppData
 Documents
+mercurial.ini
 {{ end }}
 
