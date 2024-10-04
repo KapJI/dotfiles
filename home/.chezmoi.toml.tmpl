@@ -1,3 +1,9 @@
+{{ if eq .chezmoi.os "windows" -}}
+[cd]
+    command = "pwsh.exe"
+
+{{ end -}}
+
 [diff]
     pager = "delta"
 
