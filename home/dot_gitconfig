@@ -6,18 +6,21 @@
     default = simple
     autoSetupRemote = true
 [alias]
+    # sync with zsh
+    a = add
+    b = branch
     c = commit
-    cam = commit --all --message
-    cl = clone
-    cm = commit --message
     co = checkout
+    cl = clone
+    cam = commit --all --message
+    cm = commit --message
     d = diff
     f = fetch
+    pl = pull
+    plra = pull --rebase --autostash
     p = push
-    l = pull
-    pra = pull --rebase --autostash
-    rb = rebase
     r = remote
+    rb = rebase
     rs = restore
     sh = show
     st = status
@@ -56,6 +59,9 @@
     pager = delta
 [merge]
     conflictstyle = diff3
+[diff]
+    colorMoved = default
+    colorMovedWS = allow-indentation-change
 [delta]
     file-modified-label = modified:
     line-numbers = true
