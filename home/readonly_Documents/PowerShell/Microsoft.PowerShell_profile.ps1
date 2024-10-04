@@ -7,6 +7,7 @@ $env:VIRTUAL_ENV_DISABLE_PROMPT = 1
 oh-my-posh init pwsh --config ~/Documents/ohmyposh-themes/thecyberden.omp.json | Invoke-Expression
 $env:POSH_GIT_ENABLED = $true
 $env:BAT_PAGER = "ov"
+$env:BAT_THEME = "1337"
 Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 Set-PSReadLineKeyHandler -Key Ctrl+u -Function BackwardDeleteLine
@@ -91,3 +92,21 @@ function which ($command) {
 function fd {
     fd.exe --hidden $args
 }
+
+function bathelp {
+    [CmdletBinding()]
+    param (
+        [Parameter(ValueFromPipeline = $true)]
+        [string]$InputObject
+    )
+    begin {
+        $content = @()
+    }
+    process {
+        $content += $InputObject
+    }
+    end {
+        $content -join "`n" | bat.exe -l help --plain
+    }
+}
+
