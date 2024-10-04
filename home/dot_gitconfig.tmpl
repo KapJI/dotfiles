@@ -1,6 +1,6 @@
 [user]
     name = Ruslan Sayfutdinov
-    email = ruslan@sayfutdinov.com
+    email = {{ .git_email }} 
     signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFSSzANpPTrJh7njWtP8Pba96d60IWZADcXK2YZGK/AI
 [push]
     default = simple
@@ -51,8 +51,6 @@
     gpgsign = true
 [tag]
     forceSignAnnotated = true
-[include]
-    path = ~/.gitconfig.local
 [init]
     defaultBranch = main
 [core]
@@ -73,3 +71,6 @@
     side-by-side = true
 [delta "interactive"]
     keep-plus-minus-markers = false
+# Keep at the end of file
+[include]
+    path = ~/.gitconfig.local
