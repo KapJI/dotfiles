@@ -47,6 +47,9 @@
     format = ssh
 [gpg "ssh"]
     allowedSignersFile = ~/.ssh/allowed_signers
+{{- if eq .chezmoi.os "windows" }}
+    program = C:/Windows/System32/OpenSSH/ssh-keygen.exe
+{{- end }}
 [commit]
     gpgsign = true
 [tag]
@@ -55,6 +58,10 @@
     defaultBranch = main
 [core]
     pager = delta
+{{- if eq .chezmoi.os "windows" }}
+    symlink = true
+    sshCommand = C:/Windows/System32/OpenSSH/ssh.exe
+{{- end }}
 [merge]
     conflictstyle = diff3
 [diff]
