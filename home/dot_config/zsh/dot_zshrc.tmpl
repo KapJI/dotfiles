@@ -23,7 +23,9 @@ source "$ZDOTDIR/config.d/antidote.zsh"
 source "$ZDOTDIR/config.d/aliases.zsh"
 source "$ZDOTDIR/config.d/completion.zsh"
 source "$ZDOTDIR/config.d/env.zsh"
+{{- if .work_machine }}
 source "$ZDOTDIR/config.d/fb.zsh"
+{{- end }}
 source "$ZDOTDIR/config.d/history.zsh"
 source "$ZDOTDIR/config.d/init_tools.zsh"
 source "$ZDOTDIR/config.d/key_bindings.zsh"
