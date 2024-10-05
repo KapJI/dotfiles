@@ -81,3 +81,6 @@
 # Keep at the end of file
 [include]
     path = ~/.gitconfig.local
+{{ if eq (get .chezmoi.osRelease "id") "centos" }}
+{{ includeTemplate (joinPath (osDir .chezmoi.configFile) "work_gitconfig") . }}
+{{ end }}
