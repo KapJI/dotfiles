@@ -30,6 +30,9 @@ zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 # Force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
 zstyle ':completion:*' menu no
 
+# Hide "." and ".." for completion list. Show ".." only when it's explicitly given.
+zstyle -e ':completion:*' special-dirs '[[ ${PREFIX##*/} == ".." ]] && reply=(..)'
+
 # Preview directory's content with eza when completing cd
 zstyle ':fzf-tab:complete:__enhancd::cd:*' fzf-preview 'eza -1 --color=always --icons=always $realpath'
 
