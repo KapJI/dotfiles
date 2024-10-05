@@ -75,4 +75,3 @@ inosc=1
 printf '1337;Copy=:%s' "$data" > ${CURRENT_TTY}
 print_st
 inosc=0
-

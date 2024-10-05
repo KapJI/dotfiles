@@ -22,7 +22,7 @@ fi
 # generate a file of all zeros
 echo "Generating $test_size MB test file..."
 dd if=/dev/zero of=$test_file bs=$(echo "$test_size*1024*1024" | bc) \
-  count=1 
+  count=1
 # upload test
 echo "Testing upload to $ssh_server..."
 up_speed=$(scp -v $test_file $ssh_server:$test_file 2>&1 | \

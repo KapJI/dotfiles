@@ -8,7 +8,7 @@ setopt COMPLETE_IN_WORD
 # Share history between parallel sessions
 setopt SHARE_HISTORY
 
-# If a new command line being added to the history list duplicates an older one, 
+# If a new command line being added to the history list duplicates an older one,
 # the older command is removed from the list (even if it is not the previous event).
 setopt HIST_IGNORE_ALL_DUPS
 

@@ -109,4 +109,3 @@ function bathelp {
         $content -join "`n" | bat.exe -l help --plain
     }
 }
-
