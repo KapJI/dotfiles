@@ -20,3 +20,9 @@
     {{- $hg_email := promptStringOnce . "hg_email" "Email address for Hg" $git_email }}
     hg_email = "{{ $hg_email }}"
     git_signingkey = "{{ (gitHubKeys "KapJI" | first).Key }}"
+
+encryption = "age"
+
+[age]
+    identity = "~/.config/chezmoi/key.txt"
+    recipient = "age1p6n7pr73yfxysh8qjty4guhfea9gqgh7uwk8w6e3wx7r9eqqw4sqeg4r9g"

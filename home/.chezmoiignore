@@ -1,8 +1,16 @@
+key.txt.age
+
 {{ if not .work_machine }}
 .config/zsh/config.d/fb.zsh
 {{ end }}
-{{ if eq .chezmoi.os "windows" }}
-bin
+
+{{ if ne .chezmoi.os "windows" }}
+.chezmoiscripts/windows/**
+AppData
+Documents
+mercurial.ini
+{{ else }}
+.chezmoiscripts/unix/**
 .config/1Password
 .config/zsh
 .hgrc
@@ -11,9 +19,5 @@ bin
 .tmux.conf
 .tmux.conf.local
 .zshenv
-{{ else }}
-AppData
-Documents
-mercurial.ini
+bin
 {{ end }}
-
