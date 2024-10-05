@@ -3,7 +3,7 @@
 {{ if eq (get .chezmoi.osRelease "id") "centos" }}
 TARGET_PATH="{{ joinPath (osDir .chezmoi.configFile) "work_gitconfig" }}"
 if [ ! -f "${TARGET_PATH}" ]; then
-    chezmoi age decrypt --output "${TARGET_PATH}" "{{ .chezmoi.sourceDir }}/.data/work_gitconfig.age"
+    chezmoi decrypt --output "${TARGET_PATH}" "{{ .chezmoi.sourceDir }}/.data/work_gitconfig.age"
     chmod 600 "${TARGET_PATH}"
 fi
 {{ end }}
