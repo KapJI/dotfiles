@@ -7,5 +7,5 @@ if (!(Test-Path "$HOME\.config\chezmoi\key.txt")) {
 
     # Set permissions so only the current user has read and write access
     $user = "$env:USERDOMAIN\$env:USERNAME"
-    icacls "$HOME\.config\chezmoi\key.txt" /inheritance:r /grant:r "$user:(R,W)"
+    icacls "$HOME\.config\chezmoi\key.txt" /inheritance:r /grant:r "${user}:(R,W)"
 }
