@@ -20,6 +20,11 @@
     {{- $hg_email := promptStringOnce . "hg_email" "Email address for Hg" $git_email }}
     hg_email = "{{ $hg_email }}"
     git_signingkey = "{{ (gitHubKeys "KapJI" | first).Key }}"
+    {{- $osid := .chezmoi.os -}}
+    {{- if hasKey .chezmoi.osRelease "id" -}}
+    {{-   $osid = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
+    {{- end }}
+    osid = "{{ $osid }}"
 
 encryption = "age"
 
