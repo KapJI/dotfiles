@@ -1,0 +1,20 @@
+{
+	"ensure_newline_at_eof_on_save": true,
+	"font_size": 16,
+	"rulers":
+	[
+		80
+	],
+	"show_git_status": false,
+	"translate_tabs_to_spaces": true,
+	"trim_trailing_white_space_on_save": false,
+	"update_check": false,
+	"word_wrap": false,
+	"theme": "Default.sublime-theme",
+	"color_scheme": "Monokai.sublime-color-scheme",
+	"ignored_packages":
+	[
+		"Vintage",
+	],
+	"index_files": true,
+}

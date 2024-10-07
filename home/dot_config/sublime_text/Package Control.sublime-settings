@@ -1,0 +1,23 @@
+{
+	"bootstrapped": true,
+	"installed_packages":
+	[
+		"ApplySyntax",
+		"DiffTabs",
+		"gcode",
+		"INI",
+		"Kotlin",
+		"Package Control",
+		"PowerShell",
+		"Pretty JSON",
+		"Protobuf Syntax Hightlighting",
+		"RawLineEdit",
+		"ThriftSyntax",
+		"Tmux Syntax Highlight",
+		"TOML",
+		"VimL",
+	],
+	"in_process_packages":
+	[
+	],
+}
