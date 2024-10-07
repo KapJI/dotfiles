@@ -4,7 +4,11 @@ key.txt.age
 .config/zsh/config.d/fb.zsh
 {{ end }}
 
-{{ if ne .chezmoi.os "windows" }}
+{{ if ne .osid "darwin" }}
+Library
+{{ end }}
+
+{{ if ne .osid "windows" }}
 .chezmoiscripts/windows/**
 AppData
 Documents
