@@ -21,6 +21,7 @@ bin
 {{ end }}
 
 {{ if not (or (has .osid (list "darwin" "windows")) (eq .chezmoi.hostname "homeserver" )) }}
+.chezmoiscripts/unix/20-list-ssh-pubkeys.sh
 .ssh/pubkeys/**
 !.ssh/pubkeys/github_key.pub
 {{ end }}
