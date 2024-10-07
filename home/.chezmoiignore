@@ -19,3 +19,8 @@ Documents
 .zshenv
 bin
 {{ end }}
+
+{{ if not (or (has .osid (list "darwin" "windows")) (eq .chezmoi.hostname "homeserver" )) }}
+.ssh/pubkeys/**
+!.ssh/pubkeys/github_key.pub
+{{ end }}
