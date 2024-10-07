@@ -8,12 +8,10 @@ key.txt.age
 .chezmoiscripts/windows/**
 AppData
 Documents
-mercurial.ini
 {{ else }}
 .chezmoiscripts/unix/**
 .config/1Password
 .config/zsh
-.hgrc
 .iterm2
 .mysrc
 .tmux.conf
