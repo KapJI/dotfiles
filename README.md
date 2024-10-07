@@ -10,7 +10,7 @@ My collection of dotfiles for MacOS, Linux and Windows. Feel free to use if you 
 
 ### Unix
 ```
-sh -c "$(curl -fsLS git.io/chezmoi)" -b ~/.local/bin -- init --apply KapJI
+sh -c "$(curl -fsLS git.io/chezmoi)" -- -b ~/.local/bin init --apply KapJI
 ```
 
 ### Windows
