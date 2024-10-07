@@ -11,3 +11,8 @@ updateonmove = true
 
 [hint]
 ack = smartlog-default-command
+
+{{ if eq .osid "windows" -}}
+[pager]
+pager = delta
+{{- end }}
