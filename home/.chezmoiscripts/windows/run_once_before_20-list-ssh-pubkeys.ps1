@@ -1,6 +1,14 @@
 $OUTPUT = "$HOME\.config\chezmoi\ssh_pubkeys.txt"
 
-ssh-add -L > $OUTPUT
+$keys = ssh-add -L
+
+$stream = New-Object System.IO.StreamWriter($OUTPUT, $false, [System.Text.Encoding]::ASCII)
+$stream.NewLine = "`n"
+foreach ($line in $keys) {
+    $stream.WriteLine($line)
+}
+$stream.Close()
+
 if (!(Select-String -Pattern "Github SSH Key" -Path $OUTPUT)) {
     Write-Error "Error: Github key is not found"
     exit 1
