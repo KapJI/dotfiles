@@ -1,7 +1,4 @@
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
-if ($env:PATH -notlike "*$env:USERPROFILE\.local\bin*") {
-    $env:Path += ";$env:USERPROFILE\.local\bin"
-}
 
 $env:VIRTUAL_ENV_DISABLE_PROMPT = 1
 oh-my-posh init pwsh --config ~/Documents/ohmyposh-themes/thecyberden.omp.json | Invoke-Expression
