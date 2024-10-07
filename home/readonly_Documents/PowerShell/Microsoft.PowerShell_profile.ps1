@@ -8,6 +8,8 @@ oh-my-posh init pwsh --config ~/Documents/ohmyposh-themes/thecyberden.omp.json |
 $env:POSH_GIT_ENABLED = $true
 $env:BAT_PAGER = "ov"
 $env:BAT_THEME = "1337"
+# Enable Zsh like completion
+Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 Set-PSReadLineKeyHandler -Key Ctrl+u -Function BackwardDeleteLine
