@@ -1,6 +1,6 @@
 {
 	"ensure_newline_at_eof_on_save": true,
-	"font_size": 16,
+	"font_size": {{ if eq .osid "windows" }}12{{ else }}16{{ end }},
 	"rulers":
 	[
 		80
