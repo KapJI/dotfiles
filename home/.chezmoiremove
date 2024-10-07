@@ -1,6 +1,8 @@
 .dotfiles
 .iterm2_shell_integration.zsh
+.gitignore
 .p10k.zsh
 .zsh_completion
 .zsh_history
 mercurial.ini
+README.md
