@@ -1,1 +1,13 @@
-{{- template "hgrc" . -}}
+[ui]
+username = {{ .full_name }} <{{ .hg_email }}>
+
+[alias]
+blame = annotate --user --number --date
+restore = revert
+sl = ssl
+
+[commitcloud]
+updateonmove = true
+
+[hint]
+ack = smartlog-default-command
