@@ -24,7 +24,7 @@ Documents
 bin
 {{ end }}
 
-{{ not (has .osid (list "darwin" "windows") }}
+{{ not (has .osid (list "darwin" "windows")) }}
 .config/sublime_text
 {{ end }}
 
