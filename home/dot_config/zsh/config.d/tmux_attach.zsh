@@ -6,5 +6,5 @@ else
 fi
 
 if [[ ${VSCODE_TASK:-} == false ]] && [ -t 0 ] && [ -z "$TMUX" ] && command -v tmux >/dev/null 2>&1; then
-    tmux new -A -s auto
+    exec tmux new -A -s auto
 fi
