@@ -24,6 +24,10 @@ Documents
 bin
 {{ end }}
 
+{{ not (has .osid (list "darwin" "windows") }}
+.config/sublime_text
+{{ end }}
+
 {{ if not (or (has .osid (list "darwin" "windows")) (eq .chezmoi.hostname "homeserver" )) }}
 .chezmoiscripts/unix/20-list-ssh-pubkeys.sh
 .ssh/pubkeys/**
