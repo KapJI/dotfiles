@@ -1,0 +1,4 @@
+{{- $scoopfile := join .chezmoi.sourceDir ".data/scoopfile.json" -}}
+# scoopfile hash: {{ include $scoopfile | sha256sum }}
+
+scoop import {{ $scoopfile }}
