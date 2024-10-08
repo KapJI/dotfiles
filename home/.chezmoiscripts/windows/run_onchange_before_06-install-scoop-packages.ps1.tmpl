@@ -1,4 +1,6 @@
 {{- $scoopfile := joinPath .chezmoi.sourceDir ".data/scoopfile.json" -}}
 # scoopfile hash: {{ include $scoopfile | sha256sum }}
 
+# git is needed for adding buckets
+scoop install git
 scoop import {{ $scoopfile }}
