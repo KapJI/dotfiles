@@ -1,3 +1,6 @@
+{{- $winget_pkgs := joinPath .chezmoi.sourceDir ".data/winget.json" -}}
+# winget packages hash: {{ include $winget_pkgs | sha256sum }}
+
 # Reload Path
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
@@ -8,5 +11,5 @@ if (!(Test-Path -PathType container $path)) {
 }
 $sourcePath = chezmoi source-path
 cp "$sourcePath/.chezmoitemplates/1password_agent.toml" $path\agent.toml
-winget install -e --id AgileBits.1Password
-winget install -e --id Microsoft.PowerShell
+
+winget import -i {{ $winget_pkgs }}
