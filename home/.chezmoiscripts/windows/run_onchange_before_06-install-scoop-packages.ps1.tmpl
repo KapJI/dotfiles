@@ -2,5 +2,5 @@
 # scoopfile hash: {{ include $scoopfile | sha256sum }}
 
 # git is needed for adding buckets
-powershell -Fie "$env:USERPROFILE\scoop\shims\scoop.ps1" install git
-powershell -Fie "$env:USERPROFILE\scoop\shims\scoop.ps1" import {{ $scoopfile }}
+& $env:USERPROFILE\scoop\shims\scoop.ps1 install git
+& $env:USERPROFILE\scoop\shims\scoop.ps1 import {{ $scoopfile }}
