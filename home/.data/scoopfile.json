@@ -176,20 +176,6 @@
         },
         {
             "Info": "",
-            "Version": "14.40.33810.0",
-            "Source": "extras",
-            "Name": "vcredist2022",
-            "Updated": "2024-10-02T20:56:08.3868741+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "20240203-110809-5046fc22",
-            "Source": "extras",
-            "Name": "wezterm",
-            "Updated": "2024-09-25T17:26:24.838577+01:00"
-        },
-        {
-            "Info": "",
             "Version": "0.9.6",
             "Source": "main",
             "Name": "zoxide",
