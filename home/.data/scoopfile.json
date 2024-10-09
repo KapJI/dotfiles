@@ -141,6 +141,20 @@
         },
         {
             "Info": "",
+            "Version": "1.1.0",
+            "Source": "extras",
+            "Name": "posh-git",
+            "Updated": "2024-10-09T17:57:51.1747302+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "2.6.1",
+            "Source": "extras",
+            "Name": "psfzf",
+            "Updated": "2024-10-09T17:57:24.2156979+01:00"
+        },
+        {
+            "Info": "",
             "Version": "3.13.0",
             "Source": "main",
             "Name": "python",
@@ -152,6 +166,13 @@
             "Source": "main",
             "Name": "ripgrep",
             "Updated": "2024-09-25T17:27:29.4104149+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "0.11.0",
+            "Source": "extras",
+            "Name": "terminal-icons",
+            "Updated": "2024-10-09T17:58:19.7898283+01:00"
         },
         {
             "Info": "",
