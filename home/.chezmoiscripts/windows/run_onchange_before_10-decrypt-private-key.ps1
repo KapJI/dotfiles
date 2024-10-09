@@ -8,7 +8,7 @@ if (!(Test-Path $OUTPUT)) {
     New-Item -ItemType Directory -Path "$HOME\.config\chezmoi" -Force
 
     # Decrypt the key.txt.age file
-    & $env:USERPFOILE/.local/bin/chezmoi age decrypt --output $OUTPUT --passphrase "$(chezmoi source-path)/key.txt.age"
+    chezmoi age decrypt --output $OUTPUT --passphrase "$(chezmoi source-path)/key.txt.age"
 
     # Set permissions so only the current user has read and write access
     $user = "$env:USERDOMAIN\$env:USERNAME"
