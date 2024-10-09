@@ -14,8 +14,9 @@ sh -c "$(curl -fsLS git.io/chezmoi)" -- -b ~/.local/bin init --apply KapJI
 ```
 
 ### Windows
+Run in `powershell.exe` (not pwsh):
 ```
-powershell "&{$(irm 'https://get.chezmoi.io/ps1')} -b ~/.local/bin" -- init --apply KapJI
+iex "&{$(irm 'https://get.chezmoi.io/ps1')} -b ~/.local/bin -- init --apply KapJI"
 ```
 
 ## Update configuration on current host
