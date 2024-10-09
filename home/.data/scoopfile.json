@@ -1,172 +1,185 @@
 {
-    "apps": [
-        {
-            "Name": "7zip",
-            "Info": "",
-            "Version": "24.08",
-            "Source": "main",
-            "Updated": "2024-09-25T17:54:13.2923738+01:00"
-        },
-        {
-            "Name": "age",
-            "Info": "",
-            "Version": "1.2.0",
-            "Source": "extras",
-            "Updated": "2024-10-05T13:40:22.1715224+01:00"
-        },
-        {
-            "Name": "bat",
-            "Info": "",
-            "Version": "0.24.0",
-            "Source": "main",
-            "Updated": "2024-10-02T20:54:48.112777+01:00"
-        },
-        {
-            "Name": "cmake",
-            "Info": "",
-            "Version": "3.30.3",
-            "Source": "main",
-            "Updated": "2024-09-25T17:34:58.9393123+01:00"
-        },
-        {
-            "Name": "dark",
-            "Info": "",
-            "Version": "3.14",
-            "Source": "main",
-            "Updated": "2024-10-07T22:11:20.0196261+01:00"
-        },
-        {
-            "Name": "delta",
-            "Info": "",
-            "Version": "0.18.2",
-            "Source": "main",
-            "Updated": "2024-10-04T22:14:02.2583188+01:00"
-        },
-        {
-            "Name": "fastfetch",
-            "Info": "",
-            "Version": "2.25.0",
-            "Source": "main",
-            "Updated": "2024-09-25T17:54:15.9751487+01:00"
-        },
-        {
-            "Name": "fd",
-            "Info": "",
-            "Version": "10.2.0",
-            "Source": "main",
-            "Updated": "2024-09-25T17:27:19.9755965+01:00"
-        },
-        {
-            "Name": "fzf",
-            "Info": "",
-            "Version": "0.55.0",
-            "Source": "main",
-            "Updated": "2024-09-25T17:32:25.2961403+01:00"
-        },
-        {
-            "Name": "git",
-            "Info": "",
-            "Version": "2.46.2",
-            "Source": "main",
-            "Updated": "2024-10-07T22:04:26.0046205+01:00"
-        },
-        {
-            "Name": "hyperfine",
-            "Info": "",
-            "Version": "1.18.0",
-            "Source": "main",
-            "Updated": "2024-09-25T17:32:43.0569878+01:00"
-        },
-        {
-            "Name": "jid",
-            "Info": "",
-            "Version": "0.7.6",
-            "Source": "main",
-            "Updated": "2024-09-25T17:28:52.4359099+01:00"
-        },
-        {
-            "Name": "jq",
-            "Info": "",
-            "Version": "1.7.1",
-            "Source": "main",
-            "Updated": "2024-09-25T17:28:06.1514028+01:00"
-        },
-        {
-            "Name": "neovim",
-            "Info": "",
-            "Version": "0.10.1",
-            "Source": "main",
-            "Updated": "2024-09-25T17:31:12.2384684+01:00"
-        },
-        {
-            "Name": "ninja",
-            "Info": "",
-            "Version": "1.12.1",
-            "Source": "main",
-            "Updated": "2024-09-25T17:29:12.7218158+01:00"
-        },
-        {
-            "Name": "oh-my-posh",
-            "Info": "",
-            "Version": "23.14.2",
-            "Source": "main",
-            "Updated": "2024-09-25T17:31:41.5329528+01:00"
-        },
-        {
-            "Name": "python",
-            "Info": "",
-            "Version": "3.13.0",
-            "Source": "main",
-            "Updated": "2024-10-07T22:11:57.9882708+01:00"
-        },
-        {
-            "Name": "ripgrep",
-            "Info": "",
-            "Version": "14.1.1",
-            "Source": "main",
-            "Updated": "2024-09-25T17:27:29.4104149+01:00"
-        },
-        {
-            "Name": "vcredist2022",
-            "Info": "",
-            "Version": "14.40.33810.0",
-            "Source": "extras",
-            "Updated": "2024-10-02T20:56:08.3868741+01:00"
-        },
-        {
-            "Name": "wezterm",
-            "Info": "",
-            "Version": "20240203-110809-5046fc22",
-            "Source": "extras",
-            "Updated": "2024-09-25T17:26:24.838577+01:00"
-        },
-        {
-            "Name": "zoxide",
-            "Info": "",
-            "Version": "0.9.6",
-            "Source": "main",
-            "Updated": "2024-09-25T17:30:12.8902009+01:00"
-        },
-        {
-            "Name": "zstd",
-            "Info": "",
-            "Version": "1.5.6",
-            "Source": "main",
-            "Updated": "2024-10-07T22:10:51.9826915+01:00"
-        }
-    ],
     "buckets": [
         {
             "Name": "main",
             "Source": "https://github.com/ScoopInstaller/Main.git",
-            "Updated": "2024-10-07T21:28:21+01:00",
+            "Updated": "2024-10-09T17:30:44+01:00",
             "Manifests": 1344
         },
         {
             "Name": "extras",
             "Source": "https://github.com/ScoopInstaller/Extras",
-            "Updated": "2024-10-07T21:32:15+01:00",
+            "Updated": "2024-10-09T17:32:04+01:00",
             "Manifests": 2084
+        },
+        {
+            "Name": "nerd-fonts",
+            "Source": "https://github.com/matthewjberger/scoop-nerd-fonts",
+            "Updated": "2024-10-04T23:20:09+01:00",
+            "Manifests": 336
+        }
+    ],
+    "apps": [
+        {
+            "Info": "",
+            "Version": "24.08",
+            "Source": "main",
+            "Name": "7zip",
+            "Updated": "2024-09-25T17:54:13.2923738+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "1.2.0",
+            "Source": "extras",
+            "Name": "age",
+            "Updated": "2024-10-05T13:40:22.1715224+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "0.24.0",
+            "Source": "main",
+            "Name": "bat",
+            "Updated": "2024-10-02T20:54:48.112777+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "3.2.1",
+            "Source": "nerd-fonts",
+            "Name": "CascadiaCode-NF-Mono",
+            "Updated": "2024-10-09T17:38:09.6059892+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "3.30.3",
+            "Source": "main",
+            "Name": "cmake",
+            "Updated": "2024-09-25T17:34:58.9393123+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "3.14",
+            "Source": "main",
+            "Name": "dark",
+            "Updated": "2024-10-07T22:11:20.0196261+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "0.18.2",
+            "Source": "main",
+            "Name": "delta",
+            "Updated": "2024-10-04T22:14:02.2583188+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "2.25.0",
+            "Source": "main",
+            "Name": "fastfetch",
+            "Updated": "2024-09-25T17:54:15.9751487+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "10.2.0",
+            "Source": "main",
+            "Name": "fd",
+            "Updated": "2024-09-25T17:27:19.9755965+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "0.55.0",
+            "Source": "main",
+            "Name": "fzf",
+            "Updated": "2024-09-25T17:32:25.2961403+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "2.46.2",
+            "Source": "main",
+            "Name": "git",
+            "Updated": "2024-10-07T22:04:26.0046205+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "1.18.0",
+            "Source": "main",
+            "Name": "hyperfine",
+            "Updated": "2024-09-25T17:32:43.0569878+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "0.7.6",
+            "Source": "main",
+            "Name": "jid",
+            "Updated": "2024-09-25T17:28:52.4359099+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "1.7.1",
+            "Source": "main",
+            "Name": "jq",
+            "Updated": "2024-09-25T17:28:06.1514028+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "0.10.1",
+            "Source": "main",
+            "Name": "neovim",
+            "Updated": "2024-09-25T17:31:12.2384684+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "1.12.1",
+            "Source": "main",
+            "Name": "ninja",
+            "Updated": "2024-09-25T17:29:12.7218158+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "23.14.2",
+            "Source": "main",
+            "Name": "oh-my-posh",
+            "Updated": "2024-09-25T17:31:41.5329528+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "3.13.0",
+            "Source": "main",
+            "Name": "python",
+            "Updated": "2024-10-07T22:11:57.9882708+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "14.1.1",
+            "Source": "main",
+            "Name": "ripgrep",
+            "Updated": "2024-09-25T17:27:29.4104149+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "14.40.33810.0",
+            "Source": "extras",
+            "Name": "vcredist2022",
+            "Updated": "2024-10-02T20:56:08.3868741+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "20240203-110809-5046fc22",
+            "Source": "extras",
+            "Name": "wezterm",
+            "Updated": "2024-09-25T17:26:24.838577+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "0.9.6",
+            "Source": "main",
+            "Name": "zoxide",
+            "Updated": "2024-09-25T17:30:12.8902009+01:00"
+        },
+        {
+            "Info": "",
+            "Version": "1.5.6",
+            "Source": "main",
+            "Name": "zstd",
+            "Updated": "2024-10-07T22:10:51.9826915+01:00"
         }
     ]
 }
