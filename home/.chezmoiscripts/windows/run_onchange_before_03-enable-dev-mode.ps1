@@ -1,60 +1,57 @@
-param([Switch]$WaitForKey)
+# Enable-Symlinks.ps1
+# This script enables symlink creation for non-admin users on Windows 11 by enabling Developer Mode.
+# It elevates permissions if necessary and waits for user input before exiting the elevated script.
 
-if (([Version](Get-CimInstance Win32_OperatingSystem).version).Major -lt 10)
-{
-    Write-Host -ForegroundColor Red "The DeveloperMode is only supported on Windows 10"
-    exit 1
+# Function to check if the script is running as administrator
+Function Test-IsAdministrator {
+    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
+    return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
-# Get the ID and security principal of the current user account
-$myWindowsID=[System.Security.Principal.WindowsIdentity]::GetCurrent()
-$myWindowsPrincipal=new-object System.Security.Principal.WindowsPrincipal($myWindowsID)
-
-# Get the security principal for the Administrator role
-$adminRole=[System.Security.Principal.WindowsBuiltInRole]::Administrator
-
-if ($myWindowsPrincipal.IsInRole($adminRole))
-{
-    $RegistryKeyPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock"
-    if (! (Test-Path -Path $RegistryKeyPath)) 
-    {
-        New-Item -Path $RegistryKeyPath -ItemType Directory -Force
-    }
-
-    if (! (Get-ItemProperty -Path $RegistryKeyPath -Name AllowDevelopmentWithoutDevLicense))
-    {
-        # Add registry value to enable Developer Mode
-        New-ItemProperty -Path $RegistryKeyPath -Name AllowDevelopmentWithoutDevLicense -PropertyType DWORD -Value 1
-    }
-    # $feature = Get-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online
-    # if ($feature -and ($feature.State -eq "Disabled"))
-    # {
-    #     Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online -All -LimitAccess -NoRestart
-    # }
-    Write-Host "Developer Mode enabled successfully. Symlinks are now enabled for non-admin users."
-
-    if ($WaitForKey)
-    {
-        Write-Host -NoNewLine "Press any key to continue..."
-        $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-    }
-}
-else
-{
-    Write-Host "Need Administrator access to enable Developer Mode."
-    # We are not running "as Administrator" - so relaunch as administrator
-    # Create a new process object that starts PowerShell
-    $newProcess = new-object System.Diagnostics.ProcessStartInfo "PowerShell";
-
-    # Specify the current script path and name as a parameter
-    $newProcess.Arguments = "-NoProfile",$myInvocation.MyCommand.Definition,"-WaitForKey";
-
-    # Indicate that the process should be elevated
-    $newProcess.Verb = "runas";
-
-    # Start the new process
-    [System.Diagnostics.Process]::Start($newProcess);
-
-    # Exit from the current, unelevated, process
+# If not running as administrator, restart the script with elevated privileges and wait
+if (-not (Test-IsAdministrator)) {
+    Write-Host "Elevating permissions to administrator..."
+    Start-Process -FilePath "powershell.exe" `
+        -ArgumentList "-ExecutionPolicy Bypass -NoProfile -File `"$PSCommandPath`"" `
+        -Verb RunAs -Wait
+    Write-Host "Elevation completed. Resuming script..."
     exit
 }
+
+Write-Host "Running with administrative privileges..."
+
+# Registry path and key for Developer Mode
+$regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock"
+$regKey = "AllowDevelopmentWithoutDevLicense"
+
+# Check if Developer Mode is already enabled
+$devModeEnabled = $false
+if (Test-Path $regPath) {
+    $value = Get-ItemProperty -Path $regPath -Name $regKey -ErrorAction SilentlyContinue
+    if ($value -and $value.$regKey -eq 1) {
+        $devModeEnabled = $true
+    }
+}
+
+if ($devModeEnabled) {
+    Write-Host "Developer Mode is already enabled. Symlinks are enabled for non-admin users."
+} else {
+    Write-Host "Enabling Developer Mode to allow symlink creation for non-admin users..."
+    # Create the registry key if it doesn't exist
+    if (-not (Test-Path $regPath)) {
+        New-Item -Path $regPath -Force | Out-Null
+    }
+
+    # Enable Developer Mode by setting the registry value
+    try {
+        Set-ItemProperty -Path $regPath -Name $regKey -Type DWord -Value 1
+        Write-Host "Developer Mode enabled successfully. Symlinks are now enabled for non-admin users."
+    } catch {
+        Write-Error "Failed to enable Developer Mode: $_"
+    }
+}
+
+# Wait for user input before exiting
+Write-Host
+Read-Host -Prompt "Press Enter to exit"
