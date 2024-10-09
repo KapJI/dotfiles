@@ -2,5 +2,5 @@
 # scoopfile hash: {{ include $scoopfile | sha256sum }}
 
 # git is needed for adding buckets
-scoop install git
-scoop import {{ $scoopfile }}
+$env:USERPROFILE\scoop\shims\scoop install git
+$env:USERPROFILE\scoop\shims\scoop import {{ $scoopfile }}
