@@ -1,3 +1,6 @@
+# Reload Path
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
 $OUTPUT = "$HOME\.config\chezmoi\ssh_pubkeys.txt"
 
 $keys = ssh-add -L

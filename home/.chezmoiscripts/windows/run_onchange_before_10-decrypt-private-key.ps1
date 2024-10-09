@@ -1,6 +1,9 @@
 $OUTPUT = "$HOME\.config\chezmoi\key.txt"
 
 if (!(Test-Path $OUTPUT)) {
+    # Reload Path
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
     # Create the directory if it doesn't exist
     New-Item -ItemType Directory -Path "$HOME\.config\chezmoi" -Force
 
