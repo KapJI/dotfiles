@@ -22,27 +22,6 @@
     "apps": [
         {
             "Info": "",
-            "Version": "24.08",
-            "Source": "main",
-            "Name": "7zip",
-            "Updated": "2024-09-25T17:54:13.2923738+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "1.2.0",
-            "Source": "extras",
-            "Name": "age",
-            "Updated": "2024-10-05T13:40:22.1715224+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "0.24.0",
-            "Source": "main",
-            "Name": "bat",
-            "Updated": "2024-10-02T20:54:48.112777+01:00"
-        },
-        {
-            "Info": "",
             "Version": "3.2.1",
             "Source": "nerd-fonts",
             "Name": "CascadiaCode-NF-Mono",
@@ -50,94 +29,10 @@
         },
         {
             "Info": "",
-            "Version": "3.30.3",
-            "Source": "main",
-            "Name": "cmake",
-            "Updated": "2024-09-25T17:34:58.9393123+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "3.14",
-            "Source": "main",
-            "Name": "dark",
-            "Updated": "2024-10-07T22:11:20.0196261+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "0.18.2",
-            "Source": "main",
-            "Name": "delta",
-            "Updated": "2024-10-04T22:14:02.2583188+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "2.25.0",
-            "Source": "main",
-            "Name": "fastfetch",
-            "Updated": "2024-09-25T17:54:15.9751487+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "10.2.0",
-            "Source": "main",
-            "Name": "fd",
-            "Updated": "2024-09-25T17:27:19.9755965+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "0.55.0",
-            "Source": "main",
-            "Name": "fzf",
-            "Updated": "2024-09-25T17:32:25.2961403+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "2.46.2",
-            "Source": "main",
-            "Name": "git",
-            "Updated": "2024-10-07T22:04:26.0046205+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "1.18.0",
-            "Source": "main",
-            "Name": "hyperfine",
-            "Updated": "2024-09-25T17:32:43.0569878+01:00"
-        },
-        {
-            "Info": "",
             "Version": "0.7.6",
             "Source": "main",
             "Name": "jid",
             "Updated": "2024-09-25T17:28:52.4359099+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "1.7.1",
-            "Source": "main",
-            "Name": "jq",
-            "Updated": "2024-09-25T17:28:06.1514028+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "0.10.1",
-            "Source": "main",
-            "Name": "neovim",
-            "Updated": "2024-09-25T17:31:12.2384684+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "1.12.1",
-            "Source": "main",
-            "Name": "ninja",
-            "Updated": "2024-09-25T17:29:12.7218158+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "23.14.2",
-            "Source": "main",
-            "Name": "oh-my-posh",
-            "Updated": "2024-09-25T17:31:41.5329528+01:00"
         },
         {
             "Info": "",
@@ -162,31 +57,10 @@
         },
         {
             "Info": "",
-            "Version": "14.1.1",
-            "Source": "main",
-            "Name": "ripgrep",
-            "Updated": "2024-09-25T17:27:29.4104149+01:00"
-        },
-        {
-            "Info": "",
             "Version": "0.11.0",
             "Source": "extras",
             "Name": "terminal-icons",
             "Updated": "2024-10-09T17:58:19.7898283+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "0.9.6",
-            "Source": "main",
-            "Name": "zoxide",
-            "Updated": "2024-09-25T17:30:12.8902009+01:00"
-        },
-        {
-            "Info": "",
-            "Version": "1.5.6",
-            "Source": "main",
-            "Name": "zstd",
-            "Updated": "2024-10-07T22:10:51.9826915+01:00"
         }
     ]
 }
