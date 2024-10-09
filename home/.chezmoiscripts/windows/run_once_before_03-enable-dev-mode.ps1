@@ -31,6 +31,7 @@ if ($myWindowsPrincipal.IsInRole($adminRole))
     {
         Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online -All -LimitAccess -NoRestart
     }
+    Write-Host "Developer Mode enabled successfully. Symlinks are now enabled for non-admin users."
 
     if ($WaitForKey)
     {
@@ -40,19 +41,20 @@ if ($myWindowsPrincipal.IsInRole($adminRole))
 }
 else
 {
-   # We are not running "as Administrator" - so relaunch as administrator
-   # Create a new process object that starts PowerShell
-   $newProcess = new-object System.Diagnostics.ProcessStartInfo "PowerShell";
+    Write-Host "Need Administrator access to enable Developer Mode."
+    # We are not running "as Administrator" - so relaunch as administrator
+    # Create a new process object that starts PowerShell
+    $newProcess = new-object System.Diagnostics.ProcessStartInfo "PowerShell";
 
-   # Specify the current script path and name as a parameter
-   $newProcess.Arguments = "-NoProfile",$myInvocation.MyCommand.Definition,"-WaitForKey";
+    # Specify the current script path and name as a parameter
+    $newProcess.Arguments = "-NoProfile",$myInvocation.MyCommand.Definition,"-WaitForKey";
 
-   # Indicate that the process should be elevated
-   $newProcess.Verb = "runas";
+    # Indicate that the process should be elevated
+    $newProcess.Verb = "runas";
 
-   # Start the new process
-   [System.Diagnostics.Process]::Start($newProcess);
+    # Start the new process
+    [System.Diagnostics.Process]::Start($newProcess);
 
-   # Exit from the current, unelevated, process
-   exit
+    # Exit from the current, unelevated, process
+    exit
 }
