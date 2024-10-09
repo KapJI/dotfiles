@@ -26,11 +26,11 @@ if ($myWindowsPrincipal.IsInRole($adminRole))
         # Add registry value to enable Developer Mode
         New-ItemProperty -Path $RegistryKeyPath -Name AllowDevelopmentWithoutDevLicense -PropertyType DWORD -Value 1
     }
-    $feature = Get-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online
-    if ($feature -and ($feature.State -eq "Disabled"))
-    {
-        Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online -All -LimitAccess -NoRestart
-    }
+    # $feature = Get-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online
+    # if ($feature -and ($feature.State -eq "Disabled"))
+    # {
+    #     Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online -All -LimitAccess -NoRestart
+    # }
     Write-Host "Developer Mode enabled successfully. Symlinks are now enabled for non-admin users."
 
     if ($WaitForKey)
