@@ -1,3 +1,5 @@
+encryption = "age"
+
 {{ if eq .chezmoi.os "windows" -}}
 [cd]
     command = "pwsh.exe"
@@ -25,8 +27,6 @@
     {{-   $osid = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
     {{- end }}
     osid = "{{ $osid }}"
-
-encryption = "age"
 
 [age]
     identity = "~/.config/chezmoi/key.txt"
