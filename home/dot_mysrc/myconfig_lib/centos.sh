@@ -1,12 +1,16 @@
 #!/bin/bash
 
 function install_centos_packages() {
-    setup_proxy
     local dnf_packages=(
+        bat
+        btop
+        cmake
         eza
         fd-find
         fzf
-        htop
+        hexyl
+        hyperfine
+        git-delta
         gnupg
         neovim
         PackageKit-command-not-found
@@ -14,13 +18,18 @@ function install_centos_packages() {
         readline-devel
         ripgrep
         zoxide
+        zsh
     )
-    sudo http_proxy="" https_proxy="" dnf install -y "${dnf_packages[@]}"
+    sudo dnf install -y "${dnf_packages[@]}"
     if ! command_exists et; then
         sudo feature install et
     fi
+    # TODO: Install age
+    # TODO: Install uv
+    # TODO: Install ov
     # Update rust
     env $(fwdproxy-config --format=sh curl) rustup update
+    setup_proxy
 }
 
 function setup_proxy() {
