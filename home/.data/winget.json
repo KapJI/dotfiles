@@ -67,6 +67,9 @@
 					"PackageIdentifier" : "Rustlang.Rustup"
 				},
 				{
+					"PackageIdentifier" : "astral-sh.uv"
+				},
+				{
 					"PackageIdentifier" : "Kitware.CMake"
 				},
 				{
@@ -95,6 +98,9 @@
 				},
 				{
 					"PackageIdentifier" : "Telegram.TelegramDesktop"
+				},
+				{
+					"PackageIdentifier" : "Spotify.Spotify"
 				},
 				{
 					"PackageIdentifier" : "Microsoft.VisualStudioCode"
