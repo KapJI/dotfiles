@@ -1,7 +1,7 @@
 key.txt.age
 
 {{ if not .work_machine }}
-.config/zsh/config.d/fb.zsh
+.config/zsh/config.d/work.zsh
 {{ end }}
 
 {{ if ne .osid "darwin" }}
