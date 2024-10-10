@@ -13,9 +13,6 @@
 					"PackageIdentifier" : "Git.Git"
 				},
 				{
-					"PackageIdentifier" : "FiloSottile.age"
-				},
-				{
 					"PackageIdentifier" : "Meta.Zstandard"
 				},
 				{
