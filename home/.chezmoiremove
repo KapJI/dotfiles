@@ -2,7 +2,10 @@
 .iterm2_shell_integration.zsh
 .gitignore
 .p10k.zsh
+.zcompdump
 .zsh_completion
 .zsh_history
+.zshrc.zwc
+antigen.zsh
 mercurial.ini
 README.md

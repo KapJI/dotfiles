@@ -63,9 +63,6 @@ function install_packages() {
     elif [ "$CENTOS" = true ]; then
         install_centos_packages
     fi
-    # Install vim-plug
-    curl $CURL_CONFIG -fLo $HOME/.local/share/nvim/site/autoload/plug.vim --create-dirs \
-        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     install_python_packages
     install_npm_packages
 }
@@ -126,19 +123,6 @@ function setup_machine() {
     fi
     # Update nvim plugins
     nvim +PlugUpgrade +PlugUpdate +qall
-    # Remove legacy files
-    if [ -f "$HOME/antigen.zsh" ]; then
-        rm "$HOME/antigen.zsh"
-    fi
-    if [ -f "$HOME/.zcompdump" ]; then
-        rm "$HOME/.zcompdump"
-    fi
-    if [ -f "$HOME/.zshrc.zwc" ]; then
-        rm -f "$HOME/.zshrc.zwc"
-    fi
-    if [ -f "$HOME/.zsh_history" ] && [ ! -f "$HOME/.config/zsh/.zsh_history" ]; then
-        mv "$HOME/.zsh_history" "$HOME/.config/zsh/.zsh_history"
-    fi
     # Update antidote plugins
     if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
         zsh -c 'source ~/.config/zsh/antidote/antidote.zsh; antidote update'
