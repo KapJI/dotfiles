@@ -1,10 +1,10 @@
 {
 	"$schema" : "https://aka.ms/winget-packages.schema.2.0.json",
 	"CreationDate" : "2024-10-09T17:43:01.701-00:00",
-	"Sources" : 
+	"Sources" :
 	[
 		{
-			"Packages" : 
+			"Packages" :
 			[
 				{
 					"PackageIdentifier" : "AgileBits.1Password"
@@ -106,7 +106,7 @@
 					"PackageIdentifier" : "Microsoft.VisualStudioCode"
 				}
 			],
-			"SourceDetails" : 
+			"SourceDetails" :
 			{
 				"Argument" : "https://cdn.winget.microsoft.com/cache",
 				"Identifier" : "Microsoft.Winget.Source_8wekyb3d8bbwe",
