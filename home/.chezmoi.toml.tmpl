@@ -33,6 +33,7 @@ encryption = "age"
     recipient = "age1p6n7pr73yfxysh8qjty4guhfea9gqgh7uwk8w6e3wx7r9eqqw4sqeg4r9g"
 
 {{- if eq .chezmoi.os "windows" }}
+
 [interpreters.ps1]
     command = "powershell"
     args = ["-NoLogo", "-ExecutionPolicy", "RemoteSigned"]
