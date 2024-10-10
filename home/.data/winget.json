@@ -103,6 +103,9 @@
 					"PackageIdentifier" : "Spotify.Spotify"
 				},
 				{
+					"PackageIdentifier" : "Microsoft.PowerToys"
+				},
+				{
 					"PackageIdentifier" : "Microsoft.VisualStudioCode"
 				}
 			],
