@@ -3,7 +3,13 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";"
 
 $OUTPUT = "$HOME\.config\chezmoi\ssh_pubkeys.txt"
 
-$keys = ssh-add -L
+for ($i = 0; $i -le 5; $i++) {
+    $keys = ssh-add -L
+    if ($keys | Select-String -Pattern "Github SSH Key") {
+        break
+    }
+    Read-Host -Prompt "Github key is not found. Check that SSH Agent in 1Password is running and press any key to continue"
+}
 
 $stream = New-Object System.IO.StreamWriter($OUTPUT, $false, [System.Text.Encoding]::ASCII)
 $stream.NewLine = "`n"
@@ -11,11 +17,6 @@ foreach ($line in $keys) {
     $stream.WriteLine($line)
 }
 $stream.Close()
-
-if (!(Select-String -Pattern "Github SSH Key" -Path $OUTPUT)) {
-    Write-Error "Error: Github key is not found"
-    exit 1
-}
 
 # Set permissions so only the current user has read and write access
 $user = "$env:USERDOMAIN\$env:USERNAME"
