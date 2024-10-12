@@ -109,5 +109,20 @@ function bathelp {
     }
 }
 
+function touch {
+    param (
+        [string[]]$Paths
+    )
+
+    foreach ($Path in $Paths) {
+        if (-not (Test-Path $Path)) {
+            New-Item -Path $Path -ItemType File
+        } else {
+            # Update the last write time if the file already exists
+            (Get-Item $Path).LastWriteTime = Get-Date
+        }
+    }
+}
+
 # Load completion
 . $HOME\Documents\Powershell\Completion\chezmoi.ps1
