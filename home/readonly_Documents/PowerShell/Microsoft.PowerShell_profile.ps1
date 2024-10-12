@@ -126,4 +126,6 @@ function touch {
 
 # Load completion
 . $HOME\Documents\Powershell\Completion\chezmoi.ps1
+Register-ArgumentCompleter -CommandName 'czm' -ScriptBlock ${__chezmoiCompleterBlock}
 . $HOME\Documents\Powershell\Completion\delta.ps1
+. $HOME\Documents\Powershell\Completion\ov.ps1
