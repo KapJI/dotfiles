@@ -126,3 +126,4 @@ function touch {
 
 # Load completion
 . $HOME\Documents\Powershell\Completion\chezmoi.ps1
+. $HOME\Documents\Powershell\Completion\delta.ps1
