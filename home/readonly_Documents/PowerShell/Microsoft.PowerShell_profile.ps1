@@ -108,3 +108,6 @@ function bathelp {
         $content -join "`n" | bat.exe -l help --plain
     }
 }
+
+# Load completion
+. $HOME\Documents\Powershell\Completion\chezmoi.ps1
