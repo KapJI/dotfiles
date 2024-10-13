@@ -55,6 +55,9 @@
 					"PackageIdentifier" : "ajeetdsouza.zoxide"
 				},
 				{
+					"PackageIdentifier" : "eza-community.eza"
+				},
+				{
 					"PackageIdentifier" : "Neovim.Neovim"
 				},
 				{
