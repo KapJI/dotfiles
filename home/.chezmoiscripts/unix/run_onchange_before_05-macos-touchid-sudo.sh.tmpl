@@ -1,0 +1,12 @@
+#!/bin/sh
+
+{{ if eq .osid "darwin" -}}
+# MacOS build version: {{ output "sw_vers" "--buildVersion" }}
+
+if ! grep -q "pam_tid.so" /etc/pam.d/sudo; then
+    sudo chmod +w /etc/pam.d/sudo
+    sudo /usr/bin/sed -i '' -e '2s/^/auth       sufficient     pam_tid.so\'$'\n/' \
+        /etc/pam.d/sudo
+    sudo chmod -w /etc/pam.d/sudo
+fi
+{{- end }}
