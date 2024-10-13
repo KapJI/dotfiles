@@ -1,4 +1,6 @@
-# Add-Alias requires running module "posh-alias"
+# Add-Alias requires module "posh-alias"
+Import-Module posh-alias
+
 Remove-Item -Force Alias:sl
 Add-Alias sl subl
 Add-Alias vim nvim
@@ -35,3 +37,9 @@ Add-Alias grm "git rm"
 Add-Alias gsh "git show"
 Add-Alias gst "git status"
 Add-Alias gsl "git sl"
+
+# eza
+Remove-Item -Force Alias:ls
+Add-Alias ls "eza --icons=always --all"
+Add-Alias lt "eza --icons=always --tree --all"
+Add-Alias l "eza --icons=always -l --all"
