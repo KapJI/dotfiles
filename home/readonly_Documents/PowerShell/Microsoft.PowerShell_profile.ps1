@@ -16,6 +16,7 @@ $DelayedLoadProfileRunspace.Open()
 [void]$DelayedLoadProfile.AddScript({
     # Preload modules
     Import-Module posh-alias
+    Import-Module posh-git
     Import-Module PSFzf
     Import-Module PSReadLine
 })
@@ -41,6 +42,8 @@ $null = Register-ObjectEvent -InputObject $DelayedLoadProfile -EventName Invocat
     . $HOME\Documents\Powershell\Completion\delta.ps1
     . $HOME\Documents\Powershell\Completion\ov.ps1
     . $HOME\Documents\Powershell\Completion\ruff.ps1
+    # posh-git provides completion for git
+    Import-Module posh-git
 
     # Cleanup
     $DelayedLoadProfile.Dispose()
