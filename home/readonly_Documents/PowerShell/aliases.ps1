@@ -7,8 +7,8 @@ Add-Alias vim nvim
 Add-Alias czm chezmoi
 Add-Alias czmcd "cd $(chezmoi source-path)"
 Add-Alias df Get-Volume
-Add-Alias fd "fd --hidden"
-Add-Alias rg "rg --hidden"
+Add-Alias fd "fd.exe --hidden"
+Add-Alias rg "rg.exe --hidden"
 
 # Git aliases from oh-my-zsh
 Add-Alias g git
