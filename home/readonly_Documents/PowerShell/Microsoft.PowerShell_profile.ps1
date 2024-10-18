@@ -40,6 +40,7 @@ $null = Register-ObjectEvent -InputObject $DelayedLoadProfile -EventName Invocat
     . $HOME\Documents\Powershell\Completion\chezmoi.ps1
     Register-ArgumentCompleter -CommandName 'czm' -ScriptBlock ${__chezmoiCompleterBlock}
     . $HOME\Documents\Powershell\Completion\delta.ps1
+    . $HOME\Documents\Powershell\Completion\fd.ps1
     . $HOME\Documents\Powershell\Completion\ov.ps1
     . $HOME\Documents\Powershell\Completion\ruff.ps1
     # posh-git provides completion for git
