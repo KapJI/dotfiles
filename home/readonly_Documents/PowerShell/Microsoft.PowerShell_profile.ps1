@@ -45,6 +45,8 @@ $null = Register-ObjectEvent -InputObject $DelayedLoadProfile -EventName Invocat
     . $HOME\Documents\Powershell\Completion\ov.ps1
     . $HOME\Documents\Powershell\Completion\rg.ps1
     . $HOME\Documents\Powershell\Completion\ruff.ps1
+    . $HOME\Documents\Powershell\Completion\uv.ps1
+    . $HOME\Documents\Powershell\Completion\uvx.ps1
     # posh-git provides completion for git
     Import-Module posh-git
 
