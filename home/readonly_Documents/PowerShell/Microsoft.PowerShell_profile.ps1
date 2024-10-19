@@ -41,6 +41,7 @@ $null = Register-ObjectEvent -InputObject $DelayedLoadProfile -EventName Invocat
     Register-ArgumentCompleter -CommandName 'czm' -ScriptBlock ${__chezmoiCompleterBlock}
     . $HOME\Documents\Powershell\Completion\delta.ps1
     . $HOME\Documents\Powershell\Completion\fd.ps1
+    . $HOME\Documents\Powershell\Completion\hyperfine.ps1
     . $HOME\Documents\Powershell\Completion\ov.ps1
     . $HOME\Documents\Powershell\Completion\rg.ps1
     . $HOME\Documents\Powershell\Completion\ruff.ps1
