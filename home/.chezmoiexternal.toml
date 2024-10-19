@@ -32,3 +32,14 @@
     executable = true
 
 {{ end }}
+
+{{ if eq .osid "windows" }}
+
+{{ $hyperfine_version := "1.18.0" }}
+["Documents/PowerShell/Completion/hyperfine.ps1"]
+    type = "archive-file"
+    url = "https://github.com/sharkdp/hyperfine/releases/download/v{{ $hyperfine_version }}/hyperfine-v{{ $hyperfine_version }}-x86_64-pc-windows-msvc.zip"
+    stripComponents = 1
+    path = "autocomplete/_hyperfine.ps1"
+
+{{ end }}
