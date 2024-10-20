@@ -35,6 +35,13 @@
 
 {{ if eq .osid "windows" }}
 
+{{ $bat_version := "0.24.0" }}
+["Documents/PowerShell/Completion/bat.ps1"]
+    type = "archive-file"
+    url = "https://github.com/sharkdp/bat/releases/download/v{{ $bat_version }}/bat-v{{ $bat_version }}-x86_64-pc-windows-msvc.zip"
+    stripComponents = 1
+    path = "autocomplete/_bat.ps1"
+
 {{ $hyperfine_version := "1.18.0" }}
 ["Documents/PowerShell/Completion/hyperfine.ps1"]
     type = "archive-file"
