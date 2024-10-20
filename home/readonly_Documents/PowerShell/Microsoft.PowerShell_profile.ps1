@@ -15,7 +15,6 @@ $DelayedLoadProfile.Runspace = $DelayedLoadProfileRunspace
 $DelayedLoadProfileRunspace.Open()
 [void]$DelayedLoadProfile.AddScript({
     # Preload modules
-    Import-Module posh-alias
     Import-Module posh-git
     Import-Module PSFzf
     Import-Module PSReadLine
@@ -55,68 +54,4 @@ $null = Register-ObjectEvent -InputObject $DelayedLoadProfile -EventName Invocat
     $DelayedLoadProfile.Dispose()
     $DelayedLoadProfileRunspace.Close()
     $DelayedLoadProfileRunspace.Dispose()
-}
-
-function head {
-    param(
-        [string]$Path,
-        [int]$n = 10
-    )
-
-    if ($Path -ne "") {
-        Get-Content $Path -Head $n
-    } else {
-        $input | Select-Object -First $n
-    }
-}
-
-function tail {
-    param(
-        [string]$Path,
-        [int]$n = 10
-    )
-
-    if ($Path -ne "") {
-        Get-Content $Path -Tail $n
-    } else {
-        # If no path is provided, read from stdin
-        $input | Select-Object -Last $n
-    }
-}
-
-function which ($command) {
-    Get-Command -Name $command -ErrorAction SilentlyContinue |
-    Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
-}
-
-function bathelp {
-    [CmdletBinding()]
-    param (
-        [Parameter(ValueFromPipeline = $true)]
-        [string]$InputObject
-    )
-    begin {
-        $content = @()
-    }
-    process {
-        $content += $InputObject
-    }
-    end {
-        $content -join "`n" | bat.exe -l help --plain
-    }
-}
-
-function touch {
-    param (
-        [string[]]$Paths
-    )
-
-    foreach ($Path in $Paths) {
-        if (-not (Test-Path $Path)) {
-            New-Item -Path $Path -ItemType File
-        } else {
-            # Update the last write time if the file already exists
-            (Get-Item $Path).LastWriteTime = Get-Date
-        }
-    }
 }
