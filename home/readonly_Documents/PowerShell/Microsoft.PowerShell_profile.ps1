@@ -39,6 +39,7 @@ $null = Register-ObjectEvent -InputObject $DelayedLoadProfile -EventName Invocat
     # Load completion
     . $HOME\Documents\Powershell\Completion\chezmoi.ps1
     Register-ArgumentCompleter -CommandName 'czm' -ScriptBlock ${__chezmoiCompleterBlock}
+    . $HOME\Documents\Powershell\Completion\bat.ps1
     . $HOME\Documents\Powershell\Completion\delta.ps1
     . $HOME\Documents\Powershell\Completion\fd.ps1
     . $HOME\Documents\Powershell\Completion\hyperfine.ps1
