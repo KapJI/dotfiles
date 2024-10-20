@@ -1,0 +1,6 @@
+{{- $needle := .needle -}}
+{{- range (gitHubLatestRelease .repo).Assets -}}
+    {{- if contains $needle .Name -}}
+        {{- .BrowserDownloadURL -}}
+    {{- end -}}
+{{- end -}}
