@@ -46,3 +46,10 @@
     path = "autocomplete/_hyperfine.ps1"
 
 {{ end }}
+
+{{ if and .work_machine (ne .osid "windows") }}
+[".config/zsh/custom_completion/_hg"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/facebook/sapling/refs/heads/main/eden/scm/contrib/zsh_completion"
+    refreshPeriod = {{ $default_refresh }}
+{{ end }}
