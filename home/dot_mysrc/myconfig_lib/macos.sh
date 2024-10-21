@@ -71,17 +71,17 @@ function install_macos_packages() {
     fi
     # Install command-not-found
     brew tap homebrew/command-not-found
-    install_subl_symlink
+    # install_subl_symlink
     install_copy_tool
     install_iterm_font
-    install_rustup
+    # install_rustup
 }
 
-function install_subl_symlink() {
-    if [ ! -L /usr/local/bin/subl ]; then
-        ln -s "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" /usr/local/bin/subl
-    fi
-}
+# function install_subl_symlink() {
+#     if [ ! -L /usr/local/bin/subl ]; then
+#         ln -s "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" /usr/local/bin/subl
+#     fi
+# }
 
 function install_copy_tool() {
     if ! $HOME/bin/copy > /dev/null; then
@@ -93,17 +93,17 @@ function install_copy_tool() {
     fi
 }
 
-function install_rustup() {
-    # Install rustup
-    if ! command_exists rustup; then
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-    else
-        rustup update
-    fi
-    if ! command_exists cargo; then
-        source $HOME/.cargo/env
-    fi
-}
+# function install_rustup() {
+#     # Install rustup
+#     if ! command_exists rustup; then
+#         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+#     else
+#         rustup update
+#     fi
+#     if ! command_exists cargo; then
+#         source $HOME/.cargo/env
+#     fi
+# }
 
 function iterm_get() {
   /usr/libexec/PlistBuddy -c "Print :$1" ~/Library/Preferences/com.googlecode.iterm2.plist
@@ -187,12 +187,12 @@ function disable_sonoma_cursor() {
     fi
 }
 
-function enable_sudo_touchid() {
-    # Enable sudo by TouchID
-    if ! grep -q "pam_tid.so" /etc/pam.d/sudo; then
-        sudo chmod +w /etc/pam.d/sudo
-        sudo /usr/bin/sed -i '' -e '2s/^/auth       sufficient     pam_tid.so\'$'\n/' \
-            /etc/pam.d/sudo
-        sudo chmod -w /etc/pam.d/sudo
-    fi
-}
+# function enable_sudo_touchid() {
+#     # Enable sudo by TouchID
+#     if ! grep -q "pam_tid.so" /etc/pam.d/sudo; then
+#         sudo chmod +w /etc/pam.d/sudo
+#         sudo /usr/bin/sed -i '' -e '2s/^/auth       sufficient     pam_tid.so\'$'\n/' \
+#             /etc/pam.d/sudo
+#         sudo chmod -w /etc/pam.d/sudo
+#     fi
+# }
