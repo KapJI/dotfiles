@@ -3,15 +3,15 @@
 function install_macos_packages() {
     # Although not an installation but should come early
     enable_sudo_touchid
-    if ! command_exists brew; then
-        local brew_url="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
-        /bin/bash -c "$(curl -fsSL ${brew_url})"
-    fi
-    # Make sure CLI tools are installed.
-    while xcode-select --install 2>/dev/null; do
-        echo "Waiting before Apple CLI tools are installed..."
-        sleep 10
-    done
+    # if ! command_exists brew; then
+    #     local brew_url="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
+    #     /bin/bash -c "$(curl -fsSL ${brew_url})"
+    # fi
+    # # Make sure CLI tools are installed.
+    # while xcode-select --install 2>/dev/null; do
+    #     echo "Waiting before Apple CLI tools are installed..."
+    #     sleep 10
+    # done
     # This output is very noisy
     set +x
     local brew_packages=(
