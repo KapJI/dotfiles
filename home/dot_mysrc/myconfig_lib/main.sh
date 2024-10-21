@@ -11,38 +11,38 @@ function setup_main() {
     complete_update
 }
 
-function detect_os() {
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        MACOS=true
-    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        if [ -f /etc/os-release ]; then
-            source /etc/os-release
-            case $ID in
-                centos)
-                    CENTOS=true
-                    ;;
-                debian)
-                    DEBIAN_BASED=true
-                    DEBIAN=true
-                    if grep Raspberry /proc/cpuinfo; then
-                        RASPBERRY_PI=true
-                    fi
-                    ;;
-                ubuntu|pop)
-                    DEBIAN_BASED=true
-                    UBUNTU=true
-                    ;;
-                *)
-                    error "running on unknown Linux distro: ${ID}!"
-                    ;;
-            esac
-        else
-            error "can't detect Linux distro!"
-        fi
-    else
-        error "running on unknown OS: ${OSTYPE}!"
-    fi
-}
+# function detect_os() {
+#     if [[ "$OSTYPE" == "darwin"* ]]; then
+#         MACOS=true
+#     elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+#         if [ -f /etc/os-release ]; then
+#             source /etc/os-release
+#             case $ID in
+#                 centos)
+#                     CENTOS=true
+#                     ;;
+#                 debian)
+#                     DEBIAN_BASED=true
+#                     DEBIAN=true
+#                     if grep Raspberry /proc/cpuinfo; then
+#                         RASPBERRY_PI=true
+#                     fi
+#                     ;;
+#                 ubuntu|pop)
+#                     DEBIAN_BASED=true
+#                     UBUNTU=true
+#                     ;;
+#                 *)
+#                     error "running on unknown Linux distro: ${ID}!"
+#                     ;;
+#             esac
+#         else
+#             error "can't detect Linux distro!"
+#         fi
+#     else
+#         error "running on unknown OS: ${OSTYPE}!"
+#     fi
+# }
 
 function import_scripts() {
     local current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
