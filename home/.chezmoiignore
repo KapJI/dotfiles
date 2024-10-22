@@ -5,6 +5,7 @@ key.txt.age
 {{ end }}
 
 {{ if ne .osid "darwin" }}
+.chezmoiscripts/macos/**
 Library
 {{ end }}
 

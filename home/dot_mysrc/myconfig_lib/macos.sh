@@ -2,7 +2,7 @@
 
 function install_macos_packages() {
     # Although not an installation but should come early
-    enable_sudo_touchid
+    # enable_sudo_touchid
     # if ! command_exists brew; then
     #     local brew_url="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
     #     /bin/bash -c "$(curl -fsSL ${brew_url})"
@@ -165,27 +165,27 @@ function install_iterm_font() {
 }
 
 
-function setup_macos() {
-    disable_sonoma_cursor
-}
+# function setup_macos() {
+#     disable_sonoma_cursor
+# }
 
-function disable_sonoma_cursor() {
-    local preference_key="/Library/Preferences/FeatureFlags/Domain/UIKit.plist"
-    local dict_key="redesigned_text_cursor"
+# function disable_sonoma_cursor() {
+#     local preference_key="/Library/Preferences/FeatureFlags/Domain/UIKit.plist"
+#     local dict_key="redesigned_text_cursor"
 
-    # Read the dictionary key
-    local dict_output=$(sudo defaults read "$preference_key" "$dict_key" 2>/dev/null)
+#     # Read the dictionary key
+#     local dict_output=$(sudo defaults read "$preference_key" "$dict_key" 2>/dev/null)
 
-    # Check if the dictionary key output contains 'Enabled = 0;'
-    if [[ "$dict_output" =~ "Enabled = 0;" ]]; then
-        echo "Preference for redesigned text cursor is already set correctly."
-    else
-        echo "Setting preference for redesigned text cursor..."
-        # The value isn't set correctly or the key doesn't exist, set the value now
-        sudo defaults write "$preference_key" "$dict_key" -dict Enabled -bool NO
-        echo "Preference set successfully."
-    fi
-}
+#     # Check if the dictionary key output contains 'Enabled = 0;'
+#     if [[ "$dict_output" =~ "Enabled = 0;" ]]; then
+#         echo "Preference for redesigned text cursor is already set correctly."
+#     else
+#         echo "Setting preference for redesigned text cursor..."
+#         # The value isn't set correctly or the key doesn't exist, set the value now
+#         sudo defaults write "$preference_key" "$dict_key" -dict Enabled -bool NO
+#         echo "Preference set successfully."
+#     fi
+# }
 
 # function enable_sudo_touchid() {
 #     # Enable sudo by TouchID
