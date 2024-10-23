@@ -1,9 +1,3 @@
-# Download plugin manager if we don't have it
-if ! [[ -e $ZDOTDIR/antidote ]]
-then
-    git clone --depth=1 https://github.com/mattmc3/antidote.git ${ZDOTDIR:-~}/antidote
-fi
-
 # Make plugin folder names pretty
 zstyle ':antidote:bundle' use-friendly-names 'yes'
 
