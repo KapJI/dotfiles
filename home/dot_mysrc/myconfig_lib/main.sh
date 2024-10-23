@@ -124,9 +124,9 @@ function setup_machine() {
     # Update nvim plugins
     nvim +PlugUpgrade +PlugUpdate +qall
     # Update antidote plugins
-    if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
-        zsh -c 'source ~/.config/zsh/antidote/antidote.zsh; antidote update'
-    fi
+    # if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
+    #     zsh -c 'source ~/.config/zsh/antidote/antidote.zsh; antidote update'
+    # fi
     # Update allowed_signers
     # if [ ! -f "$HOME/.ssh/allowed_signers" ]; then
     #   touch "$HOME/.ssh/allowed_signers"

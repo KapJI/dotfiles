@@ -1,0 +1,10 @@
+#!/bin/sh
+
+{{- $antidote_plugins := joinPath .chezmoi.sourceDir "dot_config/zsh/dot_zsh_plugins.txt" -}}
+# Antidote plugins hash: {{ include $antidote_plugins | sha256sum }}
+# Run weekly. Current week: {{ div now.YearDay 7 }}
+
+# Update antidote plugins
+if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
+    zsh -c 'source ~/.config/zsh/antidote/antidote.zsh; antidote update'
+fi

@@ -1,9 +1,7 @@
 #!/bin/sh
 
-{{- $uv_tools := joinPath .chezmoi.sourceDir ".data/uv_tools.txt" | include | trim -}}
-# uv tools hash: {{ $uv_tools | sha256sum }}
-
 # Install uv tools
+{{- $uv_tools := joinPath .chezmoi.sourceDir ".data/uv_tools.txt" | include | trim -}}
 {{- $tools_list := splitList "\n" $uv_tools -}}
 {{- range $tools_list }}
 uv tool install --upgrade {{ . }}
