@@ -67,25 +67,25 @@ function install_packages() {
     install_npm_packages
 }
 
-function install_python_packages() {
-    if command_exists pipx; then
-        pipx uninstall-all
-    fi
-    if ! command_exists uv; then
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-    fi
-    local packages=(
-        mypy
-        poetry
-        pre-commit
-        pygments
-    )
-    local package
-    for package in "${packages[@]}"; do
-        uv tool install --upgrade "$package"
-    done
-    uv tool install --upgrade thefuck --python python3.11 --with setuptools
-}
+# function install_python_packages() {
+#     if command_exists pipx; then
+#         pipx uninstall-all
+#     fi
+#     if ! command_exists uv; then
+#         curl -LsSf https://astral.sh/uv/install.sh | sh
+#     fi
+#     local packages=(
+#         mypy
+#         poetry
+#         pre-commit
+#         pygments
+#     )
+#     local package
+#     for package in "${packages[@]}"; do
+#         uv tool install --upgrade "$package"
+#     done
+#     uv tool install --upgrade thefuck --python python3.11 --with setuptools
+# }
 
 function install_npm_packages() {
     # Don't install npm on centos
@@ -128,35 +128,35 @@ function setup_machine() {
         zsh -c 'source ~/.config/zsh/antidote/antidote.zsh; antidote update'
     fi
     # Update allowed_signers
-    if [ ! -f "$HOME/.ssh/allowed_signers" ]; then
-      touch "$HOME/.ssh/allowed_signers"
-    fi
-    signingkey=$(git config --global user.signingkey)
-    if [ -n "$signingkey" ] && ! grep -q "$signingkey" "$HOME/.ssh/allowed_signers"; then
-      echo "ruslan@sayfutdinov.com $signingkey" >> "$HOME/.ssh/allowed_signers"
-    fi
+    # if [ ! -f "$HOME/.ssh/allowed_signers" ]; then
+    #   touch "$HOME/.ssh/allowed_signers"
+    # fi
+    # signingkey=$(git config --global user.signingkey)
+    # if [ -n "$signingkey" ] && ! grep -q "$signingkey" "$HOME/.ssh/allowed_signers"; then
+    #   echo "ruslan@sayfutdinov.com $signingkey" >> "$HOME/.ssh/allowed_signers"
+    # fi
     # Protect secret directories
-    if [ -d "$HOME/.ssh" ]; then
-      chmod 700 "$HOME/.ssh"
-      find "$HOME/.ssh" -type f -exec chmod 600 {} \;
-    fi
-    if [ -d "$HOME/.gnupg" ]; then
-      chmod 700 "$HOME/.gnupg"
-      find "$HOME/.gnupg" -type f -exec chmod 600 {} \;
-    fi
-    migrate_from_fasd
+    # if [ -d "$HOME/.ssh" ]; then
+    #   chmod 700 "$HOME/.ssh"
+    #   find "$HOME/.ssh" -type f -exec chmod 600 {} \;
+    # fi
+    # if [ -d "$HOME/.gnupg" ]; then
+    #   chmod 700 "$HOME/.gnupg"
+    #   find "$HOME/.gnupg" -type f -exec chmod 600 {} \;
+    # fi
+    # migrate_from_fasd
 }
 
-function migrate_from_fasd() {
-    if [ -f "$HOME/.cache/fasd" ]; then
-        zoxide import --from=z $HOME/.cache/fasd --merge
-        rm $HOME/.cache/fasd
-    fi
-    if [ -f "$HOME/.fasd" ]; then
-        zoxide import --from=z $HOME/.fasd --merge
-        rm $HOME/.fasd
-    fi
-}
+# function migrate_from_fasd() {
+#     if [ -f "$HOME/.cache/fasd" ]; then
+#         zoxide import --from=z $HOME/.cache/fasd --merge
+#         rm $HOME/.cache/fasd
+#     fi
+#     if [ -f "$HOME/.fasd" ]; then
+#         zoxide import --from=z $HOME/.fasd --merge
+#         rm $HOME/.fasd
+#     fi
+# }
 
 function set_zsh_shell() {
     if [ "$CENTOS" = true ]; then
