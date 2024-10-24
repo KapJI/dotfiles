@@ -1,4 +1,4 @@
-{{ if eq .osid "linux-centos" }}
+{{- if eq .osid "linux-centos" -}}
 #!/bin/sh
 
 TARGET_PATH="{{ joinPath (osDir .chezmoi.configFile) "work_gitconfig" }}"
