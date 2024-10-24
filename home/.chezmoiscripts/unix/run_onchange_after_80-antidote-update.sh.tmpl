@@ -1,6 +1,6 @@
 #!/bin/sh
 
-{{- $antidote_plugins := joinPath .chezmoi.sourceDir "dot_config/zsh/dot_zsh_plugins.txt" -}}
+{{ $antidote_plugins := joinPath .chezmoi.sourceDir "dot_config/zsh/dot_zsh_plugins.txt" -}}
 # Antidote plugins hash: {{ include $antidote_plugins | sha256sum }}
 # Run weekly. Current week: {{ div now.YearDay 7 }}
 
