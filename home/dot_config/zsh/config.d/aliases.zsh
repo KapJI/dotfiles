@@ -38,6 +38,10 @@ alias gsh="git show"
 alias gst="git status"
 alias gsl="git sl"
 
+if command -v nala &> /dev/null; then
+    alias apt="nala"
+fi
+
 # https://github.com/sharkdp/bat
 alias bathelp='bat --plain --language=help'
 help() {
