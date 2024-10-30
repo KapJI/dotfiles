@@ -1,0 +1,6 @@
+CascadiaCode-NF-Mono
+jid
+posh-git
+psfzf
+python
+terminal-icons
