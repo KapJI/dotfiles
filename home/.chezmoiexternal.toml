@@ -14,6 +14,16 @@
     url = "https://raw.githubusercontent.com/eza-community/eza-themes/refs/heads/main/themes/catppuccin.yml"
     refreshPeriod = {{ $default_refresh }}
 
+{{ $uv_tools := joinPath .chezmoi.sourceDir ".data/uv_tools.txt" | include | trim }}
+{{ $uv_tools_list := splitList "\n" $uv_tools }}
+{{ $uv_tools_list = append $uv_tools_list "thefuck" }}
+{{ range $uv_tools_list }}
+[".config/chezmoi/pypi-cache/{{ . }}.json"]
+    type = "file"
+    url = "https://pypi.org/pypi/{{ . }}/json"
+    refreshPeriod = "24h"
+{{ end }}
+
 {{ if ne .osid "windows" }}
 [".config/zsh/antidote"]
     type = "git-repo"
@@ -22,7 +32,6 @@
 {{ end }}
 
 {{ if eq .osid "linux-centos" }}
-
 [".local/bin/hexyl"]
     type = "archive-file"
     url = "{{ includeTemplate "github_download_url" (dict "repo" "sharkdp/hexyl" "needle" "x86_64-unknown-linux-musl") }}"
@@ -35,11 +44,9 @@
     url = "{{ includeTemplate "github_download_url" (dict "repo" "noborus/ov" "needle" "linux_amd64") }}"
     path = "ov"
     executable = true
-
 {{ end }}
 
 {{ if eq .osid "windows" }}
-
 ["Documents/PowerShell/Completion/bat.ps1"]
     type = "archive-file"
     url = "{{ includeTemplate "github_download_url" (dict "repo" "sharkdp/bat" "needle" "x86_64-pc-windows-msvc") }}"
@@ -51,7 +58,6 @@
     url = "{{ includeTemplate "github_download_url" (dict "repo" "sharkdp/hyperfine" "needle" "x86_64-pc-windows-msvc") }}"
     stripComponents = 1
     path = "autocomplete/_hyperfine.ps1"
-
 {{ end }}
 
 {{ if and .work_machine (ne .osid "windows") }}

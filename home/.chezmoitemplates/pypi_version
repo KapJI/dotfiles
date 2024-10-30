@@ -1,0 +1,1 @@
+{{ (joinPath .chezmoi.homeDir (list ".config/chezmoi/pypi-cache/" .package ".json" | join "") | include | fromJson).info.version }}
