@@ -1,5 +1,6 @@
 {{- $winget_pkgs := joinPath .chezmoi.sourceDir ".data/winget.json" -}}
 # winget packages hash: {{ include $winget_pkgs | sha256sum }}
+# Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 
 # Reload Path
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
