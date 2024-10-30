@@ -1,0 +1,9 @@
+# Reload Path
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+# Install packages
+{{- $scoop_packages := joinPath .chezmoi.sourceDir ".data/scoop_packages.txt" | include | trim -}}
+{{- $packages_list := splitList "\n" $scoop_packages -}}
+{{- range $packages_list }}
+scoop install {{ . }}
+{{- end }}

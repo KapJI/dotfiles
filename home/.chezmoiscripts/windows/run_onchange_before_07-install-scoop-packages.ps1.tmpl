@@ -1,7 +1,0 @@
-{{- $scoopfile := joinPath .chezmoi.sourceDir ".data/scoopfile.json" -}}
-# scoopfile hash: {{ include $scoopfile | sha256sum }}
-
-# Reload Path
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-
-scoop import {{ $scoopfile }}
