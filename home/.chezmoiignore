@@ -1,5 +1,9 @@
 key.txt.age
 
+{{ if ne .chezmoi.os "linux" }}
+.chezmoiscripts/linux/**
+{{ end }}
+
 {{ if ne .osid "darwin" }}
 .chezmoiscripts/macos/**
 Library

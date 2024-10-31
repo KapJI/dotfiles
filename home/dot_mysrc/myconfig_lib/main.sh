@@ -180,10 +180,10 @@ function set_zsh_shell() {
 }
 
 function complete_update() {
-    if command_exists tmux; then
-        tmux source-file $HOME/.tmux.conf
-    fi
-    echo "Completed successfully!"
+    # if command_exists tmux; then
+    #     tmux source-file $HOME/.tmux.conf
+    # fi
+    # echo "Completed successfully!"
     # Nothing will run after this
     exec zsh
 }
