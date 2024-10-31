@@ -4,3 +4,8 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";"
 # Update nvim plugins
 # Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 nvim +PlugUpgrade +PlugUpdate +qall
+
+if ($lastexitcode -ne 0) {
+    Write-Host -ForegroundColor Red "neovim plugins update failed with exit code $lastexitcode"
+    exit 1
+}

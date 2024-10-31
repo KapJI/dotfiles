@@ -1,8 +1,33 @@
-{{- $winget_pkgs := joinPath .chezmoi.sourceDir ".data/winget.json" -}}
-# winget packages hash: {{ include $winget_pkgs | sha256sum }}
-# Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
-
 # Reload Path
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
-winget import -i {{ $winget_pkgs }}
+# Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
+
+{{ $packages := joinPath .chezmoi.sourceDir ".data/packages.json" | include | fromJson -}}
+{{- $winget_packages := list -}}
+{{- range $packages -}}
+{{- if ne (get . "winget") "" -}}
+{{- $winget_packages = append $winget_packages (dict "PackageIdentifier" .winget) -}}
+{{- end -}}
+{{- end }}
+
+{{- $source_details := dict "Name" "winget" "Identifier" "Microsoft.Winget.Source_8wekyb3d8bbwe" "Argument" "https://cdn.winget.microsoft.com/cache" "Type" "Microsoft.PreIndexed.Package" -}}
+{{- $packages_json := dict -}}
+{{- $packages_json = setValueAtPath "`$schema" "https://aka.ms/winget-packages.schema.2.0.json" $packages_json -}}
+{{- $packages_json = setValueAtPath "Sources" (dict "Packages" $winget_packages "SourceDetails" $source_details | list) $packages_json -}}
+
+$packages = @"
+{{ $packages_json | toPrettyJson "    " }}
+"@
+
+$tempFile = [System.IO.Path]::GetTempFileName()
+$packages | Out-File -FilePath $tempFile -Encoding utf8
+
+winget import --accept-package-agreements --accept-source-agreements -i $tempFile
+
+if ($lastexitcode -ne 0) {
+    Write-Host -ForegroundColor Red "winget import $tempFile failed with exit code $lastexitcode"
+    exit 1
+}
+
+Remove-Item $tempFile
