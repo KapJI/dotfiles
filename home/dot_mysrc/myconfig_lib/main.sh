@@ -8,7 +8,7 @@ function setup_main() {
     setup_machine
     # Set current user shell to zsh
     set_zsh_shell
-    complete_update
+    # complete_update
 }
 
 # function detect_os() {
@@ -179,14 +179,14 @@ function set_zsh_shell() {
     fi
 }
 
-function complete_update() {
-    # if command_exists tmux; then
-    #     tmux source-file $HOME/.tmux.conf
-    # fi
-    # echo "Completed successfully!"
-    # Nothing will run after this
-    exec zsh
-}
+# function complete_update() {
+#     if command_exists tmux; then
+#         tmux source-file $HOME/.tmux.conf
+#     fi
+#     echo "Completed successfully!"
+#     Nothing will run after this
+#     exec zsh
+# }
 
 # function command_exists() {
 #     command -v "$1" &> /dev/null

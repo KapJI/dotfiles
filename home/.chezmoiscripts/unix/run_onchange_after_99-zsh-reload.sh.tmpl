@@ -1,0 +1,20 @@
+#!/bin/bash
+
+{{ $homeDir := .chezmoi.homeDir -}}
+{{ $zsh_files := glob (list $homeDir ".config/zsh/{custom_completion,config.d}/**" | join "/" ) -}}
+{{ $extra_files := list ".zshrc" ".zsh_plugins.zsh" "antidote/.bumpversion.cfg" -}}
+{{ range $extra_files -}}
+{{ $zsh_files = append $zsh_files (joinPath $homeDir ".config/zsh" .) -}}
+{{ end -}}
+
+{{ range $zsh_files -}}
+{{ if get (stat .) "type" | eq "file" -}}
+# File: {{ . }}, hash: {{ . | include | sha256sum }}
+{{ end -}}
+{{ end }}
+
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+printf "${YELLOW}zsh configs have changed: to apply new settings run \`${CYAN}exec zsh${YELLOW}\`${NC}\n"
