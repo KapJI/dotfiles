@@ -2,7 +2,7 @@
 
 function setup_main() {
     set -x
-    detect_os
+    # detect_os
     import_scripts
     install_packages
     setup_machine
@@ -122,7 +122,7 @@ function setup_machine() {
         setup_centos
     fi
     # Update nvim plugins
-    nvim +PlugUpgrade +PlugUpdate +qall
+    # nvim +PlugUpgrade +PlugUpdate +qall
     # Update antidote plugins
     # if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
     #     zsh -c 'source ~/.config/zsh/antidote/antidote.zsh; antidote update'
@@ -188,6 +188,6 @@ function complete_update() {
     exec zsh
 }
 
-function command_exists() {
-    command -v "$1" &> /dev/null
-}
+# function command_exists() {
+#     command -v "$1" &> /dev/null
+# }
