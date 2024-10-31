@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# .tmux.conf hash: {{ joinPath .chezmoi.homeDir ".tmux.conf" | include | sha256sum }}
+# .tmux.conf.local hash: {{ joinPath .chezmoi.homeDir ".tmux.conf.local" | include | sha256sum }}
+
+if command -v tmux &> /dev/null; then
+    tmux source-file $HOME/.tmux.conf
+fi
