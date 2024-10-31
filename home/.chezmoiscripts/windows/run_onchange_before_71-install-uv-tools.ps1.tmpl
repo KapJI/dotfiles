@@ -7,9 +7,9 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";"
 {{- $chezmoi := .chezmoi -}}
 {{- range $tools_list }}
 
-{{ includeTemplate "pypi_version" (dict "chezmoi" $chezmoi "package" .) | comment  "# " -}}
+{{ includeTemplate "pypi_version" (dict "chezmoi" $chezmoi "package" .) | comment  "# " }}
 uv tool install --upgrade {{ . }}
 {{- end }}
 
-{{ includeTemplate "pypi_version" (dict "chezmoi" $chezmoi "package" "thefuck") | comment  "# " -}}
+{{ includeTemplate "pypi_version" (dict "chezmoi" $chezmoi "package" "thefuck") | comment  "# " }}
 uv tool install --upgrade thefuck --python python3.11 --with setuptools
