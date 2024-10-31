@@ -34,14 +34,14 @@
 {{ if eq .osid "linux-centos" }}
 [".local/bin/hexyl"]
     type = "archive-file"
-    url = "{{ includeTemplate "github_download_url" (dict "repo" "sharkdp/hexyl" "needle" "x86_64-unknown-linux-musl") }}"
+    url = "{{ gitHubLatestReleaseAssetURL "sharkdp/hexyl" "*x86_64-unknown-linux-musl*" }}"
     stripComponents = 1
     path = "hexyl"
     executable = true
 
 [".local/bin/ov"]
     type = "archive-file"
-    url = "{{ includeTemplate "github_download_url" (dict "repo" "noborus/ov" "needle" "linux_amd64") }}"
+    url = "{{ gitHubLatestReleaseAssetURL "noborus/ov" "*linux_amd64*" }}"
     path = "ov"
     executable = true
 {{ end }}
@@ -49,13 +49,13 @@
 {{ if eq .osid "windows" }}
 ["Documents/PowerShell/Completion/bat.ps1"]
     type = "archive-file"
-    url = "{{ includeTemplate "github_download_url" (dict "repo" "sharkdp/bat" "needle" "x86_64-pc-windows-msvc") }}"
+    url = "{{ gitHubLatestReleaseAssetURL "sharkdp/bat" "*x86_64-pc-windows-msvc*" }}"
     stripComponents = 1
     path = "autocomplete/_bat.ps1"
 
 ["Documents/PowerShell/Completion/hyperfine.ps1"]
     type = "archive-file"
-    url = "{{ includeTemplate "github_download_url" (dict "repo" "sharkdp/hyperfine" "needle" "x86_64-pc-windows-msvc") }}"
+    url = "{{ gitHubLatestReleaseAssetURL "sharkdp/hyperfine" "*x86_64-pc-windows-msvc*" }}"
     stripComponents = 1
     path = "autocomplete/_hyperfine.ps1"
 {{ end }}
