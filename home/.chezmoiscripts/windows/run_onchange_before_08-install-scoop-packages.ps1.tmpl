@@ -2,8 +2,13 @@
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
 # Install packages
-{{- $scoop_packages := joinPath .chezmoi.sourceDir ".data/scoop_packages.txt" | include | trim -}}
-{{- $packages_list := splitList "\n" $scoop_packages -}}
-{{- range $packages_list }}
-scoop install {{ . }}
+{{- $packages := joinPath .chezmoi.sourceDir ".data/packages.json" | include | fromJson -}}
+{{- range $packages -}}
+{{- if ne (get . "scoop") "" }}
+scoop install {{ .scoop }}
+if ($lastexitcode -ne 0) {
+    Write-Host -ForegroundColor Red "scoop install {{ .scoop }} failed with exit code $lastexitcode"
+    exit 1
+}
+{{- end -}}
 {{- end }}
