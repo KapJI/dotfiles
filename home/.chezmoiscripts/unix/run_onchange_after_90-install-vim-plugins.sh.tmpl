@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Update nvim plugins
+# Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
+nvim +PlugUpgrade +PlugUpdate +qall
