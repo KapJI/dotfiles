@@ -3,11 +3,11 @@
 function setup_main() {
     set -x
     # detect_os
-    import_scripts
+    # import_scripts
     install_packages
     setup_machine
     # Set current user shell to zsh
-    set_zsh_shell
+    # set_zsh_shell
     # complete_update
 }
 
@@ -44,16 +44,16 @@ function setup_main() {
 #     fi
 # }
 
-function import_scripts() {
-    local current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-    if [ "$MACOS" = true ]; then
-        source "${current_dir}/macos.sh"
-    elif [ "$DEBIAN_BASED" = true ]; then
-        source "${current_dir}/debian_based.sh"
-    elif [ "$CENTOS" = true ]; then
-        source "${current_dir}/centos.sh"
-    fi
-}
+# function import_scripts() {
+#     local current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+#     if [ "$MACOS" = true ]; then
+#         source "${current_dir}/macos.sh"
+#     elif [ "$DEBIAN_BASED" = true ]; then
+#         source "${current_dir}/debian_based.sh"
+#     elif [ "$CENTOS" = true ]; then
+#         source "${current_dir}/centos.sh"
+#     fi
+# }
 
 function install_packages() {
     if [ "$MACOS" = true ]; then
@@ -63,7 +63,7 @@ function install_packages() {
     elif [ "$CENTOS" = true ]; then
         install_centos_packages
     fi
-    install_python_packages
+    # install_python_packages
     install_npm_packages
 }
 
@@ -114,8 +114,8 @@ function install_npm_packages() {
 }
 
 function setup_machine() {
-    if [ "$MACOS" = true ]; then
-        setup_macos
+    # if [ "$MACOS" = true ]; then
+    #     setup_macos
     elif [ "$DEBIAN_BASED" = true ]; then
         setup_debian
     elif [ "$CENTOS" = true ]; then
@@ -158,26 +158,26 @@ function setup_machine() {
 #     fi
 # }
 
-function set_zsh_shell() {
-    if [ "$CENTOS" = true ]; then
-        echo "Shell should be changed in 'i unix/shell'"
-        return
-    fi
-    local zsh_path="$(command -v zsh)"
-    local current_shell
-    if [ "$MACOS" = true ]; then
-        current_shell="$(dscl . -read /Users/$USER UserShell | awk  '{print $2}')"
-        if [ "$current_shell" != "$zsh_path" ]; then
-            sudo dscl . -create "/Users/$USER" UserShell "$zsh_path"
-        fi
-    else
-        current_shell="$(readlink -f $SHELL)"
-        new_shell="$(readlink -f $zsh_path)"
-        if [ "$current_shell" != "$new_shell" ]; then
-            chsh -s "$zsh_path"
-        fi
-    fi
-}
+# function set_zsh_shell() {
+#     if [ "$CENTOS" = true ]; then
+#         echo "Shell should be changed in 'i unix/shell'"
+#         return
+#     fi
+#     local zsh_path="$(command -v zsh)"
+#     local current_shell
+#     if [ "$MACOS" = true ]; then
+#         current_shell="$(dscl . -read /Users/$USER UserShell | awk  '{print $2}')"
+#         if [ "$current_shell" != "$zsh_path" ]; then
+#             sudo dscl . -create "/Users/$USER" UserShell "$zsh_path"
+#         fi
+#     else
+#         current_shell="$(readlink -f $SHELL)"
+#         new_shell="$(readlink -f $zsh_path)"
+#         if [ "$current_shell" != "$new_shell" ]; then
+#             chsh -s "$zsh_path"
+#         fi
+#     fi
+# }
 
 # function complete_update() {
 #     if command_exists tmux; then

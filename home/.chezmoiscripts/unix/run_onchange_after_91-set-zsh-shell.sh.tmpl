@@ -1,0 +1,29 @@
+#!/bin/bash
+
+
+if [[ $SHELL == */zsh ]]; then
+    echo "Shell is already set to zsh"
+    exit 0
+fi
+
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+zsh_path="$(command -v zsh)"
+
+{{ if eq .osid "linux-centos" -}}
+printf "${YELLOW}Shell should be changed in 'i unix/shell'${NC}\n"
+exit 1
+{{ else if eq .osid "darwin" -}}
+current_shell="$(dscl . -read /Users/$USER UserShell | awk '{print $2}')"
+if [ "$current_shell" != "$zsh_path" ]; then
+    sudo dscl . -create "/Users/$USER" UserShell "$zsh_path"
+fi
+{{ else -}}
+current_shell="$(readlink -f $SHELL)"
+new_shell="$(readlink -f $zsh_path)"
+if [ "$current_shell" != "$new_shell" ]; then
+    chsh -s "$zsh_path"
+fi
+{{ end }}
