@@ -1,3 +1,4 @@
+{{- if eq .chezmoi.os "linux" -}}
 # : << EOF
 # https://github.com/gpakosz/.tmux
 # (‑●‑●)> dual licensed under the WTFPL v2 license and the MIT license,
@@ -404,3 +405,4 @@ tmux_conf_update_plugins_on_reload=true
 #
 # "$@"
 # # /!\ do not remove the previous line
+{{- end }}

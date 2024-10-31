@@ -1,9 +1,5 @@
 key.txt.age
 
-{{ if not .work_machine }}
-.config/zsh/config.d/work.zsh
-{{ end }}
-
 {{ if ne .osid "darwin" }}
 .chezmoiscripts/macos/**
 Library
@@ -19,9 +15,6 @@ Documents
 .config/zsh
 .iterm2
 .mysrc
-.tmux.conf
-.tmux.conf.local
-.zshenv
 bin
 {{ end }}
 
@@ -30,7 +23,6 @@ bin
 {{ end }}
 
 {{ if not (or (has .osid (list "darwin" "windows")) (eq .chezmoi.hostname "homeserver" )) }}
-.chezmoiscripts/unix/20-list-ssh-pubkeys.sh
 .ssh/pubkeys/**
 !.ssh/pubkeys/github_key.pub
 {{ end }}
