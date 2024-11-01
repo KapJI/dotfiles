@@ -13,64 +13,62 @@ function install_macos_packages() {
     #     sleep 10
     # done
     # This output is very noisy
-    set +x
-    local brew_packages=(
-        ant
-        autoconf
-        cmake
-        dos2unix
-        eza
-        fd
-        ffmpeg
-        fpp
-        fzf
-        git
-        gnupg
-        go
-        graphviz
-        htop
-        jq
-        make
-        ncdu
-        neovim
-        node
-        python3
-        ripgrep
-        the_silver_searcher
-        tree
-        wget
-        zoxide
-        zsh
-        mistertea/et/et
-    )
-    brew update
+    # set +x
+    # local brew_packages=(
+    #     autoconf
+    #     cmake
+    #     dos2unix
+    #     eza
+    #     fd
+    #     ffmpeg
+    #     fpp
+    #     fzf
+    #     git
+    #     gnupg
+    #     go
+    #     graphviz
+    #     htop
+    #     jq
+    #     make
+    #     ncdu
+    #     neovim
+    #     node
+    #     python3
+    #     ripgrep
+    #     tree
+    #     wget
+    #     zoxide
+    #     zsh
+    #     mistertea/et/et
+    # )
+    # brew update
     # Find already installed packages
-    local upgrade_packages=($(brew ls --versions "${brew_packages[@]}" |
-    while read -r line; do
-        package=$(echo $line | awk '{print $1;}')
-        echo "$package"
-    done))
-    # Filter installed packages
-    local install_packages=()
-    local package
-    for package in "${brew_packages[@]}"; do
-        local short_package="$(echo $package | awk -F '/' '{print $NF}')"
-        if [[ ! " ${upgrade_packages[@]} " =~ " ${short_package} " ]]; then
-            install_packages+=($package)
-        fi
-    done
-    # Enable verbose mode back
-    set -x
-    for package in "${install_packages[@]}"; do
-        sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/sbin
-        HOMEBREW_NO_AUTO_UPDATE=1 brew install "${package}"
-    done
-    sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/sbin
-    if [ ${#upgrade_packages[@]} -gt 0 ]; then
-        HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade "${upgrade_packages[@]}"
-    fi
-    # Install command-not-found
-    brew tap homebrew/command-not-found
+    # local upgrade_packages=($(brew ls --versions "${brew_packages[@]}" |
+    # while read -r line; do
+    #     package=$(echo $line | awk '{print $1;}')
+    #     echo "$package"
+    # done))
+    # # Filter installed packages
+    # local install_packages=()
+    # local package
+    # for package in "${brew_packages[@]}"; do
+    #     local short_package="$(echo $package | awk -F '/' '{print $NF}')"
+    #     if [[ ! " ${upgrade_packages[@]} " =~ " ${short_package} " ]]; then
+    #         install_packages+=($package)
+    #     fi
+    # done
+    # # Enable verbose mode back
+    # set -x
+    # for package in "${install_packages[@]}"; do
+    #     sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/sbin
+    #     HOMEBREW_NO_AUTO_UPDATE=1 brew install "${package}"
+    # done
+    # sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/sbin
+    # if [ ${#upgrade_packages[@]} -gt 0 ]; then
+    #     HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade "${upgrade_packages[@]}"
+    # fi
+    # # Install command-not-found
+    # brew tap homebrew/command-not-found
     # install_subl_symlink
     install_copy_tool
     install_iterm_font
