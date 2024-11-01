@@ -1,3 +1,4 @@
+{{ if ne .osid "windows" -}}
 #!/bin/sh
 
 # Install uv tools
@@ -12,3 +13,4 @@ uv tool install --upgrade {{ . }}
 
 {{ includeTemplate "pypi_version" (dict "chezmoi" $chezmoi "package" "thefuck") | comment  "# " }}
 uv tool install --upgrade thefuck --python python3.11 --with setuptools
+{{ end -}}
