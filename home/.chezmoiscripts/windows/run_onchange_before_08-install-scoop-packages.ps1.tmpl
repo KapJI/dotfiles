@@ -2,9 +2,9 @@
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
 # Install packages
-{{- $packages := joinPath .chezmoi.sourceDir ".data/packages.toml" | include | fromToml -}}
-{{- range $packages.package -}}
-{{- if ne (get . "scoop") "" }}
+{{- $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml -}}
+{{- range $packages -}}
+{{- if hasKey . "scoop" }}
 scoop install {{ .scoop }}
 if ($lastexitcode -ne 0) {
     Write-Host -ForegroundColor Red "scoop install {{ .scoop }} failed with exit code $lastexitcode"
