@@ -1,0 +1,165 @@
+- brew-cask: 1password
+  winget: AgileBits.1Password
+
+- brew-cask: 1password-cli
+
+- winget: 7zip.7zip
+
+- brew: autoconf
+
+- brew-cask: bartender
+
+- brew: bat
+  winget: sharkdp.bat
+
+- brew: btop
+
+- scoop: CascadiaCode-NF-Mono
+
+- brew-cask: chatgpt
+
+- brew-cask: google-chrome
+  winget: Google.Chrome
+
+- brew: cmake
+  winget: Kitware.CMake
+
+- brew: git-delta
+  winget: dandavison.delta
+
+- brew: dos2unix
+
+- brew-cask: dropbox
+
+- brew: mistertea/et/et
+
+- brew: eza
+  winget: eza-community.eza
+
+- brew: fastfetch
+  winget: Fastfetch-cli.Fastfetch
+
+- brew: fd
+  winget: sharkdp.fd
+
+- brew: ffmpeg
+
+- brew: fzf
+  winget: junegunn.fzf
+
+- brew: git
+  winget: Git.Git
+
+- brew: gnupg
+
+- brew: go
+
+- brew: graphviz
+  winget: Graphviz.Graphviz
+
+- brew-cask: hazel
+
+- brew-cask: hex-fiend
+
+- winget: sharkdp.hexyl
+
+- brew: hyperfine
+  winget: sharkdp.hyperfine
+
+- brew-cask: istat-menus
+
+- brew-cask: iterm2
+
+- brew: jid
+  scoop: jid
+
+- brew: jq
+  winget: jqlang.jq
+
+- brew-cask: logi-options+
+
+- brew-cask: notion
+
+- brew: make
+
+- brew: mas
+
+- brew: ncdu
+
+- brew: neovim
+  winget: Neovim.Neovim
+
+- brew: ninja
+  winget: Ninja-build.Ninja
+
+- brew: node
+
+- winget: JanDeDobbeleer.OhMyPosh
+
+- brew: noborus/tap/ov
+  winget: noborus.ov
+
+- scoop: posh-git
+
+- winget: Microsoft.PowerShell
+
+- winget: Microsoft.PowerToys
+
+- scoop: psfzf
+
+- brew: python@3.13
+  scoop: python
+
+- brew-cask: raycast
+
+- brew: ripgrep
+  winget: BurntSushi.ripgrep.MSVC
+
+- brew: rustup
+  winget: Rustlang.Rustup
+
+- brew-case: spotify
+  winget: Spotify.Spotify
+
+- winget: Valve.Steam
+
+- brew-cask: sublime-text
+  winget: SublimeHQ.SublimeText.4
+
+- brew-cask: telegram
+  winget: Telegram.TelegramDesktop
+
+- brew: telnet
+
+- brew: tree
+
+- brew: uv
+  winget: astral-sh.uv
+
+- brew-cask: visual-studio-code
+  winget: Microsoft.VisualStudioCode
+
+- brew-cask: vlc
+
+- brew-cask: wezterm
+
+- brew: wget
+
+- winget: Microsoft.WindowsTerminal
+
+- winget: WinMerge.WinMerge
+
+- brew-apple-store:
+    name: WireGuard
+    id: 1451685025
+  winget: WireGuard.WireGuard
+
+- brew-cask: zoom
+
+- brew: zoxide
+  winget: ajeetdsouza.zoxide
+
+- brew: zsh
+
+- brew: zstd
+  winget: Meta.Zstandard
