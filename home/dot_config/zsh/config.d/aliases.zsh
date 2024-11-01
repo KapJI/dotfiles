@@ -1,5 +1,6 @@
 # Aliases
 alias fd="fd --hidden"
+alias rg="rg --hidden"
 alias hgsl="hg sl"
 alias ls="eza --icons=always --group --all"
 alias lt="eza --icons=always --tree --all"
