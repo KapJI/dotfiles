@@ -24,8 +24,18 @@
 - brew: cmake
   winget: Kitware.CMake
 
+- brew-tap: homebrew/command-not-found
+
 - brew: git-delta
   winget: dandavison.delta
+
+- brew-appstore:
+    name: Disk Speed Test
+    id: 425264550
+
+- brew-appstore:
+    name: Divvy
+    id: 413857545
 
 - brew: dos2unix
 
@@ -53,6 +63,10 @@
 - brew: gnupg
 
 - brew: go
+
+- brew-appstore:
+    name: Goodnotes
+    id: 1444383602
 
 - brew: graphviz
   winget: Graphviz.Graphviz
@@ -131,6 +145,10 @@
 
 - brew: telnet
 
+- brew-appstore:
+    name: Things
+    id: 904280696
+
 - brew: tree
 
 - brew: uv
@@ -149,7 +167,7 @@
 
 - winget: WinMerge.WinMerge
 
-- brew-apple-store:
+- brew-appstore:
     name: WireGuard
     id: 1451685025
   winget: WireGuard.WireGuard
@@ -163,3 +181,9 @@
 
 - brew: zstd
   winget: Meta.Zstandard
+
+# VSCode plugins
+- brew-vscode: golang.go
+- brew-vscode: ms-python.debugpy
+- brew-vscode: ms-python.python
+- brew-vscode: ms-python.vscode-pylance

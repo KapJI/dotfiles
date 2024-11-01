@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
+
+{{- $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml -}}
+{{ $taps := list -}}
+{{ $brews := list -}}
+{{ $casks := list -}}
+{{ $appstore := list -}}
+{{ $vscode := list -}}
+{{ range $packages -}}
+    {{ if hasKey . "brew-tap" -}}
+        {{ $taps = append $taps (get . "brew-tap") -}}
+    {{ end -}}
+    {{ if hasKey . "brew" -}}
+        {{ $brews = append $brews (get . "brew") -}}
+    {{ end -}}
+    {{ if hasKey . "brew-cask" -}}
+        {{ $casks = append $casks (get . "brew-cask") -}}
+    {{ end -}}
+    {{ if hasKey . "brew-appstore" -}}
+        {{ $appstore = append $appstore (get . "brew-appstore") -}}
+    {{ end -}}
+    {{ if hasKey . "brew-vscode" -}}
+        {{ $vscode = append $vscode (get . "brew-vscode") -}}
+    {{ end -}}
+{{ end }}
+
+brew bundle --no-lock --verbose --file=/dev/stdin <<EOF
+{{ range $taps -}}
+tap "{{ . }}"
+{{ end -}}
+{{ range $brews -}}
+brew "{{ . }}"
+{{ end -}}
+{{ range $casks -}}
+cask "{{ . }}"
+{{ end -}}
+{{ range $appstore -}}
+mas "{{ .name }}", id: {{ .id }}
+{{ end -}}
+{{ range $vscode -}}
+vscode "{{ . }}"
+{{ end -}}
+EOF
