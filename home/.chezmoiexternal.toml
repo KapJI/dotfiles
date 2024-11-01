@@ -18,7 +18,7 @@
 {{ $uv_tools_list := splitList "\n" $uv_tools }}
 {{ $uv_tools_list = append $uv_tools_list "thefuck" }}
 {{ range $uv_tools_list }}
-[".config/chezmoi/pypi-cache/{{ . }}.json"]
+[".config/chezmoi/pypi-cache/00-{{ . }}.json"]
     type = "file"
     url = "https://pypi.org/pypi/{{ . }}/json"
     refreshPeriod = "24h"
