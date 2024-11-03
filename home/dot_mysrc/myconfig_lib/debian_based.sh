@@ -49,27 +49,27 @@ function install_nvm() {
 }
 
 function install_debian_packages() {
-    local apt_packages=(
-        build-essential
-        command-not-found
-        eza
-        fd-find
-        fzf
-        gnupg
-        golang
-        htop
-        ncat
-        neovim
-        pinentry-tty
-        python3
-        python3-dev
-        python3-pip
-        python3-setuptools
-        python3-venv
-        ripgrep
-        tmux
-        zsh
-    )
+    # local apt_packages=(
+    #     build-essential
+    #     command-not-found
+    #     eza
+    #     fd-find
+    #     fzf
+    #     gnupg
+    #     golang
+    #     htop
+    #     ncat
+    #     neovim
+    #     pinentry-tty
+    #     python3
+    #     python3-dev
+    #     python3-pip
+    #     python3-setuptools
+    #     python3-venv
+    #     ripgrep
+    #     tmux
+    #     zsh
+    # )
     if [ "$RASPBERRY_PI" != true ]; then
         apt_packages+=(et)
         add_eternal_terminal_repo
