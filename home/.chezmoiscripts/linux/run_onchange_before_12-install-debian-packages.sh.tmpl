@@ -18,5 +18,5 @@ fi
     {{ end -}}
 {{ end -}}
 
-sudo nala install -y {{ $deb_packages | join }}
+sudo nala install -y {{ $deb_packages | join " " }}
 {{ end -}}
