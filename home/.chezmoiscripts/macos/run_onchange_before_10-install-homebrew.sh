@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 if ! command -v brew &> /dev/null; then
     brew_url="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"

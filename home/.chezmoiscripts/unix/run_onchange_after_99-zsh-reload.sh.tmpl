@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 {{ $homeDir := .chezmoi.homeDir -}}
 {{ $zsh_files := glob (list $homeDir ".config/zsh/{custom_completion,config.d}/**" | join "/" ) -}}
