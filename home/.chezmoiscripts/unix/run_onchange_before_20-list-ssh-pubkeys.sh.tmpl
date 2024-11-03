@@ -1,5 +1,5 @@
 {{- if or (has .osid (list "darwin" "windows")) (eq .chezmoi.hostname "homeserver" ) -}}
-#!/bin/sh
+#!/usr/bin/env bash
 
 OUTPUT="${HOME}/.config/chezmoi/ssh_pubkeys.txt"
 

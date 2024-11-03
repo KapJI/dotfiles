@@ -1,5 +1,5 @@
 {{- if eq .osid "linux-centos" -}}
-#!/bin/sh
+#!/usr/bin/env bash
 
 TARGET_PATH="{{ joinPath (osDir .chezmoi.configFile) "work_gitconfig" }}"
 if [ ! -f "${TARGET_PATH}" ]; then
