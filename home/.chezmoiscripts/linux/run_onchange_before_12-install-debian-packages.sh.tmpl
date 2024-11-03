@@ -1,0 +1,22 @@
+{{ if has .osid (list "linux-debian" "linux-ubuntu") -}}
+#!/bin/sh
+
+# Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
+
+# Install nala
+if ! command -v nala &> /dev/null; then
+    sudo apt update
+    sudo apt install -y nala
+fi
+
+# Install packages
+{{ $deb_packages := list -}}
+{{ $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml -}}
+{{ range $packages -}}
+    {{ if hasKey . "deb" -}}
+        {{ $deb_packages = append $deb_packages .deb -}}
+    {{ end -}}
+{{ end -}}
+
+sudo nala install -y {{ $deb_packages | join }}
+{{ end -}}

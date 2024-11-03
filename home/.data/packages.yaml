@@ -14,6 +14,9 @@
   winget: sharkdp.bat
 
 - brew: btop
+  deb: btop
+
+- deb: build-essential
 
 - scoop: CascadiaCode-NF-Mono
 
@@ -26,8 +29,10 @@
   winget: Kitware.CMake
 
 - brew-tap: homebrew/command-not-found
+  deb: command-not-found
 
 - brew: git-delta
+  deb: git-delta
   winget: dandavison.delta
 
 - brew-appstore:
@@ -47,26 +52,31 @@
 - brew: mistertea/et/et
 
 - brew: eza
+  deb: eza
   winget: eza-community.eza
 
 - brew: fastfetch
   winget: Fastfetch-cli.Fastfetch
 
 - brew: fd
+  deb: fd-find
   winget: sharkdp.fd
 
 - brew: ffmpeg
 
 - brew: fzf
+  deb: fzf
   winget: junegunn.fzf
 
 - brew: git
   winget: Git.Git
 
 - brew: gnupg
+  deb: gnupg
   winget: GnuPG.GnuPG
 
 - brew: go
+  deb: golang
   winget: GoLang.Go
 
 - brew-appstore:
@@ -105,10 +115,15 @@
 
 - brew: mas
 
+- deb: nala
+
 - brew: ncdu
 
 - brew: neovim
+  deb: neovim
   winget: Neovim.Neovim
+
+- deb: ncat
 
 - brew: ninja
   winget: Ninja-build.Ninja
@@ -121,6 +136,8 @@
 - brew: noborus/tap/ov
   winget: noborus.ov
 
+- deb: pinentry-tty
+
 - scoop: posh-git
 
 - winget: Microsoft.PowerShell
@@ -130,11 +147,18 @@
 - scoop: psfzf
 
 - brew: python@3.13
+  deb: python3
   scoop: python
+
+- deb: python3-dev
+- deb: python3-pip
+- deb: python3-setuptools
+- deb: python3-venv
 
 - brew-cask: raycast
 
 - brew: ripgrep
+  deb: ripgrep
   winget: BurntSushi.ripgrep.MSVC
 
 - brew: rustup
@@ -156,6 +180,8 @@
 - brew-appstore:
     name: Things
     id: 904280696
+
+- deb: tmux
 
 - brew: tree
   winget: GnuWin32.Tree
@@ -193,6 +219,7 @@
   winget: ajeetdsouza.zoxide
 
 - brew: zsh
+  deb: zsh
 
 - brew: zstd
   winget: Meta.Zstandard
