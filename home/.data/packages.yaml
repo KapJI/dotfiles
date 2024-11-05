@@ -4,13 +4,16 @@
 - brew-cask: 1password-cli
   winget: AgileBits.1Password.CLI
 
-- winget: 7zip.7zip
+- deb: 7zip
+  winget: 7zip.7zip
 
 - brew: autoconf
+  deb: autoconf
 
 - brew-cask: bartender
 
 - brew: bat
+  deb: bat
   winget: sharkdp.bat
 
 - brew: btop
@@ -26,6 +29,7 @@
   winget: Google.Chrome
 
 - brew: cmake
+  deb: cmake
   winget: Kitware.CMake
 
 - brew-tap: homebrew/command-not-found
@@ -44,18 +48,22 @@
     id: 413857545
 
 - brew: dos2unix
+  deb: dos2unix
   winget: waterlan.dos2unix
 
 - brew-cask: dropbox
   winget: Dropbox.Dropbox
 
 - brew: mistertea/et/et
+  deb: et
 
 - brew: eza
   deb: eza
   winget: eza-community.eza
 
 - brew: fastfetch
+  deb: fastfetch
+  dnf: fastfetch
   winget: Fastfetch-cli.Fastfetch
 
 - brew: fd
@@ -69,6 +77,7 @@
   winget: junegunn.fzf
 
 - brew: git
+  deb: git
   winget: Git.Git
 
 - brew: gnupg
@@ -84,6 +93,7 @@
     id: 1444383602
 
 - brew: graphviz
+  deb: graphviz
   winget: Graphviz.Graphviz
 
 - brew-cask: hazel
@@ -91,9 +101,11 @@
 - brew-cask: hex-fiend
 
 - brew: hexyl
+  deb: hexyl
   winget: sharkdp.hexyl
 
 - brew: hyperfine
+  deb: hyperfine
   winget: sharkdp.hyperfine
 
 - brew-cask: istat-menus
@@ -222,6 +234,7 @@
   deb: zsh
 
 - brew: zstd
+  deb: zstd
   winget: Meta.Zstandard
 
 # VSCode plugins

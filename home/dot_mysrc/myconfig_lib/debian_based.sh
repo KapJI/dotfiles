@@ -87,4 +87,5 @@ function setup_debian() {
     # Create symlinks
     sudo ln -sfn $(command -v fdfind) /usr/local/bin/fd
     sudo ln -sfn /usr/bin/pinentry-tty /usr/local/bin/pinentry-current
+    sudo ln -sfn $(command -v batcat) /usr/local/bin/bat
 }
