@@ -158,6 +158,10 @@
 
 - scoop: psfzf
 
+- brew: pv
+  dev: pv
+  dnf: pv
+
 - brew: python@3.13
   deb: python3
   scoop: python
