@@ -156,6 +156,10 @@
 
 - winget: Microsoft.PowerToys
 
+- winget: Microsoft.Sysinternals.ProcessExplorer
+
+- winget: Microsoft.Sysinternals.ProcessMonitor
+
 - scoop: psfzf
 
 - brew: pv
