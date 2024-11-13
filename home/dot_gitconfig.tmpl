@@ -80,5 +80,5 @@
 [delta "interactive"]
     keep-plus-minus-markers = false
 {{- if eq .osid "linux-centos" }}
-{{ includeTemplate (joinPath (osDir .chezmoi.configFile) "work_gitconfig") . }}
+{{ includeTemplate (joinPath .chezmoi.homeDir ".config/git/centos.gitconfig") . }}
 {{ end }}

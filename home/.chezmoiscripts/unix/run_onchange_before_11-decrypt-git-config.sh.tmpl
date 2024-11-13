@@ -1,9 +1,0 @@
-{{- if eq .osid "linux-centos" -}}
-#!/usr/bin/env bash
-
-TARGET_PATH="{{ joinPath (osDir .chezmoi.configFile) "work_gitconfig" }}"
-if [ ! -f "${TARGET_PATH}" ]; then
-    {{ .chezmoi.executable }} decrypt --output "${TARGET_PATH}" "{{ .chezmoi.sourceDir }}/.data/work_gitconfig.age"
-    chmod 600 "${TARGET_PATH}"
-fi
-{{ end }}
