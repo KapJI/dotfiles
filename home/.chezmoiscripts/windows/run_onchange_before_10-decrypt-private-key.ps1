@@ -12,7 +12,7 @@ if (!(Test-Path $OUTPUT)) {
 
     # Decrypt the key.txt.age file
     for ($i = 0; $i -le 5; $i++) {
-        chezmoi age decrypt --output $OUTPUT --passphrase "$(chezmoi source-path)/key.txt.age"
+        chezmoi age decrypt --output $OUTPUT --passphrase "$(chezmoi source-path)/.data/key.txt.age"
         if ($?) {
             break
         }
