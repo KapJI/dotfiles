@@ -1,5 +1,5 @@
 {{- $name := .name -}}
-{{- $list := include (joinPath (osDir .context.chezmoi.configFile) "ssh_pubkeys.txt") | trim | splitList "\n" -}}
+{{- $list := output "ssh-add" "-L" | trim | splitList "\n" -}}
 {{- range $list -}}
 {{- if hasSuffix $name . -}}
 {{ . }}
