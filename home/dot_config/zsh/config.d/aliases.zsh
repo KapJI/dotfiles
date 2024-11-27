@@ -56,3 +56,7 @@ hg() {
         command hg "$@"
     fi
 }
+
+rgd() {
+    command rg --hidden --json -C 2 "$@" | delta
+}
