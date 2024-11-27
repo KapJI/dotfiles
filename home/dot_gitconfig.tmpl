@@ -70,13 +70,27 @@
 [interactive]
     diffFilter = delta --color-only --pager less
 [delta]
+    # features:
+    dark = true
+    pager = "ov -F"
+    side-by-side = true
+    line-numbers = true
+    # styles:
     file-modified-label = modified:
     hunk-header-decoration-style = yellow box
     hunk-header-style = syntax
-    line-numbers = true
+    right-arrow = ->
+    line-numbers-left-format = "{nm:>3}│"
+    line-numbers-right-format = "{np:>3}│"
+    line-numbers-zero-style = gray
+    minus-emph-style = lemonchiffon crimson underline
+    minus-empty-line-marker-style = normal maroon
+    minus-style = syntax darkred
+    plus-emph-style = lemonchiffon olivedrab underline
+    plus-empty-line-marker-style = normal seagreen
+    plus-style = syntax darkgreen
+    whitespace-error-style = black white
     map-styles = "bold purple => syntax #33194d, bold cyan => syntax #4d2673"
-    pager = "ov -F"
-    side-by-side = true
 [delta "interactive"]
     keep-plus-minus-markers = false
 {{- if eq .osid "linux-centos" }}
