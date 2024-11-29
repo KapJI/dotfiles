@@ -4,7 +4,8 @@
 - brew-cask: 1password-cli
   winget: AgileBits.1Password.CLI
 
-- deb: 7zip
+- brew: sevenzip
+  deb: 7zip
   winget: 7zip.7zip
 
 - brew: autoconf
@@ -72,6 +73,8 @@
 
 - brew: ffmpeg
 
+- brew: ffmpegthumbnailer
+
 - brew: fzf
   deb: fzf
   winget: junegunn.fzf
@@ -107,6 +110,8 @@
 - brew: hyperfine
   deb: hyperfine
   winget: sharkdp.hyperfine
+
+- brew: imagemagick
 
 - brew-cask: istat-menus
 
@@ -150,6 +155,8 @@
 
 - deb: pinentry-tty
 
+- brew: poppler
+
 - scoop: posh-git
 
 - winget: Microsoft.PowerShell
@@ -185,8 +192,12 @@
   deb: rustup
   winget: Rustlang.Rustup
 
-- brew-case: spotify
+- brew-cask: spotify
   winget: Spotify.Spotify
+
+- brew: starship
+  nix: nixpkgs.starship
+  winget: Starship.Starship
 
 - winget: Valve.Steam
 
@@ -238,6 +249,8 @@
   winget: WireGuard.WireGuard
 
 - winget: AntibodySoftware.WizTree
+
+- brew: yazi
 
 - brew-cask: zoom
   winget: Zoom.Zoom
