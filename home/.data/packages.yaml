@@ -195,10 +195,6 @@
 - brew-cask: spotify
   winget: Spotify.Spotify
 
-- brew: starship
-  nix: nixpkgs.starship
-  winget: Starship.Starship
-
 - winget: Valve.Steam
 
 - brew-cask: sublime-text
