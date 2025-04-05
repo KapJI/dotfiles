@@ -26,7 +26,7 @@
     {{ end -}}
 {{ end }}
 
-brew bundle --no-lock --verbose --file=/dev/stdin <<EOF
+brew bundle --verbose --file=/dev/stdin <<EOF
 {{ range $taps -}}
 tap "{{ . }}"
 {{ end -}}
