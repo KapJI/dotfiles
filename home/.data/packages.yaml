@@ -170,7 +170,7 @@
 - scoop: psfzf
 
 - brew: pv
-  dev: pv
+  deb: pv
   dnf: pv
 
 - brew: python@3.13
