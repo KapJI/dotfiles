@@ -37,7 +37,6 @@
   deb: command-not-found
 
 - brew: git-delta
-  deb: git-delta
   winget: dandavison.delta
 
 - brew-appstore:
