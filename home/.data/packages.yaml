@@ -63,8 +63,6 @@
   winget: eza-community.eza
 
 - brew: fastfetch
-  deb: fastfetch
-  dnf: fastfetch
   winget: Fastfetch-cli.Fastfetch
 
 - brew: fd
@@ -171,7 +169,6 @@
 
 - brew: pv
   deb: pv
-  dnf: pv
 
 - brew: python@3.13
   deb: python3
@@ -189,7 +186,6 @@
   winget: BurntSushi.ripgrep.MSVC
 
 - brew: rustup
-  deb: rustup
   winget: Rustlang.Rustup
 
 - brew-cask: spotify
@@ -205,18 +201,15 @@
 
 - brew: telnet
   deb: telnet
-  dnf: telnet
 
 - brew-appstore:
     name: Things
     id: 904280696
 
 - deb: tmux
-  dnf: tmux
 
 - brew: tree
   deb: tree
-  dnf: tree
   winget: GnuWin32.Tree
 
 - brew: uv
@@ -253,12 +246,10 @@
 
 - brew: zoxide
   deb: zoxide
-  dnf: zoxide
   winget: ajeetdsouza.zoxide
 
 - brew: zsh
   deb: zsh
-  dnf: zsh
 
 - brew: zstd
   deb: zstd
