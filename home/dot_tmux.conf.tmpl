@@ -32,7 +32,7 @@ set -g allow-rename on
 set -g set-titles on
 
 # Only window index, title and hostname
-set -g set-titles-string '#I: #T (#{host})'
+set -g set-titles-string '#I: #W (#{host})'
 
 # Match window size to current client (vs largest attached)
 setw -g aggressive-resize on
@@ -105,8 +105,8 @@ bind -n S-Right next-window
 ##### Theme #####
 
 set -g @catppuccin_flavour 'mocha'
-set -g @catppuccin_window_text "#T"
-set -g @catppuccin_window_current_text "#T"
+set -g @catppuccin_window_text "#W"
+set -g @catppuccin_window_current_text "#W"
 set -g @catppuccin_window_current_number "#I#{?window_zoomed_flag, ,}"
 set -g @catppuccin_date_time_text " %H:%M | %d %b"
 set -g @catppuccin_window_number_position "right"
