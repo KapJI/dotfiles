@@ -23,9 +23,9 @@ ohmyzsh/ohmyzsh path:plugins/extract
 ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z
 ohmyzsh/ohmyzsh path:plugins/rust
 ohmyzsh/ohmyzsh path:plugins/safe-paste
+ohmyzsh/ohmyzsh path:plugins/shrink-path
 ohmyzsh/ohmyzsh path:plugins/thefuck
 
 # Need compinit
-ohmyzsh/ohmyzsh path:plugins/mosh
 ohmyzsh/ohmyzsh path:plugins/pip
 b4b4r07/enhancd
