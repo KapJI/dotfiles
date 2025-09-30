@@ -1,13 +1,3 @@
-# Display $1 in terminal title.
-_set_term_title() {
-  emulate -L zsh
-  if [[ -t 1 ]]; then
-    print -rn -- $'\e]0;'${(V)1}$'\a'
-  elif [[ -w $TTY ]]; then
-    print -rn -- $'\e]0;'${(V)1}$'\a' >$TTY
-  fi
-}
-
 # When no command is running, display the current directory in the terminal title.
 _set_term_title_precmd() {
   local max_length=20
@@ -24,7 +14,7 @@ _set_term_title_precmd() {
         short=$full_pwd
     fi
   fi
-  _set_term_title "$short"
+  title "$short" "$full_pwd"
 }
 
 add-zsh-hook precmd _set_term_title_precmd
