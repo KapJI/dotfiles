@@ -1,5 +1,5 @@
 # Display $1 in terminal title.
-function set-term-title() {
+_set_term_title() {
   emulate -L zsh
   if [[ -t 1 ]]; then
     print -rn -- $'\e]0;'${(V)1}$'\a'
@@ -8,22 +8,23 @@ function set-term-title() {
   fi
 }
 
-# When a command is running, display it in the terminal title.
-function set-term-title-preexec() {
-  set-term-title "${1%% *}"
-}
-
 # When no command is running, display the current directory in the terminal title.
-function set-term-title-precmd() {
+_set_term_title_precmd() {
+  local max_length=20
+  # Replace home with '~'
+  local full_pwd=$(print -P "%~")
   local short
-  if (( $+functions[shrink_path] )); then
-    short=$(shrink_path -f -3)
+
+  if (( ${#full_pwd} <= max_length )); then
+    short=$full_pwd
   else
-    short=${PWD/#$HOME/~}
+    if (( $+functions[shrink_path] )); then
+        short=$(shrink_path -f -3)
+    else
+        short=$full_pwd
+    fi
   fi
-  set-term-title "${short}"
+  _set_term_title "$short"
 }
 
-autoload -Uz add-zsh-hook
-add-zsh-hook preexec set-term-title-preexec
-add-zsh-hook precmd set-term-title-precmd
+add-zsh-hook precmd _set_term_title_precmd
