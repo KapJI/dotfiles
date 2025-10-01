@@ -49,6 +49,9 @@ set -s focus-events on
 # Emacs-style keys in command prompt (prefix + :)
 set -g status-keys emacs
 
+# Use vi keys in copy mode
+setw -g mode-keys vi
+
 # Remove vim Esc delay
 set -s escape-time 0
 
@@ -91,6 +94,9 @@ bind F break-pane
 # Toggle synchronize-panes
 bind S setw synchronize-panes
 
+# Copy mode
+bind v copy-mode
+
 # Use Alt-arrow keys without prefix key to switch panes
 bind -n M-Left select-pane -L
 bind -n M-Right select-pane -R
@@ -101,6 +107,16 @@ bind -n M-Down select-pane -D
 bind -n S-Left  previous-window
 bind -n S-Right next-window
 
+# Vi-like selection in copy mode
+bind -T copy-mode-vi v send -X begin-selection
+bind -T copy-mode-vi V send -X select-line
+bind -T copy-mode-vi C-v send -X rectangle-toggle
+bind -T copy-mode-vi Home send -X start-of-line
+bind -T copy-mode-vi End  send -X end-of-line
+
+# Do not cancel copy mode after copy
+bind -T copy-mode-vi y send -X copy-selection
+bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection
 
 ##### Theme #####
 
@@ -132,4 +148,7 @@ set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'catppuccin/tmux#v2.1.3'
 set -g @plugin 'MunifTanjim/tmux-mode-indicator'
 run '~/.tmux/plugins/tpm/tpm'
+
+# Override Catppuccin style
+set -g mode-style "fg=#cdd6f4,bg=#585b70"
 {{- end }}
