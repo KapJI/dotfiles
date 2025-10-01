@@ -113,14 +113,23 @@ set -g @catppuccin_window_number_position "right"
 # Make status line pretty
 set -g status-right-length 100
 set -g status-left-length 100
-set -g status-left ""
+set -g status-left "#{tmux_mode_indicator} "
 set -g status-right "#{E:@catppuccin_status_user}"
 set -ag status-right "#{E:@catppuccin_status_host}"
+
+
+##### Mode Indicator #####
+
+set -g @mode_indicator_prefix_prompt "WAIT "
+set -g @mode_indicator_copy_prompt "COPY "
+set -g @mode_indicator_sync_prompt "SYNC "
+set -g @mode_indicator_empty_prompt "TMUX "
 
 
 ##### Plugins #####
 
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'catppuccin/tmux#v2.1.3'
+set -g @plugin 'MunifTanjim/tmux-mode-indicator'
 run '~/.tmux/plugins/tpm/tpm'
 {{- end }}
