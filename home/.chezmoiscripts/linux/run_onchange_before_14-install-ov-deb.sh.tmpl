@@ -1,0 +1,5 @@
+{{ if has .osid (list "linux-debian" "linux-ubuntu") -}}
+#!/usr/bin/env bash
+
+sudo nala install -o APT::Get::AllowUnauthenticated=true -y {{ gitHubLatestReleaseAssetURL "noborus/ov" (printf "*_%s.deb" .chezmoi.arch) }}
+{{ end -}}
