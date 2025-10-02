@@ -93,6 +93,3 @@
     map-styles = "bold purple => syntax #33194d, bold cyan => syntax #4d2673"
 [delta "interactive"]
     keep-plus-minus-markers = false
-{{- if eq .osid "linux-centos" }}
-{{ includeTemplate (joinPath .chezmoi.homeDir ".config/git/centos.gitconfig") . }}
-{{ end }}

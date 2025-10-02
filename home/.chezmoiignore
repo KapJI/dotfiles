@@ -28,7 +28,3 @@ bin
 .ssh/pubkeys/**
 !.ssh/pubkeys/github_key.pub
 {{ end }}
-
-{{ if ne .osid "linux-centos" }}
-.config/git/centos.gitconfig
-{{ end }}
