@@ -1,6 +1,9 @@
 # Set PATH
 
-_EXTRA_PATH=(
+# Keep first occurrence of each entry
+typeset -U path
+
+local -a extra=(
     "$HOME/bin"
     "$HOME/.local/bin"
     "$HOME/.npm/bin"
@@ -11,9 +14,11 @@ _EXTRA_PATH=(
 )
 
 if [ "$MACOS" = true ]; then
-    _EXTRA_PATH+=("/opt/homebrew/bin")
+    extra+="/opt/homebrew/bin"
 fi
 
-_EXTRA_PATH+=("/usr/local/bin")
+extra+="/usr/local/bin"
 
-export PATH="$(printf ":%s" "${_EXTRA_PATH[@]}"):$PATH"
+path=( $extra $path )
+
+export PATH
