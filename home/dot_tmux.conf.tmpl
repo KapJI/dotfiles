@@ -118,6 +118,12 @@ bind -T copy-mode-vi End  send -X end-of-line
 bind -T copy-mode-vi y send -X copy-selection
 bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection
 
+# Quickly jump between shell prompts
+bind P copy-mode \; send -X search-backward "❯"
+bind N copy-mode \; send -X search-forward "❯"
+bind -T copy-mode-vi P send -X search-backward "❯"
+bind -T copy-mode-vi N send -X search-forward  "❯"
+
 ##### Theme #####
 
 set -g @catppuccin_flavour 'mocha'
