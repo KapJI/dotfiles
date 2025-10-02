@@ -65,7 +65,7 @@ set -g repeat-time 500
 set -g status-interval 5
 
 # Duration of messages (ms)
-set -g display-time 1500
+set -g display-time 1000
 
 # Duration of pane number overlay (ms)
 set -g display-panes-time 1500
@@ -117,6 +117,29 @@ bind -T copy-mode-vi End  send -X end-of-line
 # Do not cancel copy mode after copy
 bind -T copy-mode-vi y send -X copy-selection
 bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection
+
+# Copy last command output
+bind Y if-shell -b "tmux capture-pane -p -J | tail -n 2 | grep -q '❯'" {
+    copy-mode
+    send -X search-backward '❯'
+    send -X search-backward '❯'
+    send -X begin-selection
+    send -X search-forward '❯'
+    send -X cursor-up
+    send -X cursor-up
+    send -X end-of-line
+    send -X copy-pipe-and-cancel "tmux load-buffer -w -b lastcmd -"
+    display-message 'Copied last command output'
+} {
+    copy-mode
+    send -X search-backward '❯'
+    send -X begin-selection
+    send -X bottom-line
+    send -X end-of-line
+    send -X copy-selection-and-cancel
+    send -X copy-pipe-and-cancel "tmux load-buffer -w -b lastcmd -"
+    display-message 'Copied last command output'
+}
 
 # Quickly jump between shell prompts
 bind P copy-mode \; send -X search-backward "❯"
