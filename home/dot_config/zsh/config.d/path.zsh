@@ -3,7 +3,6 @@
 _EXTRA_PATH=(
     "$HOME/bin"
     "$HOME/.local/bin"
-    "$GOPATH/bin"
     "$HOME/.npm/bin"
     "$HOME/.iterm2"
     "$HOME/.cargo/bin"
