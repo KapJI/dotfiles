@@ -1,6 +1,7 @@
 .dotfiles
 .iterm2_shell_integration.zsh
 .gitignore
+.mysrc
 .p10k.zsh
 .zcompdump
 .zsh_completion
