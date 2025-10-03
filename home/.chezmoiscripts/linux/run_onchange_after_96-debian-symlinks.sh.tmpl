@@ -1,0 +1,7 @@
+{{ if has .osid (list "linux-debian" "linux-ubuntu") -}}
+#!/usr/bin/env bash
+
+sudo ln -sfn $(command -v fdfind) /usr/local/bin/fd
+sudo ln -sfn $(command -v batcat) /usr/local/bin/bat
+
+{{ end -}}
