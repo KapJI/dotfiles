@@ -1,5 +1,10 @@
 {{ $default_refresh := "168h" | quote }}
 
+{{ $binary_suffix := "" }}
+{{ if eq .osid "windows" }}
+{{ $binary_suffix = ".exe" }}
+{{ end }}
+
 {{ $nvim_dir := ".local/share/nvim" }}
 {{ if eq .osid "windows" }}
 {{ $nvim_dir = "AppData/Local/nvim-data" }}
@@ -38,12 +43,14 @@
     stripComponents = 1
     path = "hexyl"
     executable = true
+    refreshPeriod = {{ $default_refresh }}
 
 [".local/bin/ov"]
     type = "archive-file"
     url = "{{ gitHubLatestReleaseAssetURL "noborus/ov" "*linux_amd64*" }}"
     path = "ov"
     executable = true
+    refreshPeriod = {{ $default_refresh }}
 {{ end }}
 
 {{ if eq .osid "windows" }}
@@ -52,12 +59,14 @@
     url = "{{ gitHubLatestReleaseAssetURL "sharkdp/bat" "*x86_64-pc-windows-msvc*" }}"
     stripComponents = 1
     path = "autocomplete/_bat.ps1"
+    refreshPeriod = {{ $default_refresh }}
 
 ["Documents/PowerShell/Completion/hyperfine.ps1"]
     type = "archive-file"
     url = "{{ gitHubLatestReleaseAssetURL "sharkdp/hyperfine" "*x86_64-pc-windows-msvc*" }}"
     stripComponents = 1
     path = "autocomplete/_hyperfine.ps1"
+    refreshPeriod = {{ $default_refresh }}
 {{ end }}
 
 {{ if eq .chezmoi.os "linux" }}
@@ -66,3 +75,10 @@
     url = "https://github.com/tmux-plugins/tpm"
     refreshPeriod = {{ $default_refresh }}
 {{ end }}
+
+["{{ printf ".local/bin/tree-sitter-cli%s" $binary_suffix }}"]
+    type = "file"
+    decompress = "gzip"
+    url = "{{ gitHubLatestReleaseAssetURL "tree-sitter/tree-sitter" (printf "tree-sitter-%s-%s.gz" (.chezmoi.os | replace "darwin" "macos") (.chezmoi.arch | replace "amd64" "x64")) }}"
+    executable = true
+    refreshPeriod = {{ $default_refresh }}
