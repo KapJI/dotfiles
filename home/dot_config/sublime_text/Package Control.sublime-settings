@@ -4,6 +4,7 @@
 	[
 		"ApplySyntax",
 		"DiffTabs",
+		"Dockerfile Syntax Highlighting",
 		"gcode",
 		"INI",
 		"Kotlin",
