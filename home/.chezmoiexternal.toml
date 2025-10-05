@@ -76,7 +76,7 @@
     refreshPeriod = {{ $default_refresh }}
 {{ end }}
 
-["{{ printf ".local/bin/tree-sitter-cli%s" $binary_suffix }}"]
+["{{ printf ".local/bin/tree-sitter%s" $binary_suffix }}"]
     type = "file"
     decompress = "gzip"
     url = "{{ gitHubLatestReleaseAssetURL "tree-sitter/tree-sitter" (printf "tree-sitter-%s-%s.gz" (.chezmoi.os | replace "darwin" "macos") (.chezmoi.arch | replace "amd64" "x64")) }}"
