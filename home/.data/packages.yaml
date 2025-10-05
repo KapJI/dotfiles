@@ -33,6 +33,8 @@
   deb: cmake
   winget: Kitware.CMake
 
+- brew: colima
+
 - brew-tap: homebrew/command-not-found
   deb: command-not-found
 
@@ -46,6 +48,8 @@
 - brew-appstore:
     name: Divvy
     id: 413857545
+
+- brew: docker
 
 - brew: dos2unix
   deb: dos2unix
