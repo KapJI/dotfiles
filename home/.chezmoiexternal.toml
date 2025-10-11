@@ -26,7 +26,7 @@
 [".config/chezmoi/pypi-cache/00-{{ . }}.json"]
     type = "file"
     url = "https://pypi.org/pypi/{{ . }}/json"
-    refreshPeriod = "24h"
+    refreshPeriod = {{ $default_refresh }}
 {{ end }}
 
 {{ if ne .osid "windows" }}
