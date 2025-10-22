@@ -151,7 +151,7 @@
 
 - winget: JanDeDobbeleer.OhMyPosh
 
-- brew: noborus/tap/ov
+- brew: ov
   winget: noborus.ov
 
 - deb: pinentry-tty
