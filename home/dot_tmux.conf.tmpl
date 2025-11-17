@@ -7,8 +7,8 @@ set -g mouse on
 # History buffer (default ~2000)
 set -g history-limit 50000
 
-# 256-color mode
-set -g default-terminal "tmux-256color"
+# Setting to xterm instead of tmux to have ccc (change colors)
+set -g default-terminal "xterm-256color"
 
 # Enable TrueColor support for vim
 set -ga terminal-overrides ",*-256color*:RGB"
