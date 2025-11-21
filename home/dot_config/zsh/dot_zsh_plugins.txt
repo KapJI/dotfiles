@@ -28,4 +28,4 @@ ohmyzsh/ohmyzsh path:plugins/thefuck
 
 # Need compinit
 ohmyzsh/ohmyzsh path:plugins/pip
-b4b4r07/enhancd
+babarot/enhancd
