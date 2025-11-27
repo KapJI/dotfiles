@@ -56,7 +56,7 @@ set -g status-keys emacs
 setw -g mode-keys vi
 
 # Remove vim Esc delay
-set -s escape-time 0
+set -s escape-time 40
 
 # Time window for repeatable key bindings (ms)
 set -g repeat-time 500
@@ -92,10 +92,10 @@ bind c new-window -c "#{pane_current_path}"
 bind f resize-pane -Z
 
 # Convert pane into a window
-bind F break-pane
+bind F break-pane \; display-message "Pane moved to a separate window"
 
 # Toggle synchronize-panes
-bind S setw synchronize-panes
+bind S setw synchronize-panes \; display-message "Toggled synchronize-panes"
 
 # Copy mode
 bind v copy-mode
@@ -113,7 +113,7 @@ bind -n S-Right next-window
 # Vi-like selection in copy mode
 bind -T copy-mode-vi v send -X begin-selection
 bind -T copy-mode-vi V send -X select-line
-bind -T copy-mode-vi C-v send -X rectangle-toggle
+bind -T copy-mode-vi M-v send -X rectangle-toggle
 bind -T copy-mode-vi Home send -X start-of-line
 bind -T copy-mode-vi End  send -X end-of-line
 
@@ -164,6 +164,7 @@ set -g status-left-length 100
 set -g status-left "#{tmux_mode_indicator} "
 set -g status-right "#{E:@catppuccin_status_user}"
 set -ag status-right "#{E:@catppuccin_status_host}"
+set -ag status-right "#{E:@catppuccin_status_session}"
 
 
 ##### Mode Indicator #####
@@ -181,6 +182,6 @@ set -g @plugin 'catppuccin/tmux#v2.1.3'
 set -g @plugin 'MunifTanjim/tmux-mode-indicator'
 run '~/.tmux/plugins/tpm/tpm'
 
-# Override Catppuccin style
+# Override Catppuccin style for selected text
 set -g mode-style "fg=#cdd6f4,bg=#585b70"
 {{- end }}
