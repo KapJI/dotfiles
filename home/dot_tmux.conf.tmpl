@@ -110,6 +110,9 @@ bind -n M-Down select-pane -D
 bind -n S-Left  previous-window
 bind -n S-Right next-window
 
+# Prevent mouse drag in normal mode from entering copy mode
+unbind -T root MouseDrag1Pane
+
 # Vi-like selection in copy mode
 bind -T copy-mode-vi v send -X begin-selection
 bind -T copy-mode-vi V send -X select-line
