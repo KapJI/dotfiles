@@ -26,8 +26,6 @@
 
 - brew-cask: chatgpt
 
-- brew-cask: claude-code
-
 - brew-cask: google-chrome
   winget: Google.Chrome
 
@@ -93,10 +91,6 @@
 - brew: go
   deb: golang
   winget: GoLang.Go
-
-- brew-appstore:
-    name: Goodnotes
-    id: 1444383602
 
 - brew: graphviz
   deb: graphviz
