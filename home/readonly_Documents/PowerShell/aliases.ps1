@@ -136,6 +136,14 @@ function global:gd {
     }
 }
 
+function global:gds {
+    if ($MyInvocation.ExpectingInput) {
+        $input | & git.exe diff $args
+    } else {
+        & git.exe diff --staged $args
+    }
+}
+
 function global:gf {
     if ($MyInvocation.ExpectingInput) {
         $input | & git.exe fetch $args
