@@ -26,6 +26,8 @@
 
 - brew-cask: chatgpt
 
+- brew-cask: claude-code
+
 - brew-cask: google-chrome
   winget: Google.Chrome
 
