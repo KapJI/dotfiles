@@ -17,27 +17,6 @@ config.window_padding = {
 config.default_cursor_style = 'BlinkingBar'
 config.use_fancy_tab_bar = true
 
--- Arthur (extracted from iTerm2)
-config.color_schemes = {
-    ['Arthur'] = {
-        foreground = '#DDEEDD',
-        background = '#1C1C1C',
-        cursor_bg = '#E2BBEF',
-        cursor_fg = '#000000',
-        cursor_border = '#E2BBEF',
-        selection_bg = '#4D4D4D',
-        selection_fg = '#FFFFFF',
-        ansi = {
-            '#3D352A', '#CD5C5C', '#86AF80', '#E8AE5B',
-            '#6495ED', '#DEB887', '#B0C4DE', '#BBAA99',
-        },
-        brights = {
-            '#554444', '#CC5533', '#88AA22', '#FFA75D',
-            '#87CEEB', '#996600', '#B0C4DE', '#DDCCBB',
-        },
-    },
-}
-
 config.color_scheme = 'Arthur'
 
 return config
