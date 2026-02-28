@@ -68,6 +68,7 @@ All packages are defined in a single central manifest: `.data/packages.yaml`. Ea
   brew-tap: ...          # Homebrew taps
   brew-appstore: ...     # mas (Mac App Store)
   brew-vscode: ...       # VS Code extensions
+  uv-tool: ...           # Python tools via uv (all platforms)
 ```
 
 Install scripts in `.chezmoiscripts/` read this YAML and install packages for their platform. When adding a new tool, add it to `packages.yaml` rather than directly to install scripts.
@@ -102,7 +103,7 @@ The zsh config is modular under `dot_config/zsh/config.d/`:
 - `env.zsh.tmpl` — environment variables (templated)
 - `key_bindings.zsh` — keybindings
 
-The plugin manager is **antidote** (configured in `dot_zsh_plugins.txt`). Plugins are loaded at shell startup.
+The plugin manager is **antidote** (configured in `dot_config/zsh/dot_zsh_plugins.txt`). Plugins are loaded at shell startup.
 
 ### Encryption
 

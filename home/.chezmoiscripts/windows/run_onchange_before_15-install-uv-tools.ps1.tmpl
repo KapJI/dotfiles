@@ -3,12 +3,13 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";"
 
 # Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 
-{{- $uv_tools := joinPath .chezmoi.sourceDir ".data/uv_tools.txt" | include | trim -}}
-{{- $tools_list := splitList "\n" $uv_tools }}
-{{ range $tools_list -}}
-uv tool install --upgrade {{ . }}
+{{- $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml -}}
+{{ range $packages -}}
+{{- if hasKey . "uv-tool" }}
+uv tool install --upgrade {{ get . "uv-tool" }}
 if ($lastexitcode -ne 0) {
-    Write-Host -ForegroundColor Red "uv tool install {{ . }} failed with exit code $lastexitcode"
+    Write-Host -ForegroundColor Red "uv tool install {{ get . "uv-tool" }} failed with exit code $lastexitcode"
     exit 1
 }
 {{ end -}}
+{{- end -}}

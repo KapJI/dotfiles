@@ -2,8 +2,9 @@
 
 # Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 
-{{- $uv_tools := joinPath .chezmoi.sourceDir ".data/uv_tools.txt" | include | trim -}}
-{{- $tools_list := splitList "\n" $uv_tools }}
-{{ range $tools_list -}}
-uv tool install --upgrade {{ . }}
+{{- $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml -}}
+{{ range $packages -}}
+{{- if hasKey . "uv-tool" }}
+uv tool install --upgrade {{ get . "uv-tool" }}
 {{ end -}}
+{{- end -}}
