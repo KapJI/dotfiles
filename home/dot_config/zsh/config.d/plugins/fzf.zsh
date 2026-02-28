@@ -1,3 +1,6 @@
+# Initialize fzf shell integration (Ctrl+R, Ctrl+T, Alt+C)
+eval "$(fzf --zsh)"
+
 # Configure fzf to use fd
 export FZF_DEFAULT_COMMAND="fd --type file --color=always --hidden --exclude .git --exclude .hg --exclude node_modules"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
