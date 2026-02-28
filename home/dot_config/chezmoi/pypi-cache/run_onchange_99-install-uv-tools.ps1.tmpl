@@ -16,10 +16,4 @@ if ($lastexitcode -ne 0) {
 }
 {{- end }}
 
-{{ includeTemplate "pypi_version" (dict "chezmoi" $chezmoi "package" "thefuck") | comment  "# " }}
-uv tool install --upgrade thefuck --python python3.11 --with setuptools
-if ($lastexitcode -ne 0) {
-    Write-Host -ForegroundColor Red "uv tool install thefuck failed with exit code $lastexitcode"
-    exit 1
-}
 {{ end -}}

@@ -21,7 +21,6 @@
 
 {{ $uv_tools := joinPath .chezmoi.sourceDir ".data/uv_tools.txt" | include | trim }}
 {{ $uv_tools_list := splitList "\n" $uv_tools }}
-{{ $uv_tools_list = append $uv_tools_list "thefuck" }}
 {{ range $uv_tools_list }}
 [".config/chezmoi/pypi-cache/00-{{ . }}.json"]
     type = "file"
