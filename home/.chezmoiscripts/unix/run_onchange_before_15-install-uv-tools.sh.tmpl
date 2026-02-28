@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
+
+{{- $uv_tools := joinPath .chezmoi.sourceDir ".data/uv_tools.txt" | include | trim -}}
+{{- $tools_list := splitList "\n" $uv_tools }}
+{{ range $tools_list -}}
+uv tool install --upgrade {{ . }}
+{{ end -}}

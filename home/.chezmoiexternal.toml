@@ -19,14 +19,6 @@
     url = "https://raw.githubusercontent.com/eza-community/eza-themes/refs/heads/main/themes/catppuccin-mocha.yml"
     refreshPeriod = {{ $default_refresh }}
 
-{{ $uv_tools := joinPath .chezmoi.sourceDir ".data/uv_tools.txt" | include | trim }}
-{{ $uv_tools_list := splitList "\n" $uv_tools }}
-{{ range $uv_tools_list }}
-[".config/chezmoi/pypi-cache/00-{{ . }}.json"]
-    type = "file"
-    url = "https://pypi.org/pypi/{{ . }}/json"
-    refreshPeriod = {{ $default_refresh }}
-{{ end }}
 
 {{ if ne .osid "windows" }}
 [".config/zsh/antidote"]

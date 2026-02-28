@@ -1,6 +1,0 @@
-{{- $path := joinPath .chezmoi.homeDir (list ".config/chezmoi/pypi-cache/" .package ".json" | join "") -}}
-{{- if stat $path -}}
-{{- ($path | include | fromJson).info.version -}}
-{{- else -}}
-unknown version
-{{- end -}}
