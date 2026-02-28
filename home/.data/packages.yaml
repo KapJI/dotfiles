@@ -216,6 +216,11 @@
 - brew: uv
   winget: astral-sh.uv
 
+- uv-tool: mypy
+- uv-tool: prek
+- uv-tool: pre-commit
+- uv-tool: ruff
+
 - brew-cask: visual-studio-code
   winget: Microsoft.VisualStudioCode
 
