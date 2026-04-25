@@ -27,6 +27,7 @@
 - brew-cask: chatgpt
 
 - brew-cask: claude-code
+  winget: Anthropic.ClaudeCode
 
 - brew-cask: google-chrome
   winget: Google.Chrome
