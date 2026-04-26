@@ -1,0 +1,23 @@
+{{ if and (has .osid (list "linux-debian" "linux-ubuntu")) .is_desktop -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+font_base_url="https://github.com/romkatv/powerlevel10k-media/raw/master"
+font_dir="$HOME/.local/share/fonts"
+mkdir -p "$font_dir"
+
+needs_cache=0
+for style in Regular Bold Italic 'Bold Italic'; do
+    file="MesloLGS NF ${style}.ttf"
+    target="$font_dir/$file"
+    if [ ! -f "$target" ]; then
+        curl -fsSL -o "$target.tmp" "$font_base_url/${file// /%20}"
+        mv -f "$target.tmp" "$target"
+        needs_cache=1
+    fi
+done
+
+if [ "$needs_cache" -eq 1 ]; then
+    fc-cache -f "$font_dir"
+fi
+{{ end -}}
