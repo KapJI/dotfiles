@@ -195,6 +195,7 @@
   winget: Rustlang.Rustup
 
 - brew-cask: spotify
+  deb-desktop: spotify-client
   winget: Spotify.Spotify
 
 - winget: Valve.Steam

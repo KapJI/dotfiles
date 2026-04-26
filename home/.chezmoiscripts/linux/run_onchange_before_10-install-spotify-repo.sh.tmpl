@@ -1,0 +1,27 @@
+{{ if and (has .osid (list "linux-debian" "linux-ubuntu")) .is_desktop -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+KEYRING=/usr/share/keyrings/spotify-archive-keyring.gpg
+LIST=/etc/apt/sources.list.d/spotify.list
+
+if [ -f "$KEYRING" ] && [ -f "$LIST" ]; then
+    exit 0
+fi
+
+# Spotify hosts multiple signing keys and rotates which one signs the repo
+# without changing their install instructions. Bundle both currently-published
+# keys into the keyring so we don't break on the next rotation.
+TMP_KEYRING=$(mktemp)
+for kid in 5384CE82BA52C83A C85668DF69375001; do
+    curl -fsSL "https://download.spotify.com/debian/pubkey_${kid}.gpg" \
+        | gpg --no-default-keyring --keyring "$TMP_KEYRING" --import 2>/dev/null
+done
+sudo install -o root -g root -m 0644 "$TMP_KEYRING" "$KEYRING"
+rm -f "$TMP_KEYRING"
+
+echo "deb [signed-by=$KEYRING] https://repository.spotify.com stable non-free" \
+    | sudo tee "$LIST" >/dev/null
+
+# spotify-client is installed in before_12 via the deb-desktop key.
+{{ end -}}
