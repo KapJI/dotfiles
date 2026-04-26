@@ -5,11 +5,12 @@ config.font = wezterm.font {
     family = 'MesloLGS NF',
     harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' },
 }
-config.font_size = 14.0
 config.line_height = 1.0
 if wezterm.target_triple:find("darwin") then
+    config.font_size = 14.0
     config.window_decorations = "RESIZE|INTEGRATED_BUTTONS"
 else
+    config.font_size = 12.0
     config.window_decorations = "TITLE|RESIZE"
 end
 config.window_padding = {
