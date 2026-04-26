@@ -11,8 +11,6 @@ encryption = "age"
     full_name = "Ruslan Sayfutdinov"
     {{- $git_email := promptStringOnce . "git_email" "Email address for Git" }}
     git_email = "{{ $git_email }}"
-    {{- $hg_email := promptStringOnce . "hg_email" "Email address for Hg" $git_email }}
-    hg_email = "{{ $hg_email }}"
     git_signingkey = "{{ (gitHubKeys "KapJI" | first).Key }}"
     {{- $osid := .chezmoi.os -}}
     {{- if hasKey .chezmoi.osRelease "id" -}}

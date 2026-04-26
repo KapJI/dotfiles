@@ -1,7 +1,6 @@
 # Aliases
 alias fd="fd --hidden"
 alias rg="rg --hidden"
-alias hgsl="hg sl"
 alias ls="eza --icons=always --group --all"
 alias lt="eza --icons=always --tree --all"
 alias l="eza --icons=always -l --group --all"
@@ -49,14 +48,6 @@ fi
 alias bathelp='bat --plain --language=help'
 help() {
     "$@" --help 2>&1 | bathelp
-}
-
-hg() {
-    if [[ "$1" == "diff" || "$1" == "show" ]]; then
-        command hg "$@" | delta
-    else
-        command hg "$@"
-    fi
 }
 
 rgd() {

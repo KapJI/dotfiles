@@ -1,6 +1,6 @@
 # you-should-use
 YSU_MESSAGE_POSITION="after"
-YSU_IGNORED_ALIASES=("hgsl" "vi")
+YSU_IGNORED_ALIASES=("vi")
 COLOUR_NONE="$(tput sgr0)"
 COLOUR_BOLD="$(tput bold)"
 COLOUR_YELLOW="$(tput setaf 3)"

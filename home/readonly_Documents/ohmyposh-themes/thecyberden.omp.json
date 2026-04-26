@@ -49,19 +49,6 @@
             "{{ if gt .Ahead 0 }}#FF7070{{ end }}",
             "{{ if gt .Behind 0 }}#90F090{{ end }}"
           ]
-        },
-        {
-          "properties": {
-            "command": "no-arg",
-            "interpret": false,
-            "shell": "C:\\ProgramData\\chocolatey\\bin\\hg_prompt.exe"
-          },
-          "template": " \uf126 {{ .Output }} ",
-          "foreground": "#4e4437",
-          "powerline_symbol": "\ue0b0",
-          "background": "#96ba92",
-          "type": "command",
-          "style": "powerline"
         }
       ],
       "newline": true

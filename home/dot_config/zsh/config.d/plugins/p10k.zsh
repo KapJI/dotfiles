@@ -35,7 +35,6 @@
     # os_icon               # os identifier
     dir                     # current directory
     vcs                     # git status
-    facebook_hg             # facebook hg status
     pyenv                   # python environment (https://github.com/pyenv/pyenv)
     virtualenv              # python virtual environment (https://docs.python.org/3/library/venv.html)
     # nodenv                  # node.js version from nodenv (https://github.com/nodenv/nodenv)
@@ -230,7 +229,6 @@
     .bzr
     .citc
     .git
-    .hg
     .node-version
     .python-version
     .go-version
@@ -1621,22 +1619,6 @@
   # Type `p10k help segment` for documentation and a more sophisticated example.
   function prompt_example() {
     p10k segment -b 1 -f 3 -i '⭐' -t 'hello, %n'
-  }
-
-  function prompt_facebook_hg() {
-    [[ "$(declare -Ff _dotfiles_scm_info)" ]] || return
-    dir="$PWD"
-    while : ; do
-      [[ "$dir" = "/home" ]] && break
-      if [[ -d "$dir/.git" ]]; then
-        return
-      fi
-      [[ "$dir" = "/" ]] && break
-      # portable "realpath" equivalent
-      dir="$(builtin cd -P "$dir/.." && builtin echo "$PWD")"
-    done
-    scm_prompt="$(_dotfiles_scm_info)"
-    [ ! -z "${scm_prompt}" ] && p10k segment -b 2 -f 0 -t "${(g::)POWERLEVEL9K_VCS_BRANCH_ICON}${scm_prompt}"
   }
 
   # User-defined prompt segments may optionally provide an instant_prompt_* function. Its job
