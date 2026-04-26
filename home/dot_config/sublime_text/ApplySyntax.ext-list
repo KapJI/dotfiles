@@ -263,4 +263,8 @@
 		".npmrc",
 		"ini.dist"
 	],
+	"Zsh":
+	[
+		"zsh"
+	],
 }
