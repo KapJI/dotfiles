@@ -7,7 +7,11 @@ config.font = wezterm.font {
 }
 config.font_size = 14.0
 config.line_height = 1.0
-config.window_decorations = "RESIZE|INTEGRATED_BUTTONS"
+if wezterm.target_triple:find("darwin") then
+    config.window_decorations = "RESIZE|INTEGRATED_BUTTONS"
+else
+    config.window_decorations = "TITLE|RESIZE"
+end
 config.window_padding = {
     left = "0.5cell",
     right = "0.5cell",
