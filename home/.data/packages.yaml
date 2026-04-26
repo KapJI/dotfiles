@@ -198,6 +198,7 @@
 - winget: Valve.Steam
 
 - brew-cask: sublime-text
+  deb-desktop: sublime-text
   winget: SublimeHQ.SublimeText.4
 
 - brew-cask: telegram

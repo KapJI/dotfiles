@@ -1,0 +1,25 @@
+{{ if and (eq .chezmoi.os "linux") .is_desktop -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Sublime Text 4 on Linux reads settings from ~/.config/sublime-text/Packages/User/.
+# Mirror the macOS/Windows symlink approach: point that path at the chezmoi-managed
+# settings tree at ~/.config/sublime_text/.
+SOURCE="$HOME/.config/sublime_text"
+TARGET_DIR="$HOME/.config/sublime-text/Packages"
+TARGET="$TARGET_DIR/User"
+
+mkdir -p "$TARGET_DIR"
+
+if [ -L "$TARGET" ] && [ "$(readlink -f "$TARGET")" = "$(readlink -f "$SOURCE")" ]; then
+    exit 0
+fi
+
+# If Sublime Text already created a real User/ directory, move it aside so the
+# user can salvage anything before the symlink takes over.
+if [ -d "$TARGET" ] && [ ! -L "$TARGET" ]; then
+    mv "$TARGET" "$TARGET.chezmoi-backup-$(date +%s)"
+fi
+
+ln -sfn "$SOURCE" "$TARGET"
+{{ end -}}
