@@ -3,9 +3,13 @@
 
 # Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 
+# Refresh apt indices to pick up any repos configured by earlier before_* scripts
+# (1Password, Chrome, etc.). Tolerate per-repo errors so a single broken source
+# doesn't block the install.
+sudo apt-get update || true
+
 # Install nala
 if ! command -v nala &> /dev/null; then
-    sudo apt update
     sudo apt install -y nala
 fi
 
@@ -15,6 +19,12 @@ fi
 {{ range $packages -}}
     {{ if hasKey . "deb" -}}
         {{ $deb_packages = append $deb_packages .deb -}}
+    {{ end -}}
+    {{ if and $.is_desktop (hasKey . "deb-desktop") -}}
+        {{ $deb_packages = append $deb_packages (get . "deb-desktop") -}}
+    {{ end -}}
+    {{ if and (not $.is_desktop) (hasKey . "deb-server") -}}
+        {{ $deb_packages = append $deb_packages (get . "deb-server") -}}
     {{ end -}}
 {{ end -}}
 

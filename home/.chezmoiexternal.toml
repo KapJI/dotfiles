@@ -60,7 +60,7 @@
     refreshPeriod = {{ $default_refresh }}
 {{ end }}
 
-{{ if eq .chezmoi.os "linux" }}
+{{ if and (eq .chezmoi.os "linux") (not .is_desktop) }}
 [".tmux/plugins/tpm"]
     type = "git-repo"
     url = "https://github.com/tmux-plugins/tpm"

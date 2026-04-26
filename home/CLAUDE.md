@@ -61,7 +61,9 @@ All packages are defined in a single central manifest: `.data/packages.yaml`. Ea
 
 ```yaml
 - brew: ripgrep          # macOS Homebrew
-  deb: ripgrep           # Debian/Ubuntu apt
+  deb: ripgrep           # Debian/Ubuntu apt (all Linux hosts)
+  deb-desktop: ...       # Debian/Ubuntu apt (Linux desktop only)
+  deb-server: ...        # Debian/Ubuntu apt (Linux server only)
   winget: BurntSushi.ripgrep  # Windows winget
   scoop: ripgrep         # Windows Scoop
   brew-cask: ...         # macOS GUI apps
@@ -76,10 +78,10 @@ Install scripts in `.chezmoiscripts/` read this YAML and install packages for th
 ### Templating
 
 Files ending in `.tmpl` are Go templates processed by chezmoi. Template data comes from:
-- `.chezmoi.toml.tmpl` — defines `chezmoi.data` (gitEmail, signing keys, etc.)
+- `.chezmoi.toml.tmpl` — defines `chezmoi.data` (gitEmail, signing keys, `is_desktop`, etc.)
 - Chezmoi built-ins: `{{ .chezmoi.os }}`, `{{ .chezmoi.hostname }}`, etc.
 
-Use `{{ if eq .chezmoi.os "darwin" }}` for OS-specific blocks.
+Use `{{ if eq .chezmoi.os "darwin" }}` for OS-specific blocks. Use `{{ if .is_desktop }}` to gate desktop-only behavior — `.is_desktop` is `true` on macOS and Windows; on Linux it is prompted at first init via `promptBoolOnce` (default `false` for backward-compat with existing servers).
 
 ### OS-Specific Scripts
 

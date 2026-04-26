@@ -7,7 +7,9 @@ source "$ZDOTDIR/config.d/path.zsh"
 source "$ZDOTDIR/config.d/sockets.zsh"
 
 # Auto attach to tmux session. Should come before instant prompt.
+{{- if not .is_desktop }}
 source "$ZDOTDIR/config.d/tmux_attach.zsh"
+{{- end }}
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]

@@ -17,6 +17,13 @@ encryption = "age"
     {{-   $osid = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
     {{- end }}
     osid = "{{ $osid }}"
+    {{- $is_desktop := false -}}
+    {{- if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "windows") -}}
+    {{-   $is_desktop = true -}}
+    {{- else if eq .chezmoi.os "linux" -}}
+    {{-   $is_desktop = promptBoolOnce . "is_desktop" "Is this a desktop machine (GUI)?" false -}}
+    {{- end }}
+    is_desktop = {{ $is_desktop }}
 
 [age]
     identity = "~/.config/chezmoi/key.txt"

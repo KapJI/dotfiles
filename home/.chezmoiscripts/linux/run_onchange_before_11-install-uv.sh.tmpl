@@ -1,0 +1,14 @@
+{{ if eq .chezmoi.os "linux" -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+if command -v uv &>/dev/null; then
+    exit 0
+fi
+
+# Astral's installer; install to /usr/local/bin so uv is on PATH for subsequent
+# chezmoi scripts (notably unix/before_15-install-uv-tools.sh) without needing
+# any login-shell sourcing.
+curl -LsSf https://astral.sh/uv/install.sh \
+    | sudo env UV_INSTALL_DIR=/usr/local/bin UV_NO_MODIFY_PATH=1 sh
+{{ end -}}

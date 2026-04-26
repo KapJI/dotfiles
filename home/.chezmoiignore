@@ -22,11 +22,20 @@ Documents
 bin
 {{ end }}
 
-{{ if not (has .osid (list "darwin" "windows")) }}
+{{ if .is_desktop }}
+# Desktop-only excludes (macOS, Windows, Linux desktop).
+.tmux.conf
+.config/zsh/config.d/tmux_attach.zsh
+{{ else }}
+# Server-only excludes (Linux server, headless).
 .config/sublime_text
 {{ end }}
 
 {{ if not (or (has .osid (list "darwin" "windows")) (eq .chezmoi.hostname "homeserver" )) }}
+# Non-primary SSH pubkeys: only synced on macOS, Windows, or homeserver.
+# Re-include the directory itself so the negation for github_key.pub takes
+# effect (chezmoi won't surface a file inside an ignored directory).
 .ssh/pubkeys/**
+!.ssh/pubkeys
 !.ssh/pubkeys/github_key.pub
 {{ end }}

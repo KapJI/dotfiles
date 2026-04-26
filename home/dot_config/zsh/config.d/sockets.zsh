@@ -4,6 +4,10 @@ fi
 
 if [ "$MACOS" = true ]; then
     export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+elif [ -S "$HOME/.1password/agent.sock" ]; then
+    # Linux with 1Password running: use its agent directly. Anything inherited
+    # (wezterm's own agent, ssh-forwarded sockets) is overridden.
+    export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
 else
     # Update symlink for all tmux tabs
     if [ -S "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/ssh_auth_sock" ]; then

@@ -1,7 +1,9 @@
 - brew-cask: 1password
+  deb-desktop: 1password
   winget: AgileBits.1Password
 
 - brew-cask: 1password-cli
+  deb-desktop: 1password-cli
   winget: AgileBits.1Password.CLI
 
 - brew: sevenzip
@@ -30,6 +32,7 @@
   winget: Anthropic.ClaudeCode
 
 - brew-cask: google-chrome
+  deb-desktop: google-chrome-stable
   winget: Google.Chrome
 
 - brew: cmake
@@ -62,7 +65,6 @@
   winget: Dropbox.Dropbox
 
 - brew: mistertea/et/et
-  deb: et
 
 - brew: eza
   deb: eza
@@ -208,7 +210,7 @@
     name: Things
     id: 904280696
 
-- deb: tmux
+- deb-server: tmux
 
 - brew: tree
   deb: tree
@@ -229,6 +231,7 @@
   winget: VideoLAN.VLC
 
 - brew-cask: wezterm
+  deb-desktop: wezterm-nightly
   winget: wez.wezterm
 
 - brew: wget

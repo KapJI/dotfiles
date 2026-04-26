@@ -1,0 +1,29 @@
+{{ if and (has .osid (list "linux-debian" "linux-ubuntu")) .is_desktop -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+KEYRING=/usr/share/keyrings/google-chrome-archive-keyring.gpg
+LIST=/etc/apt/sources.list.d/google-chrome.list
+GOOGLE_LIST=/etc/apt/sources.list.d/google-chrome-stable.list
+
+# The official google-chrome-stable .deb auto-creates `google-chrome-stable.list`.
+# If it's there, defer to it - our `google-chrome.list` would duplicate the repo.
+if [ -f "$GOOGLE_LIST" ]; then
+    if [ -f "$LIST" ]; then
+        sudo rm -f "$LIST"
+    fi
+    exit 0
+fi
+
+if [ -f "$KEYRING" ] && [ -f "$LIST" ]; then
+    exit 0
+fi
+
+curl -sSL https://dl.google.com/linux/linux_signing_key.pub \
+    | sudo gpg --dearmor --yes --output "$KEYRING"
+
+echo "deb [arch=amd64 signed-by=$KEYRING] https://dl.google.com/linux/chrome/deb/ stable main" \
+    | sudo tee "$LIST" >/dev/null
+
+# apt-get update deferred to before_12.
+{{ end -}}

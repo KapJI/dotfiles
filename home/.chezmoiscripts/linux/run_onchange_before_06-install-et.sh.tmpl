@@ -1,0 +1,58 @@
+{{ if has .osid (list "linux-debian" "linux-ubuntu" "linux-raspbian") -}}
+#!/usr/bin/env bash
+set -uo pipefail
+
+if command -v et &>/dev/null; then
+    exit 0
+fi
+
+CODENAME="{{ .chezmoi.osRelease.versionCodename }}"
+KEYRING=/usr/share/keyrings/eternalterminal-archive-keyring.gpg
+LIST=/etc/apt/sources.list.d/eternalterminal.list
+
+{{ if eq .osid "linux-ubuntu" -}}
+# Ubuntu: official Launchpad PPA `ppa:jgmath2000/et`.
+FALLBACK="plucky"
+PPA_BASE="https://ppa.launchpadcontent.net/jgmath2000/et/ubuntu"
+
+if ! curl -sfI "${PPA_BASE}/dists/${CODENAME}/Release" >/dev/null 2>&1; then
+    echo "jgmath2000/et PPA has no build for ${CODENAME}; falling back to ${FALLBACK}"
+    CODENAME="${FALLBACK}"
+fi
+
+# PPA signing key fingerprint per launchpad.net/~jgmath2000/+archive/ubuntu/et.
+# Fetch the armored key over HTTPS (avoids needing dirmngr / /root/.gnupg).
+KEY_FINGERPRINT="D3614CB0B3C2D154356BD436CB4ADEA5B72A07A1"
+curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x${KEY_FINGERPRINT}" \
+    | sudo gpg --dearmor --yes --output "${KEYRING}" \
+    || { echo "Failed to fetch PPA signing key"; exit 1; }
+
+echo "deb [signed-by=${KEYRING}] ${PPA_BASE} ${CODENAME} main" \
+    | sudo tee "${LIST}" >/dev/null
+
+{{ else -}}
+# Debian / Raspbian: upstream MisterTea github-pages repo
+# (serves amd64, arm64 and armhf for bookworm/forky/trixie).
+FALLBACK="trixie"
+REPO_BASE="https://mistertea.github.io/debian-et/debian-source"
+
+if ! curl -sfI "${REPO_BASE}/dists/${CODENAME}/Release" >/dev/null 2>&1; then
+    echo "MisterTea/debian-et has no build for ${CODENAME}; falling back to ${FALLBACK}"
+    CODENAME="${FALLBACK}"
+fi
+
+curl -sSL https://github.com/MisterTea/debian-et/raw/master/et.gpg \
+    | sudo gpg --dearmor --yes --output "${KEYRING}"
+
+echo "deb [signed-by=${KEYRING}] ${REPO_BASE}/ ${CODENAME} main" \
+    | sudo tee "${LIST}" >/dev/null
+{{ end -}}
+
+# Refresh only the et list - avoids interaction with other (potentially broken)
+# apt sources during this bootstrap step.
+sudo apt-get update \
+    -o Dir::Etc::sourcelist="${LIST}" \
+    -o Dir::Etc::sourceparts=- \
+    -o APT::Get::List-Cleanup=0
+sudo apt-get install -y et
+{{ end -}}

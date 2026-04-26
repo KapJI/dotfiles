@@ -1,0 +1,9 @@
+{{ if and (eq .chezmoi.os "linux") .is_desktop -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+if command -v claude &>/dev/null; then
+    exit 0
+fi
+curl -fsSL https://claude.ai/install.sh | bash
+{{ end -}}
