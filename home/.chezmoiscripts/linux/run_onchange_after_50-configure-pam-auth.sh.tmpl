@@ -1,0 +1,44 @@
+{{ if and (has .osid (list "linux-debian" "linux-ubuntu")) .is_desktop -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+# 1. Wire pam_fprintd into common-auth so polkit / sudo / lock screen accept the
+#    fingerprint reader as an alternative to the password.
+if dpkg -s libpam-fprintd &>/dev/null \
+        && ! grep -q pam_fprintd.so /etc/pam.d/common-auth; then
+    sudo pam-auth-update --enable fprintd
+fi
+
+# 2. Authorize sudo via the 1Password SSH agent. pam_ssh_agent_auth.so is checked
+#    before common-auth in /etc/pam.d/sudo; if the active SSH agent holds a key
+#    matching /etc/security/authorized_keys_sudo, sudo is granted without a
+#    password (1Password prompts for biometric / desktop unlock instead).
+SUDO_PUBKEY="$HOME/.ssh/pubkeys/sudo_key.pub"
+SUDO_KEYS=/etc/security/authorized_keys_sudo
+if [ ! -s "$SUDO_PUBKEY" ]; then
+    echo "$SUDO_PUBKEY missing or empty; skipping sudo-via-ssh setup" >&2
+else
+    if ! sudo cmp -s "$SUDO_PUBKEY" "$SUDO_KEYS" 2>/dev/null; then
+        sudo install -o root -g root -m 0644 "$SUDO_PUBKEY" "$SUDO_KEYS"
+    fi
+
+    PAM_SUDO=/etc/pam.d/sudo
+    if ! sudo grep -q pam_ssh_agent_auth.so "$PAM_SUDO"; then
+        # Insert before the first @include so it's evaluated before common-auth.
+        sudo sed -i '0,/^@include/{s|^@include|auth sufficient pam_ssh_agent_auth.so file=/etc/security/authorized_keys_sudo\n&|}' "$PAM_SUDO"
+    fi
+fi
+
+# 3. Preserve SSH_AUTH_SOCK across sudo so pam_ssh_agent_auth can reach the
+#    user's 1Password agent socket.
+SUDOERS_DROP=/etc/sudoers.d/ssh_auth_sock
+SUDOERS_CONTENT='Defaults env_keep += "SSH_AUTH_SOCK"'
+if ! sudo test -f "$SUDOERS_DROP" \
+        || ! echo "$SUDOERS_CONTENT" | sudo cmp -s - "$SUDOERS_DROP" 2>/dev/null; then
+    TMP=$(mktemp)
+    echo "$SUDOERS_CONTENT" > "$TMP"
+    sudo install -o root -g root -m 0440 "$TMP" "$SUDOERS_DROP"
+    rm -f "$TMP"
+    sudo visudo -c -f "$SUDOERS_DROP"
+fi
+{{ end -}}

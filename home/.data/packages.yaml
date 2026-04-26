@@ -157,6 +157,8 @@
 
 - deb: pinentry-tty
 
+- deb-desktop: libpam-ssh-agent-auth
+
 - brew: poppler
 
 - scoop: posh-git
