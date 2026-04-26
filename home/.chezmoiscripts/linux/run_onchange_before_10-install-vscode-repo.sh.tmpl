@@ -1,0 +1,29 @@
+{{ if and (has .osid (list "linux-debian" "linux-ubuntu")) .is_desktop -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+KEYRING=/usr/share/keyrings/packages.microsoft.gpg
+LIST=/etc/apt/sources.list.d/vscode.list
+MS_LIST=/etc/apt/sources.list.d/vscode.sources
+
+# Microsoft's official .deb post-install runs `apt-add-repository` and writes
+# its own vscode.sources file; defer to that if present.
+if [ -f "$MS_LIST" ]; then
+    if [ -f "$LIST" ]; then
+        sudo rm -f "$LIST"
+    fi
+    exit 0
+fi
+
+if [ -f "$KEYRING" ] && [ -f "$LIST" ]; then
+    exit 0
+fi
+
+curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
+    | sudo gpg --dearmor --yes --output "$KEYRING"
+
+echo "deb [arch=amd64,arm64,armhf signed-by=$KEYRING] https://packages.microsoft.com/repos/code stable main" \
+    | sudo tee "$LIST" >/dev/null
+
+# code is installed in before_12 via the deb-desktop key.
+{{ end -}}

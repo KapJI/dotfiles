@@ -229,6 +229,7 @@
 - uv-tool: ruff
 
 - brew-cask: visual-studio-code
+  deb-desktop: code
   winget: Microsoft.VisualStudioCode
 
 - brew-cask: vlc
