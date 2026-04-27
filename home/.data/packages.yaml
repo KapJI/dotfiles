@@ -62,7 +62,11 @@
   winget: waterlan.dos2unix
 
 - brew-cask: dropbox
+  deb-desktop: dropbox
   winget: Dropbox.Dropbox
+
+# Required by the Dropbox Linux client to verify update signatures.
+- deb-desktop: python3-gpg
 
 - brew: mistertea/et/et
 
@@ -234,6 +238,7 @@
   winget: Microsoft.VisualStudioCode
 
 - brew-cask: vlc
+  deb-desktop: vlc
   winget: VideoLAN.VLC
 
 - brew-cask: wezterm

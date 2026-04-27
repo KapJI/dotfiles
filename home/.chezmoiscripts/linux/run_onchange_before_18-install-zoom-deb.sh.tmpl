@@ -1,0 +1,14 @@
+{{ if and (has .osid (list "linux-debian" "linux-ubuntu")) .is_desktop -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
+#
+# Zoom doesn't run an apt repo and their .deb URL has no version in it
+# (`zoom.us/client/latest/zoom_amd64.deb`), so the rendered script content
+# would never change on its own. The weekly comment above re-triggers the
+# script so apt picks up newer Zoom builds; if the version is unchanged the
+# install is a no-op.
+sudo nala install -o APT::Get::AllowUnauthenticated=true -y \
+    https://zoom.us/client/latest/zoom_amd64.deb
+{{ end -}}

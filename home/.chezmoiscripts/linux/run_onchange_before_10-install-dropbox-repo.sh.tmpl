@@ -1,0 +1,20 @@
+{{ if and (has .osid (list "linux-debian" "linux-ubuntu")) .is_desktop -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+KEYRING=/usr/share/keyrings/dropbox-archive-keyring.gpg
+LIST=/etc/apt/sources.list.d/dropbox.list
+CODENAME="{{ .chezmoi.osRelease.versionCodename }}"
+
+if [ -f "$KEYRING" ] && [ -f "$LIST" ]; then
+    exit 0
+fi
+
+curl -fsSL https://linux.dropbox.com/fedora/rpm-public-key.asc \
+    | sudo gpg --dearmor --yes --output "$KEYRING"
+
+echo "deb [arch=amd64 signed-by=$KEYRING] http://linux.dropbox.com/ubuntu ${CODENAME} main" \
+    | sudo tee "$LIST" >/dev/null
+
+# dropbox is installed in before_12 via the deb-desktop key.
+{{ end -}}
