@@ -205,6 +205,7 @@
   winget: SublimeHQ.SublimeText.4
 
 - brew-cask: telegram
+  snap-desktop: telegram-desktop
   winget: Telegram.TelegramDesktop
 
 - brew: telnet

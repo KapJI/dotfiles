@@ -64,6 +64,7 @@ All packages are defined in a single central manifest: `.data/packages.yaml`. Ea
   deb: ripgrep           # Debian/Ubuntu apt (all Linux hosts)
   deb-desktop: ...       # Debian/Ubuntu apt (Linux desktop only)
   deb-server: ...        # Debian/Ubuntu apt (Linux server only)
+  snap-desktop: ...      # Snap (Linux desktop only) - for apps not in apt
   winget: BurntSushi.ripgrep  # Windows winget
   scoop: ripgrep         # Windows Scoop
   brew-cask: ...         # macOS GUI apps

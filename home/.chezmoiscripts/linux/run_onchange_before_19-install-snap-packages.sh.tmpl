@@ -1,0 +1,24 @@
+{{ if and (eq .chezmoi.os "linux") .is_desktop -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
+
+if ! command -v snap &>/dev/null; then
+    echo "snap not available; skipping snap-desktop installs" >&2
+    exit 0
+fi
+
+{{ $snaps := list -}}
+{{ $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml -}}
+{{ range $packages -}}
+    {{ if hasKey . "snap-desktop" -}}
+        {{ $snaps = append $snaps (get . "snap-desktop") -}}
+    {{ end -}}
+{{ end }}
+for pkg in {{ $snaps | join " " }}; do
+    if ! snap list "$pkg" &>/dev/null; then
+        sudo snap install "$pkg"
+    fi
+done
+{{ end -}}
