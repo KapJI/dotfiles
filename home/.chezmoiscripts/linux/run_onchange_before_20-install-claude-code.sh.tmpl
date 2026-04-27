@@ -2,8 +2,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if command -v claude &>/dev/null; then
-    exit 0
-fi
+# Run daily. Current day: {{ now.YearDay }}, {{ now.Year }}
+#
+# Anthropic's installer is idempotent and always pulls the latest release;
+# re-running it daily upgrades claude in place.
 curl -fsSL https://claude.ai/install.sh | bash
 {{ end -}}

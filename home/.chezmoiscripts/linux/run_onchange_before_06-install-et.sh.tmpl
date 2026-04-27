@@ -2,9 +2,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-if command -v et &>/dev/null; then
-    exit 0
-fi
+# Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 
 CODENAME="{{ .chezmoi.osRelease.versionCodename }}"
 KEYRING=/usr/share/keyrings/eternalterminal-archive-keyring.gpg
