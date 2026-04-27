@@ -5,8 +5,10 @@ set -uo pipefail
 # Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 
 CODENAME="{{ .chezmoi.osRelease.versionCodename }}"
-KEYRING=/usr/share/keyrings/eternalterminal-archive-keyring.gpg
-LIST=/etc/apt/sources.list.d/eternalterminal.list
+KEYRING=/etc/apt/keyrings/eternalterminal-archive-keyring.gpg
+SOURCES=/etc/apt/sources.list.d/eternalterminal.sources
+
+sudo mkdir -p /etc/apt/keyrings
 
 {{ if eq .osid "linux-ubuntu" -}}
 # Ubuntu: official Launchpad PPA `ppa:jgmath2000/et`.
@@ -25,8 +27,13 @@ curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x${KEY_FINGER
     | sudo gpg --dearmor --yes --output "${KEYRING}" \
     || { echo "Failed to fetch PPA signing key"; exit 1; }
 
-echo "deb [signed-by=${KEYRING}] ${PPA_BASE} ${CODENAME} main" \
-    | sudo tee "${LIST}" >/dev/null
+sudo tee "${SOURCES}" >/dev/null <<EOF
+Types: deb
+URIs: ${PPA_BASE}
+Suites: ${CODENAME}
+Components: main
+Signed-By: ${KEYRING}
+EOF
 
 {{ else -}}
 # Debian / Raspbian: upstream MisterTea github-pages repo
@@ -42,14 +49,19 @@ fi
 curl -sSL https://github.com/MisterTea/debian-et/raw/master/et.gpg \
     | sudo gpg --dearmor --yes --output "${KEYRING}"
 
-echo "deb [signed-by=${KEYRING}] ${REPO_BASE}/ ${CODENAME} main" \
-    | sudo tee "${LIST}" >/dev/null
+sudo tee "${SOURCES}" >/dev/null <<EOF
+Types: deb
+URIs: ${REPO_BASE}/
+Suites: ${CODENAME}
+Components: main
+Signed-By: ${KEYRING}
+EOF
 {{ end -}}
 
 # Refresh only the et list - avoids interaction with other (potentially broken)
 # apt sources during this bootstrap step.
 sudo apt-get update \
-    -o Dir::Etc::sourcelist="${LIST}" \
+    -o Dir::Etc::sourcelist="${SOURCES}" \
     -o Dir::Etc::sourceparts=- \
     -o APT::Get::List-Cleanup=0
 sudo apt-get install -y et

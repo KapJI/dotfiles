@@ -2,18 +2,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-KEYRING=/usr/share/keyrings/sublimehq-archive-keyring.gpg
-LIST=/etc/apt/sources.list.d/sublime-text.list
+KEYRING=/etc/apt/keyrings/sublimehq-archive-keyring.gpg
+SOURCES=/etc/apt/sources.list.d/sublime-text.sources
 
-if [ -f "$KEYRING" ] && [ -f "$LIST" ]; then
+if [ -f "$KEYRING" ] && [ -f "$SOURCES" ]; then
     exit 0
 fi
 
+sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.sublimetext.com/sublimehq-pub.gpg \
     | sudo gpg --dearmor --yes --output "$KEYRING"
 
-echo "deb [signed-by=$KEYRING] https://download.sublimetext.com/ apt/stable/" \
-    | sudo tee "$LIST" >/dev/null
-
-# sublime-text package itself is installed in before_12 via the deb-desktop key.
+sudo tee "$SOURCES" >/dev/null <<EOF
+Types: deb
+URIs: https://download.sublimetext.com/
+Suites: apt/stable/
+Signed-By: $KEYRING
+EOF
 {{ end -}}

@@ -2,12 +2,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-KEYRING=/usr/share/keyrings/spotify-archive-keyring.gpg
-LIST=/etc/apt/sources.list.d/spotify.list
+KEYRING=/etc/apt/keyrings/spotify-archive-keyring.gpg
+SOURCES=/etc/apt/sources.list.d/spotify.sources
 
-if [ -f "$KEYRING" ] && [ -f "$LIST" ]; then
+if [ -f "$KEYRING" ] && [ -f "$SOURCES" ]; then
     exit 0
 fi
+
+sudo mkdir -p /etc/apt/keyrings
 
 # Spotify hosts multiple signing keys and rotates which one signs the repo
 # without changing their install instructions. Bundle both currently-published
@@ -20,8 +22,11 @@ done
 sudo install -o root -g root -m 0644 "$TMP_KEYRING" "$KEYRING"
 rm -f "$TMP_KEYRING"
 
-echo "deb [signed-by=$KEYRING] https://repository.spotify.com stable non-free" \
-    | sudo tee "$LIST" >/dev/null
-
-# spotify-client is installed in before_12 via the deb-desktop key.
+sudo tee "$SOURCES" >/dev/null <<EOF
+Types: deb
+URIs: https://repository.spotify.com
+Suites: stable
+Components: non-free
+Signed-By: $KEYRING
+EOF
 {{ end -}}

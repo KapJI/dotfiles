@@ -2,19 +2,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-KEYRING=/usr/share/keyrings/wezterm-fury.gpg
-LIST=/etc/apt/sources.list.d/wezterm.list
+KEYRING=/etc/apt/keyrings/wezterm-fury.gpg
+SOURCES=/etc/apt/sources.list.d/wezterm.sources
 
-if [ -f "$KEYRING" ] && [ -f "$LIST" ]; then
+if [ -f "$KEYRING" ] && [ -f "$SOURCES" ]; then
     exit 0
 fi
 
+sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://apt.fury.io/wez/gpg.key \
-    | sudo gpg --yes --dearmor --output "$KEYRING"
+    | sudo gpg --dearmor --yes --output "$KEYRING"
 sudo chmod 644 "$KEYRING"
 
-echo 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *' \
-    | sudo tee "$LIST" >/dev/null
-
-# wezterm package itself is installed in before_12 via the deb-desktop key.
+sudo tee "$SOURCES" >/dev/null <<EOF
+Types: deb
+URIs: https://apt.fury.io/wez/
+Suites: *
+Components: *
+Signed-By: $KEYRING
+EOF
 {{ end -}}

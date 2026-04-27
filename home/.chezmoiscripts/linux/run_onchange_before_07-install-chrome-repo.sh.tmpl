@@ -2,28 +2,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-KEYRING=/usr/share/keyrings/google-chrome-archive-keyring.gpg
-LIST=/etc/apt/sources.list.d/google-chrome.list
-GOOGLE_LIST=/etc/apt/sources.list.d/google-chrome-stable.list
+KEYRING=/etc/apt/keyrings/google-chrome-archive-keyring.gpg
+SOURCES=/etc/apt/sources.list.d/google-chrome.sources
 
-# The official google-chrome-stable .deb auto-creates `google-chrome-stable.list`.
-# If it's there, defer to it - our `google-chrome.list` would duplicate the repo.
-if [ -f "$GOOGLE_LIST" ]; then
-    if [ -f "$LIST" ]; then
-        sudo rm -f "$LIST"
-    fi
+# The official google-chrome-stable .deb post-install also writes a
+# google-chrome.sources file at the same path - defer to it if present.
+if [ -f "$SOURCES" ]; then
     exit 0
 fi
 
-if [ -f "$KEYRING" ] && [ -f "$LIST" ]; then
-    exit 0
-fi
-
-curl -sSL https://dl.google.com/linux/linux_signing_key.pub \
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://dl.google.com/linux/linux_signing_key.pub \
     | sudo gpg --dearmor --yes --output "$KEYRING"
 
-echo "deb [arch=amd64 signed-by=$KEYRING] https://dl.google.com/linux/chrome/deb/ stable main" \
-    | sudo tee "$LIST" >/dev/null
-
-# apt-get update deferred to before_12.
+sudo tee "$SOURCES" >/dev/null <<EOF
+Types: deb
+URIs: https://dl.google.com/linux/chrome/deb/
+Suites: stable
+Components: main
+Architectures: amd64
+Signed-By: $KEYRING
+EOF
 {{ end -}}

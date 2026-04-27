@@ -2,28 +2,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-KEYRING=/usr/share/keyrings/packages.microsoft.gpg
-LIST=/etc/apt/sources.list.d/vscode.list
-MS_LIST=/etc/apt/sources.list.d/vscode.sources
+KEYRING=/etc/apt/keyrings/packages.microsoft.gpg
+SOURCES=/etc/apt/sources.list.d/vscode.sources
 
-# Microsoft's official .deb post-install runs `apt-add-repository` and writes
-# its own vscode.sources file; defer to that if present.
-if [ -f "$MS_LIST" ]; then
-    if [ -f "$LIST" ]; then
-        sudo rm -f "$LIST"
-    fi
+# Microsoft's official .deb post-install writes its own vscode.sources file at
+# the same path - defer to it if present.
+if [ -f "$SOURCES" ]; then
     exit 0
 fi
 
-if [ -f "$KEYRING" ] && [ -f "$LIST" ]; then
-    exit 0
-fi
-
+sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
     | sudo gpg --dearmor --yes --output "$KEYRING"
 
-echo "deb [arch=amd64,arm64,armhf signed-by=$KEYRING] https://packages.microsoft.com/repos/code stable main" \
-    | sudo tee "$LIST" >/dev/null
-
-# code is installed in before_12 via the deb-desktop key.
+sudo tee "$SOURCES" >/dev/null <<EOF
+Types: deb
+URIs: https://packages.microsoft.com/repos/code
+Suites: stable
+Components: main
+Architectures: amd64 arm64 armhf
+Signed-By: $KEYRING
+EOF
 {{ end -}}
