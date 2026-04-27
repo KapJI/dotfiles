@@ -31,6 +31,11 @@ bin
 .config/sublime_text
 {{ end }}
 
+{{ if not (and (eq .chezmoi.os "linux") .is_desktop) }}
+# KDE-only on Linux desktop.
+.config/kxkbrc
+{{ end }}
+
 {{ if not (or (has .osid (list "darwin" "windows")) (eq .chezmoi.hostname "homeserver" )) }}
 # Non-primary SSH pubkeys: only synced on macOS, Windows, or homeserver.
 # Re-include the directory itself so the negation for github_key.pub takes
