@@ -231,6 +231,7 @@
 - uv-tool: mypy
 - uv-tool: prek
 - uv-tool: pre-commit
+- uv-tool: pyright
 - uv-tool: ruff
 
 - brew-cask: visual-studio-code
