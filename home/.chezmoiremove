@@ -10,3 +10,12 @@
 antigen.zsh
 mercurial.ini
 README.md
+
+# Stale vim-plug install + plugin clones from the old vimscript nvim config.
+# Plugged directory was hardcoded to ~/.vim/plugged in plug#begin() on every OS.
+.vim/plugged
+{{ if eq .osid "windows" -}}
+AppData/Local/nvim-data/site/autoload/plug.vim
+{{- else -}}
+.local/share/nvim/site/autoload/plug.vim
+{{- end }}
