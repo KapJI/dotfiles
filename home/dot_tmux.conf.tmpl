@@ -10,8 +10,8 @@ set -g allow-passthrough on
 # History buffer (default ~2000)
 set -g history-limit 50000
 
-# Setting to xterm instead of tmux to have ccc (change colors)
-set -g default-terminal "xterm-256color"
+# Use tmux-256color for proper terminfo support
+set -g default-terminal "tmux-256color"
 
 # Enable TrueColor support for vim
 set -ga terminal-overrides ",*-256color*:RGB"
@@ -48,9 +48,6 @@ setw -g xterm-keys on
 
 # Send terminal focus in/out events
 set -s focus-events on
-
-# Emacs-style keys in command prompt (prefix + :)
-set -g status-keys emacs
 
 # Use vi keys in copy mode
 setw -g mode-keys vi
@@ -100,18 +97,19 @@ bind S setw synchronize-panes \; display-message "Toggled synchronize-panes"
 # Copy mode
 bind v copy-mode
 
-# Use Alt-arrow keys without prefix key to switch panes
-bind -n M-Left select-pane -L
-bind -n M-Right select-pane -R
-bind -n M-Up select-pane -U
-bind -n M-Down select-pane -D
-
-# Shift arrow to switch windows
-bind -n S-Left  previous-window
-bind -n S-Right next-window
-
 # Prevent mouse drag in normal mode from entering copy mode
 unbind -T root MouseDrag1Pane
+
+# Use Alt-hjkl to switch panes (compatible with vim-tmux-navigator)
+is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf)(diff)?$'"
+bind -n M-h if-shell "$is_vim" "send-keys M-h" "select-pane -L"
+bind -n M-j if-shell "$is_vim" "send-keys M-j" "select-pane -D"
+bind -n M-k if-shell "$is_vim" "send-keys M-k" "select-pane -U"
+bind -n M-l if-shell "$is_vim" "send-keys M-l" "select-pane -R"
+
+# Alt-i/o to switch windows (no wrap-around)
+bind -n M-i if -F '#{?window_start_flag,,1}' 'previous-window'
+bind -n M-o if -F '#{?window_end_flag,,1}'   'next-window'
 
 # Vi-like selection in copy mode
 bind -T copy-mode-vi v send -X begin-selection
@@ -155,11 +153,15 @@ bind -T copy-mode-vi N send -X search-forward  "❯"
 
 ##### Theme #####
 
-set -g @catppuccin_flavour 'mocha'
+set -g @catppuccin_flavor 'mocha'
 set -g @catppuccin_window_text "#W"
 set -g @catppuccin_window_current_text "#W"
 set -g @catppuccin_window_current_number "#I#{?window_zoomed_flag, ,}"
 set -g @catppuccin_window_number_position "right"
+
+# Default icon may break tmux statusline in older Windows Terminal versions.
+# Uncomment to fix or better update Windows Terminal.
+#set -g @catppuccin_host_icon " "
 
 # Make status line pretty
 set -g status-right-length 100
@@ -178,13 +180,42 @@ set -g @mode_indicator_sync_prompt " SYNC "
 set -g @mode_indicator_empty_prompt " TMUX "
 
 
+##### Extrakto #####
+
+set -g @extrakto_clip_tool_run "tmux_osc52"
+set -g @extrakto_filter_order "path word line all"
+set -g @extrakto_grab_area "recent"
+
+
+##### Fingers #####
+
+set -g @fingers-key G
+bind -n M-g run -b "#{@fingers-cli} start #{pane_id}"
+bind -n M-j run -b "#{@fingers-cli} start #{pane_id} --mode jump"
+
+
+##### Resurrect & Continuum #####
+
+set -g @resurrect-capture-pane-contents 'on'
+set -g @continuum-restore 'on'
+set -g @continuum-save-interval '10'
+
+
 ##### Plugins #####
 
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'catppuccin/tmux#v2.1.3'
 set -g @plugin 'MunifTanjim/tmux-mode-indicator'
+set -g @plugin 'laktak/extrakto'
+set -g @plugin 'Morantron/tmux-fingers'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @plugin 'tmux-plugins/tmux-continuum'
 run '~/.tmux/plugins/tpm/tpm'
 
 # Override Catppuccin style for selected text
 set -g mode-style "fg=#cdd6f4,bg=#585b70"
+
+# Dim inactive panes
+set -g window-style 'fg=#b7b9c5,bg=#24243a'
+set -g window-active-style 'fg=#eeeeee,bg=#1e1e2e'
 {{- end }}
