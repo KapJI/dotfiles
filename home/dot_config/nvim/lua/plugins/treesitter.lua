@@ -2,7 +2,7 @@ return {
   -- Syntax highlighting and code understanding via AST
   {
     "nvim-treesitter/nvim-treesitter",
-    branch = "master",         -- v1.0 rewrite on `main` requires nvim 0.12 nightly
+    branch = "master",         -- frozen, kept for nvim < 0.11 compat; `main` rewrite needs newer nvim
     build = ":TSUpdate",
     event = { "BufReadPost", "BufNewFile" },
     config = function()
