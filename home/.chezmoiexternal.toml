@@ -41,6 +41,16 @@
     refreshPeriod = {{ $default_refresh }}
 {{ end }}
 
+{{ if and (eq .chezmoi.os "linux") .is_desktop }}
+# Icon-only Nerd Font, fallback for glyphs missing from MesloLGS NF.
+# macOS gets it from the font-symbols-only-nerd-font cask in packages.yaml.
+[".local/share/fonts/SymbolsNerdFontMono-Regular.ttf"]
+    type = "archive-file"
+    url = "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/NerdFontsSymbolsOnly.tar.xz"
+    path = "SymbolsNerdFontMono-Regular.ttf"
+    refreshPeriod = {{ $default_refresh }}
+{{ end }}
+
 ["{{ printf ".local/bin/tree-sitter%s" $binary_suffix }}"]
     type = "file"
     decompress = "gzip"
