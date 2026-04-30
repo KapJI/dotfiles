@@ -1,9 +1,13 @@
 local wezterm = require 'wezterm'
 local config = {}
 
-config.font = wezterm.font {
-    family = 'MesloLGS NF',
-    harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' },
+config.font = wezterm.font_with_fallback {
+    {
+        family = 'MesloLGS NF',
+        harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' },
+    },
+    -- Covers Nerd Font glyphs missing from MesloLGS NF (e.g. MDI yaml icon U+E8EB).
+    'Symbols Nerd Font Mono',
 }
 config.line_height = 1.0
 if wezterm.target_triple:find("darwin") then

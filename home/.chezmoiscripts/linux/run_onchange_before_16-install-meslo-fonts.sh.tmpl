@@ -2,7 +2,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-font_base_url="https://github.com/romkatv/powerlevel10k-media/raw/master"
+meslo_base_url="https://github.com/romkatv/powerlevel10k-media/raw/master"
+symbols_url="https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/NerdFontsSymbolsOnly/SymbolsNerdFontMono-Regular.ttf"
 font_dir="$HOME/.local/share/fonts"
 mkdir -p "$font_dir"
 
@@ -11,11 +12,19 @@ for style in Regular Bold Italic 'Bold Italic'; do
     file="MesloLGS NF ${style}.ttf"
     target="$font_dir/$file"
     if [ ! -f "$target" ]; then
-        curl -fsSL -o "$target.tmp" "$font_base_url/${file// /%20}"
+        curl -fsSL -o "$target.tmp" "$meslo_base_url/${file// /%20}"
         mv -f "$target.tmp" "$target"
         needs_cache=1
     fi
 done
+
+# Icon-only fallback font for glyphs missing from MesloLGS NF (e.g. MDI yaml icon).
+symbols_target="$font_dir/SymbolsNerdFontMono-Regular.ttf"
+if [ ! -f "$symbols_target" ]; then
+    curl -fsSL -o "$symbols_target.tmp" "$symbols_url"
+    mv -f "$symbols_target.tmp" "$symbols_target"
+    needs_cache=1
+fi
 
 if [ "$needs_cache" -eq 1 ]; then
     fc-cache -f "$font_dir"
