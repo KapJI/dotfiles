@@ -19,3 +19,17 @@ AppData/Local/nvim-data/site/autoload/plug.vim
 {{- else -}}
 .local/share/nvim/site/autoload/plug.vim
 {{- end }}
+
+# Old vimscript nvim config files. The active config is now init.lua + lua/;
+# leftover *.vim files trigger E5422 ("Conflicting configs: init.lua / init.vim").
+{{ $nvim_dir := ternary "AppData/Local/nvim" ".config/nvim" (eq .osid "windows") -}}
+{{ $nvim_dir }}/init.vim
+{{ $nvim_dir }}/general.vim
+{{ $nvim_dir }}/keymaps.vim
+{{ $nvim_dir }}/plugins.vim
+{{ $nvim_dir }}/terminal.vim
+{{ $nvim_dir }}/theme.vim
+{{ $nvim_dir }}/plugins/fern.vim
+{{ $nvim_dir }}/plugins/fzf.vim
+{{ $nvim_dir }}/plugins/lightline.vim
+{{ $nvim_dir }}/plugins/signify.vim
