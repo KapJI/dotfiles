@@ -10,11 +10,7 @@ YELLOW='\033[0;33m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-{{ if eq .osid "linux-centos" -}}
-zsh_path="$(command -v zsh)"
-printf "${YELLOW}Shell should be changed in 'i unix/shell'${NC}\n"
-exit 1
-{{ else if eq .osid "darwin" -}}
+{{ if eq .osid "darwin" -}}
 zsh_path="$(command -v zsh)"
 current_shell="$(dscl . -read /Users/$USER UserShell | awk '{print $2}')"
 if [ "$current_shell" != "$zsh_path" ]; then
