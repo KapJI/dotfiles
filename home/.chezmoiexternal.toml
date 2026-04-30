@@ -49,6 +49,28 @@
     url = "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/NerdFontsSymbolsOnly.tar.xz"
     path = "SymbolsNerdFontMono-Regular.ttf"
     refreshPeriod = {{ $default_refresh }}
+
+# Powerlevel10k-recommended MesloLGS NF (Powerline + small Nerd Font subset).
+# romkatv/powerlevel10k-media is a fonts-only mirror; no tagged releases exist.
+[".local/share/fonts/MesloLGS NF Regular.ttf"]
+    type = "file"
+    url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf"
+    refreshPeriod = {{ $default_refresh }}
+
+[".local/share/fonts/MesloLGS NF Bold.ttf"]
+    type = "file"
+    url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf"
+    refreshPeriod = {{ $default_refresh }}
+
+[".local/share/fonts/MesloLGS NF Italic.ttf"]
+    type = "file"
+    url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf"
+    refreshPeriod = {{ $default_refresh }}
+
+[".local/share/fonts/MesloLGS NF Bold Italic.ttf"]
+    type = "file"
+    url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf"
+    refreshPeriod = {{ $default_refresh }}
 {{ end }}
 
 ["{{ printf ".local/bin/tree-sitter%s" $binary_suffix }}"]
