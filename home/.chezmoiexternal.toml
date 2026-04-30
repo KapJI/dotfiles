@@ -46,7 +46,7 @@
 # macOS gets it from the font-symbols-only-nerd-font cask in packages.yaml.
 [".local/share/fonts/SymbolsNerdFontMono-Regular.ttf"]
     type = "archive-file"
-    url = "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/NerdFontsSymbolsOnly.tar.xz"
+    url = "{{ gitHubLatestReleaseAssetURL "ryanoasis/nerd-fonts" "NerdFontsSymbolsOnly.tar.xz" }}"
     path = "SymbolsNerdFontMono-Regular.ttf"
     refreshPeriod = {{ $default_refresh }}
 
