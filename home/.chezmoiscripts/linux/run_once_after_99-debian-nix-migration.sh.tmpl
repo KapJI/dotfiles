@@ -1,0 +1,79 @@
+{{ if has .osid (list "linux-debian" "linux-ubuntu") -}}
+#!/usr/bin/env bash
+# One-off cleanup: drop apt packages and curl|sh-installed binaries that
+# have moved to Nix. Runs once per host (run_once_* prefix).
+#
+# Strategy: apt-mark auto + apt autoremove. apt only removes packages
+# that nothing manually-installed still depends on, so heavy tools the
+# user pulled in transitively (mactex, llvm, wireshark) keep their deps.
+set -euo pipefail
+
+APT_MIGRATED=(
+    7zip
+    bat
+    btop
+    cmake
+    dos2unix
+    eternal-terminal
+    et
+    eza
+    fd-find
+    fzf
+    git
+    git-delta
+    gnupg
+    golang
+    graphviz
+    hexyl
+    hyperfine
+    jq
+    ncdu
+    neovim
+    ov
+    pv
+    python3-dev
+    python3-pip
+    python3-setuptools
+    python3-venv
+    ripgrep
+    telnet
+    tmux
+    tree
+    wget
+    zoxide
+    zsh
+    zstd
+)
+
+INSTALLED=()
+for pkg in "${APT_MIGRATED[@]}"; do
+    if dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null \
+            | grep -q '^install ok installed'; then
+        INSTALLED+=("$pkg")
+    fi
+done
+
+if [ ${#INSTALLED[@]} -gt 0 ]; then
+    echo "Marking as auto-installed: ${INSTALLED[*]}"
+    sudo apt-mark auto "${INSTALLED[@]}"
+    echo "Running apt autoremove..."
+    sudo apt-get autoremove -y
+else
+    echo "No migrated apt packages installed; skipping apt cleanup."
+fi
+
+# Binaries placed by the now-deleted curl|sh installers. Remove only
+# regular files; leave symlinks alone (they may point into ~/.nix-profile).
+for path in \
+        "$HOME/.local/bin/uv" \
+        "$HOME/.local/bin/uvx" \
+        "$HOME/.local/bin/claude" \
+        "/usr/local/bin/uv" \
+        "/usr/local/bin/uvx" \
+        "/usr/local/bin/claude"; do
+    if [ -f "$path" ] && [ ! -L "$path" ]; then
+        echo "Removing hand-installed binary: $path"
+        rm -f "$path" 2>/dev/null || sudo rm -f "$path"
+    fi
+done
+{{ end -}}
