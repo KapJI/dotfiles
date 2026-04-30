@@ -2,17 +2,21 @@ return {
   -- Syntax highlighting and code understanding via AST
   {
     "nvim-treesitter/nvim-treesitter",
-    branch = "master",         -- frozen, kept for nvim < 0.11 compat; `main` rewrite needs newer nvim
+    branch = "main",         -- v1 rewrite; requires nvim 0.11+
+    lazy = false,            -- main does not support lazy-loading
     build = ":TSUpdate",
-    event = { "BufReadPost", "BufNewFile" },
     config = function()
-      require("nvim-treesitter.configs").setup({
-        ensure_installed = {
-          "bash", "json", "lua", "markdown", "nix", "python",
-          "terraform", "typescript", "yaml",
-        },
-        highlight = { enable = true },
-        indent = { enable = true },
+      require("nvim-treesitter").install({
+        "bash", "json", "lua", "markdown", "nix", "python",
+        "terraform", "typescript", "yaml",
+      })
+
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function(args)
+          if pcall(vim.treesitter.start, args.buf) then
+            vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
       })
     end,
   },
