@@ -1,0 +1,11 @@
+{{ if has .chezmoi.os (list "darwin" "linux") -}}
+#!/usr/bin/env bash
+
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
+
+# Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
+# Delete profile generations older than 30 days (keeps recent rollback window),
+# then GC unreferenced store paths.
+command -v nix-collect-garbage >/dev/null && \
+    nix-collect-garbage --delete-older-than 30d
+{{ end -}}
