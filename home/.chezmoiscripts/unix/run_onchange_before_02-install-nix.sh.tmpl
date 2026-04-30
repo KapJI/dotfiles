@@ -1,0 +1,15 @@
+{{ if has .chezmoi.os (list "darwin" "linux") -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+if command -v nix >/dev/null 2>&1; then
+    exit 0
+fi
+
+if [ -e /nix/var/nix/profiles/default/bin/nix ]; then
+    exit 0
+fi
+
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix \
+    | sh -s -- install --determinate --no-confirm
+{{ end -}}

@@ -6,21 +6,17 @@
   deb-desktop: 1password-cli
   winget: AgileBits.1Password.CLI
 
-- brew: sevenzip
-  deb: 7zip
+- nix: _7zz
   winget: 7zip.7zip
 
-- brew: autoconf
-  deb: autoconf
+- nix: autoconf
 
 - brew-cask: bartender
 
-- brew: bat
-  deb: bat
+- nix: bat
   winget: sharkdp.bat
 
-- brew: btop
-  deb: btop
+- nix: btop
 
 - deb: build-essential
 
@@ -28,15 +24,16 @@
 
 - brew-cask: chatgpt
 
-- brew-cask: claude-code@latest
-  winget: Anthropic.ClaudeCode
+# claude-code on macOS+Linux comes from the claude-code-nix flake input
+# (sadjow/claude-code-nix), which auto-bumps within hours of upstream releases.
+# Windows continues using winget.
+- winget: Anthropic.ClaudeCode
 
 - brew-cask: google-chrome
   deb-desktop: google-chrome-stable
   winget: Google.Chrome
 
-- brew: cmake
-  deb: cmake
+- nix: cmake
   winget: Kitware.CMake
 
 - brew: colima
@@ -44,7 +41,7 @@
 - brew-tap: homebrew/command-not-found
   deb: command-not-found
 
-- brew: git-delta
+- nix: delta
   winget: dandavison.delta
 
 - brew-appstore:
@@ -57,8 +54,7 @@
 
 - brew: docker
 
-- brew: dos2unix
-  deb: dos2unix
+- nix: dos2unix
   winget: waterlan.dos2unix
 
 - brew-cask: dropbox
@@ -68,102 +64,92 @@
 # Required by the Dropbox Linux client to verify update signatures.
 - deb-desktop: python3-gpg
 
-- brew: mistertea/et/et
+- nix: eternal-terminal
 
-- brew: eza
-  deb: eza
+- nix: eza
   winget: eza-community.eza
 
-- brew: fastfetch
+- nix: fastfetch
   winget: Fastfetch-cli.Fastfetch
 
-- brew: fd
-  deb: fd-find
+- nix: fd
   winget: sharkdp.fd
 
-- brew: ffmpeg
+- nix: ffmpeg
 
-- brew: ffmpegthumbnailer
+- nix: ffmpegthumbnailer
 
-- brew: fzf
-  deb: fzf
+- nix: fzf
   winget: junegunn.fzf
 
-- brew: git
-  deb: git
+- nix: git
   winget: Git.Git
 
-- brew: gnupg
-  deb: gnupg
+- nix: gnupg
   winget: GnuPG.GnuPG
 
-- brew: go
-  deb: golang
+- nix: go
   winget: GoLang.Go
 
-- brew: graphviz
-  deb: graphviz
+- nix: graphviz
   winget: Graphviz.Graphviz
 
 - brew-cask: hazel
 
 - brew-cask: hex-fiend
 
-- brew: hexyl
-  deb: hexyl
+- nix: hexyl
   winget: sharkdp.hexyl
 
-- brew: hyperfine
-  deb: hyperfine
+- nix: hyperfine
   winget: sharkdp.hyperfine
 
-- brew: imagemagick
+- nix: imagemagick
 
 - brew-cask: istat-menus
 
 - brew-cask: iterm2
 
-- brew: jid
+- nix: jid
   scoop: jid
 
-- brew: jq
+- nix: jq
   winget: jqlang.jq
 
 - brew-cask: logi-options+
 
 - brew-cask: notion
 
-- brew: make
+- nix: gnumake
   winget: GnuWin32.Make
 
 - brew: mas
 
 - deb: nala
 
-- brew: ncdu
+- nix: ncdu
 
-- brew: neovim
-  deb: neovim
+- nix: neovim
   winget: Neovim.Neovim
 
 - deb: ncat
 
-- brew: ninja
+- nix: ninja
   winget: Ninja-build.Ninja
 
-- brew: node
+- nix: nodejs_22
   winget: OpenJS.NodeJS
 
 - winget: JanDeDobbeleer.OhMyPosh
 
-- brew: ov
+- nix: ov
   winget: noborus.ov
 
 - deb: pinentry-tty
 
 - deb-desktop: libpam-ssh-agent-auth
 
-- brew: poppler
+- nix: poppler
 
 - scoop: posh-git
 
@@ -177,25 +163,20 @@
 
 - scoop: psfzf
 
-- brew: pv
-  deb: pv
+- nix: pv
 
-- brew: python@3.13
-  deb: python3
-  scoop: python
-
-- deb: python3-dev
-- deb: python3-pip
-- deb: python3-setuptools
-- deb: python3-venv
+# User-CLI Python via nix on Unix, scoop on Windows. Linux apt pulls
+# `python3` transitively as a dep of nala / command-not-found / GUI apps,
+# so no explicit deb: python3 needed.
+- nix: python314
+  winget: Python.Python.3.14
 
 - brew-cask: raycast
 
-- brew: ripgrep
-  deb: ripgrep
+- nix: ripgrep
   winget: BurntSushi.ripgrep.MSVC
 
-- brew: rustup
+- nix: rustup
   winget: Rustlang.Rustup
 
 - brew-cask: spotify
@@ -212,27 +193,31 @@
   snap-desktop: telegram-desktop
   winget: Telegram.TelegramDesktop
 
-- brew: telnet
-  deb: telnet
+- nix: inetutils
 
 - brew-appstore:
     name: Things
     id: 904280696
 
-- deb-server: tmux
+- nix: tmux
 
-- brew: tree
-  deb: tree
+- nix: tree
   winget: GnuWin32.Tree
 
-- brew: uv
+- nix: uv
   winget: astral-sh.uv
 
-- uv-tool: mypy
-- uv-tool: prek
-- uv-tool: pre-commit
-- uv-tool: pyright
-- uv-tool: ruff
+# Python tools: nix on Unix, uv-tool on Windows (nix doesn't run there).
+- nix: mypy
+  uv-tool: mypy
+- nix: prek
+  uv-tool: prek
+- nix: pre-commit
+  uv-tool: pre-commit
+- nix: pyright
+  uv-tool: pyright
+- nix: ruff
+  uv-tool: ruff
 
 - brew-cask: visual-studio-code
   deb-desktop: code
@@ -246,8 +231,7 @@
   deb-desktop: wezterm-nightly
   winget: wez.wezterm
 
-- brew: wget
-  deb: wget
+- nix: wget
   winget: GNU.Wget2
 
 - winget: Microsoft.WindowsTerminal
@@ -261,20 +245,17 @@
 
 - winget: AntibodySoftware.WizTree
 
-- brew: yazi
+- nix: yazi
 
 - brew-cask: zoom
   winget: Zoom.Zoom
 
-- brew: zoxide
-  deb: zoxide
+- nix: zoxide
   winget: ajeetdsouza.zoxide
 
-- brew: zsh
-  deb: zsh
+- nix: zsh
 
-- brew: zstd
-  deb: zstd
+- nix: zstd
   winget: Meta.Zstandard
 
 # VSCode plugins

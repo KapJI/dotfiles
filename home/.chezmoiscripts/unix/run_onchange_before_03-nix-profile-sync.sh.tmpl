@@ -1,0 +1,67 @@
+{{ if has .chezmoi.os (list "darwin" "linux") -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Re-runs whenever packages.yaml or flake.lock content changes.
+# packages.yaml hash: {{ include ".data/packages.yaml" | sha256sum }}
+# flake.lock hash:    {{ include "dot_config/nix-profile/flake.lock" | sha256sum }}
+
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
+
+mkdir -p "$HOME/.config/nix-profile"
+cp -f "{{ joinPath .chezmoi.sourceDir "dot_config/nix-profile/flake.lock" }}" \
+    "$HOME/.config/nix-profile/flake.lock"
+
+cat > "$HOME/.config/nix-profile/flake.nix" <<'NIXEOF'
+{
+  description = "Ruslan dotfiles CLI tools";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    claude-code-nix.url = "github:sadjow/claude-code-nix";
+    claude-code-nix.inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  outputs = { self, nixpkgs, claude-code-nix }:
+    let
+      systems = [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
+
+      defaultPaths = pkgs: system: with pkgs; [
+        claude-code-nix.packages.${system}.default
+{{- $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml }}
+{{- range $packages }}
+{{-   if hasKey . "nix" }}
+        {{ get . "nix" }}
+{{-   end }}
+{{- end }}
+      ];
+
+      desktopExtras = pkgs: system: with pkgs; [
+{{- range $packages }}
+{{-   if hasKey . "nix-desktop" }}
+        {{ get . "nix-desktop" }}
+{{-   end }}
+{{- end }}
+      ];
+
+      mkProfile = system: extras:
+        let pkgs = nixpkgs.legacyPackages.${system};
+        in pkgs.buildEnv {
+          name = "dotfiles-profile";
+          paths = (defaultPaths pkgs system) ++ (extras pkgs system);
+        };
+    in {
+      packages = forAllSystems (system: {
+        default = mkProfile system (_: _: []);
+        desktop = mkProfile system desktopExtras;
+      });
+    };
+}
+NIXEOF
+
+profile_target="{{ if .is_desktop }}desktop{{ else }}default{{ end }}"
+nix profile remove "${profile_target}" 2>/dev/null || true
+nix profile add --priority 5 \
+    "path:$HOME/.config/nix-profile#${profile_target}"
+{{ end -}}

@@ -12,6 +12,9 @@ alias usage="du -h -d1 | sort -h"
 alias vim="nvim"
 alias czm="chezmoi"
 alias czmcd="cd $(chezmoi source-path)"
+# Bump pinned nixpkgs + claude-code-nix in the flake, then re-add the lock to chezmoi source.
+# After running, review/commit: chezmoi cd && git diff home/dot_config/nix-profile/flake.lock
+alias nix-bump-lock='nix flake update --flake ~/.config/nix-profile && chezmoi re-add ~/.config/nix-profile/flake.lock'
 
 # Git aliases from oh-my-zsh
 alias g="git"

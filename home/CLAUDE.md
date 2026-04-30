@@ -60,21 +60,48 @@ Source filenames encode metadata via prefixes/suffixes:
 All packages are defined in a single central manifest: `.data/packages.yaml`. Each entry can have keys for multiple platforms:
 
 ```yaml
-- brew: ripgrep          # macOS Homebrew
-  deb: ripgrep           # Debian/Ubuntu apt (all Linux hosts)
-  deb-desktop: ...       # Debian/Ubuntu apt (Linux desktop only)
-  deb-server: ...        # Debian/Ubuntu apt (Linux server only)
-  snap-desktop: ...      # Snap (Linux desktop only) - for apps not in apt
-  winget: BurntSushi.ripgrep  # Windows winget
-  scoop: ripgrep         # Windows Scoop
+- nix: ripgrep           # Nix (macOS arm64 + Linux x86_64/aarch64; cross-platform CLI tools)
+  nix-desktop: ...       # Nix, included only when is_desktop=true
   brew-cask: ...         # macOS GUI apps
   brew-tap: ...          # Homebrew taps
   brew-appstore: ...     # mas (Mac App Store)
   brew-vscode: ...       # VS Code extensions
+  brew: colima           # macOS-only formulae (rare; CLI tools should use nix:)
+  deb: ...               # Debian/Ubuntu apt (system libraries / OS-integration only)
+  deb-desktop: ...       # Debian/Ubuntu apt (Linux desktop only — GUI apps)
+  deb-server: ...        # Debian/Ubuntu apt (Linux server only)
+  snap-desktop: ...      # Snap (Linux desktop only) - for apps not in apt
+  winget: BurntSushi.ripgrep  # Windows winget
+  scoop: ripgrep         # Windows Scoop
   uv-tool: ...           # Python tools via uv (all platforms)
 ```
 
-Install scripts in `.chezmoiscripts/` read this YAML and install packages for their platform. When adding a new tool, add it to `packages.yaml` rather than directly to install scripts.
+Default routing:
+- **CLI tools** → `nix:` (covers macOS + Linux). Pinned via committed `flake.lock` for cross-host reproducibility.
+- **macOS GUI apps** → `brew-cask:`. Mac App Store apps → `brew-appstore:`.
+- **Linux GUI apps / system libraries** → `deb:` / `deb-desktop:` (apt is intentionally retained for these).
+- **Windows** → `winget:` (preferred) / `scoop:` (fallback).
+
+Install scripts in `.chezmoiscripts/` read this YAML and install packages for their platform. When adding a new CLI tool, prefer `nix:` and skip `brew:` / `deb:` unless you have a reason (system lib, GUI integration).
+
+#### Nix flake
+
+A flake at `~/.config/nix-profile/flake.nix` is rendered inline by `home/.chezmoiscripts/unix/run_onchange_before_03-nix-profile-sync.sh.tmpl` from the `nix:` / `nix-desktop:` keys. It has two flake inputs:
+- `nixpkgs` (nixos-unstable channel) — most CLI tools.
+- `claude-code-nix` (`github:sadjow/claude-code-nix`) — daily-fresh `claude-code`, decoupled from nixpkgs cadence so it gets bumped within hours of upstream releases.
+
+`flake.lock` is chezmoi-managed at `home/dot_config/nix-profile/flake.lock` for cross-host reproducibility. The before_03 script reads it from `chezmoi sourceDir` directly (because chezmoi target-state writes happen *after* `before_*` scripts) and chezmoi's later target-write phase is a no-op when content matches.
+
+Bump versions on a primary host:
+```bash
+nix-bump-lock        # alias: nix flake update + chezmoi re-add flake.lock
+chezmoi cd && git diff home/dot_config/nix-profile/flake.lock
+git commit -am "nix: bump flake.lock"
+git push
+```
+Other hosts: `chezmoi update` → before_03 reruns (lock hash changed) → `nix profile remove` + `nix profile add` rebuilds the profile entry atomically.
+
+Scripts that invoke nix-installed tools (`uv`, `nvim`, etc.) source `/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh` at the top so the nix profile is on PATH (chezmoi runs each script in a fresh non-interactive shell).
 
 ### Templating
 

@@ -1,7 +1,0 @@
-{{ if has .osid (list "linux-debian" "linux-ubuntu") -}}
-#!/usr/bin/env bash
-
-{{ $version := (gitHubLatestRelease "dandavison/delta").TagName }}
-
-sudo nala install -o APT::Get::AllowUnauthenticated=true -y https://github.com/dandavison/delta/releases/download/{{ $version }}/git-delta_{{ $version }}_{{ .chezmoi.arch }}.deb
-{{ end -}}
