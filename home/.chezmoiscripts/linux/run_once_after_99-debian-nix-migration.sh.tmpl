@@ -6,6 +6,13 @@
 # Strategy: apt-mark auto + apt autoremove. apt only removes packages
 # that nothing manually-installed still depends on, so heavy tools the
 # user pulled in transitively (mactex, llvm, wireshark) keep their deps.
+#
+# NOTE: zsh and git are intentionally excluded. Removing apt zsh while
+# the user's login shell points at /usr/bin/zsh and /etc/shells doesn't
+# include the nix path locks the user out of SSH. Removing apt git breaks
+# chezmoi itself (which calls git) mid-apply if PATH isn't yet primed
+# with ~/.nix-profile/bin. Once the shell migration is done out-of-band
+# (chsh + /etc/shells edit), these can be removed manually.
 set -euo pipefail
 
 APT_MIGRATED=(
@@ -19,7 +26,6 @@ APT_MIGRATED=(
     eza
     fd-find
     fzf
-    git
     git-delta
     gnupg
     golang
@@ -41,7 +47,6 @@ APT_MIGRATED=(
     tree
     wget
     zoxide
-    zsh
     zstd
 )
 
