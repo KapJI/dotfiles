@@ -1,6 +1,13 @@
 # Enable custom completions
 fpath=("$ZDOTDIR/custom_completion" $fpath)
 
+# Enable Nix-shipped completions (user profile + system default profile).
+# Covers any tool installed via nix: keys in packages.yaml.
+[ -d "$HOME/.nix-profile/share/zsh/site-functions" ] && \
+    fpath+=("$HOME/.nix-profile/share/zsh/site-functions")
+[ -d /nix/var/nix/profiles/default/share/zsh/site-functions ] && \
+    fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
+
 # Enable Homebrew completions
 if [ "$MACOS" = true ]; then
     fpath+=("$(brew --prefix)/share/zsh/site-functions")
