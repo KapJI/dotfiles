@@ -1,0 +1,14 @@
+{{ if has .chezmoi.os (list "darwin" "linux") -}}
+#!/usr/bin/env bash
+
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
+
+# Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
+# Keep Determinate Nix up to date. before_02-install-nix is a one-shot
+# (skips if `command -v nix` succeeds), so without this each host stays
+# pinned to whichever Determinate version was current when it first
+# installed. Skipped on hosts not using Determinate (e.g., upstream
+# Nix installer or no nix at all).
+command -v determinate-nixd >/dev/null 2>&1 || exit 0
+sudo determinate-nixd upgrade
+{{ end -}}
