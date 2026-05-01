@@ -23,7 +23,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
     keyset("n", "K", vim.lsp.buf.hover, opts("Show documentation"))
     keyset("n", "<leader>cr", vim.lsp.buf.rename, opts("Rename symbol"))
     keyset({ "n", "v" }, "<leader>ca", function() require("fzf-lua").lsp_code_actions() end, opts("Code action"))
-    keyset({ "n", "v" }, "<leader>cf", function() vim.lsp.buf.format({ async = true }) end, opts("Format buffer/selection"))
+    -- <leader>cf is bound globally by conform.nvim (with lsp_fallback for filetypes
+    -- without a CLI formatter). Don't shadow it here with a buffer-local LSP-only
+    -- binding.
   end,
 })
 
