@@ -1,41 +1,52 @@
 # Configure keyboard layouts: English (US ANSI) + Russian.
 #
-# Display language stays English (United Kingdom): we keep en-GB at the top
-# of the user language list (so the en-GB UI pack stays installed and
-# Set-WinUILanguageOverride keeps working) but swap its keyboard from UK
-# (0809:00000809) to US (0409:00000409). On an ISO keyboard, 0409 gives
-# US-ANSI key semantics (@ on Shift+2, " on Shift+', etc).
-# Russian (0419:00000419) is the second list entry.
+# Goal: only two entries in the language switcher (ENG, RUS), with US-ANSI
+# key semantics under ENG and the Windows UI continuing to display in
+# English (United Kingdom).
+#
+# Win11 enforces that each input method's locale matches its parent language
+# entry: putting 0409 (US kb) under en-GB causes Windows to silently split
+# the list and auto-create an en-US entry. So the user language list must
+# hold en-US, not en-GB. The UK display is preserved separately via
+# Set-WinUILanguageOverride; the en-GB language pack stays installed (only
+# Uninstall-Language removes it).
 
-$desired = @(
-    @{ Tag = 'en-GB'; Tips = @('0409:00000409') },
+$desiredList = @(
+    @{ Tag = 'en-US'; Tips = @('0409:00000409') },
     @{ Tag = 'ru';    Tips = @('0419:00000419') }
 )
+$desiredUI = 'en-GB'
 
 $current = Get-WinUserLanguageList
-$matches = $current.Count -eq $desired.Count
-if ($matches) {
-    for ($i = 0; $i -lt $desired.Count; $i++) {
-        if ($current[$i].LanguageTag -ne $desired[$i].Tag) { $matches = $false; break }
+$listMatches = $current.Count -eq $desiredList.Count
+if ($listMatches) {
+    for ($i = 0; $i -lt $desiredList.Count; $i++) {
+        if ($current[$i].LanguageTag -ne $desiredList[$i].Tag) { $listMatches = $false; break }
         $a = @($current[$i].InputMethodTips)
-        $b = $desired[$i].Tips
-        if ($a.Count -ne $b.Count) { $matches = $false; break }
+        $b = $desiredList[$i].Tips
+        if ($a.Count -ne $b.Count) { $listMatches = $false; break }
         for ($j = 0; $j -lt $b.Count; $j++) {
-            if ($a[$j] -ne $b[$j]) { $matches = $false; break }
+            if ($a[$j] -ne $b[$j]) { $listMatches = $false; break }
         }
-        if (-not $matches) { break }
+        if (-not $listMatches) { break }
     }
 }
 
-if ($matches) {
-    Write-Host "Keyboard layouts already configured: en-GB (US keyboard) + ru."
+$uiMatches = (Get-WinUILanguageOverride).Name -eq $desiredUI
+
+if ($listMatches -and $uiMatches) {
+    Write-Host "Keyboard layouts already configured: en-US + ru, UI display $desiredUI."
     return
 }
 
-$list = New-WinUserLanguageList -Language en-GB
-$list[0].InputMethodTips.Clear()
-$list[0].InputMethodTips.Add('0409:00000409')
-$list.Add('ru')
+if (-not $listMatches) {
+    $list = New-WinUserLanguageList -Language en-US
+    $list.Add('ru')
+    Set-WinUserLanguageList -LanguageList $list -Force
+}
 
-Set-WinUserLanguageList -LanguageList $list -Force
-Write-Host "Configured keyboard layouts: en-GB (US keyboard) + ru."
+if (-not $uiMatches) {
+    Set-WinUILanguageOverride -Language $desiredUI
+}
+
+Write-Host "Configured keyboard layouts: en-US + ru, UI display $desiredUI."
