@@ -14,8 +14,9 @@
 {{- end -}}
 {{- $found := "" -}}
 {{- range $output | splitList "\n" -}}
-{{-   if hasSuffix $name . -}}
-{{-     $found = . -}}
+{{-   $line := trimSuffix "\r" . -}}
+{{-   if hasSuffix $name $line -}}
+{{-     $found = $line -}}
 {{-   end -}}
 {{- end -}}
 {{- if eq $found "" -}}
