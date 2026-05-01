@@ -45,4 +45,10 @@ sudo tee /etc/update-motd.d/50-sysinfo >/dev/null <<'SH'
 exec fastfetch --config /etc/fastfetch/motd.jsonc
 SH
 sudo chmod +x /etc/update-motd.d/50-sysinfo
+
+# Regenerate the cached motd so the new entry appears at next login without
+# waiting for a reboot. Debian's vanilla pam_motd.so reads /run/motd.dynamic
+# but does not auto-rebuild it (unlike Ubuntu's patched variant). Run-parts
+# the directory once here; pam_motd will then serve the fresh content.
+sudo sh -c 'run-parts --lsbsysinit /etc/update-motd.d/ > /run/motd.dynamic' || true
 {{ end -}}
