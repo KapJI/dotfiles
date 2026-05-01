@@ -41,7 +41,22 @@ vim.lsp.config("pyright", {
 
 vim.lsp.config("ruff", {})
 
--- Only enable servers whose binary is on PATH (avoids errors on hosts missing nil/pyright)
+vim.lsp.config("lua_ls", {
+  settings = {
+    Lua = {
+      runtime = { version = "LuaJIT" },
+      workspace = {
+        checkThirdParty = false,
+        library = vim.api.nvim_get_runtime_file("", true),  -- nvim runtime + plugin sources
+      },
+      diagnostics = { globals = { "vim" } },
+      telemetry = { enable = false },
+    },
+  },
+})
+
+-- Servers whose binaries come from outside mason (uv-tool / nix / system).
+-- mason-installed servers auto-enable via mason-lspconfig's automatic_enable.
 local function executable(name) return vim.fn.executable(name) == 1 end
 local servers = {}
 if executable("nil") then table.insert(servers, "nil_ls") end
