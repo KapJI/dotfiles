@@ -1,0 +1,48 @@
+{{ if has .osid (list "linux-debian" "linux-ubuntu") -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Install / update the fastfetch-based motd panel.
+# - /etc/fastfetch/motd.jsonc         JSONC config used by fastfetch
+# - /etc/update-motd.d/50-sysinfo     wrapper that runs fastfetch with the above
+#
+# Errors from fastfetch (missing binary, bad config) are intentionally NOT
+# silenced. They surface on stderr and reach update-motd's journal output;
+# login still proceeds because update-motd tolerates per-script failures.
+
+sudo install -d -m 0755 /etc/fastfetch
+
+sudo tee /etc/fastfetch/motd.jsonc >/dev/null <<'JSONC'
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": { "type": "none" },
+  "display": { "separator": "  " },
+  "modules": [
+    "title",
+    "separator",
+    { "type": "os",        "key": "OS         " },
+    { "type": "kernel",    "key": "Kernel     " },
+    { "type": "uptime",    "key": "Uptime     " },
+    { "type": "loadavg",   "key": "Load       ", "compact": true },
+    { "type": "memory",    "key": "Memory     ", "format": "{used} / {total} ({percentage})" },
+    { "type": "swap",      "key": "Swap       ", "format": "{used} / {total} ({percentage})" },
+    { "type": "disk",      "key": "Disk (/)   ", "folders": "/", "format": "{size-used} / {size-total} ({size-percentage})" },
+    { "type": "localip",   "key": "IPv4       ", "showIpv4": true, "showIpv6": false, "format": "{ipv4} ({ifname})" },
+    { "type": "users",     "key": "Users      " },
+    { "type": "processes", "key": "Processes  " }
+  ]
+}
+JSONC
+
+sudo tee /etc/update-motd.d/50-sysinfo >/dev/null <<'SH'
+#!/bin/sh
+# Render the fastfetch-based system info panel.
+# Errors are NOT silenced — visible via `journalctl -t update-motd` or by
+# running `run-parts /etc/update-motd.d/`. update-motd tolerates per-script
+# failures, so a missing fastfetch or broken config doesn't block login.
+[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ] && \
+    . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+exec fastfetch --config /etc/fastfetch/motd.jsonc
+SH
+sudo chmod +x /etc/update-motd.d/50-sysinfo
+{{ end -}}
