@@ -3,9 +3,21 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";"
 
 # Update nvim plugins
 # Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
-nvim --headless "+Lazy! sync" "+Lazy! load nvim-treesitter" "+TSUpdateSync" +qall
 
+# First pass: sync Lazy. If nvim-treesitter is changing branches (master->main
+# during the migration window), this is where Lazy fetches and checks out the
+# new branch on disk. The lua module loaded into THIS nvim process is still
+# the pre-switch version, so we can't call main-branch APIs here.
+nvim --headless "+Lazy! sync" +qall
 if ($lastexitcode -ne 0) {
-    Write-Host -ForegroundColor Red "neovim plugins update failed with exit code $lastexitcode"
+    Write-Host -ForegroundColor Red "Lazy sync failed with exit code $lastexitcode"
+    exit 1
+}
+
+# Second pass: fresh nvim, plugin loads from the now-current branch. update()
+# is main-branch's async parser updater; :wait blocks until parsers finish.
+nvim --headless "+lua require('nvim-treesitter').update():wait(300000)" +qall
+if ($lastexitcode -ne 0) {
+    Write-Host -ForegroundColor Red "nvim-treesitter update failed with exit code $lastexitcode"
     exit 1
 }
