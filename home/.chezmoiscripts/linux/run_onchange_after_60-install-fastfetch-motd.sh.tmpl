@@ -40,9 +40,23 @@ sudo tee /etc/update-motd.d/50-sysinfo >/dev/null <<'SH'
 # Errors are NOT silenced — visible via `journalctl -t update-motd` or by
 # running `run-parts /etc/update-motd.d/`. update-motd tolerates per-script
 # failures, so a missing fastfetch or broken config doesn't block login.
-[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ] && \
-    . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-exec fastfetch --config /etc/fastfetch/motd.jsonc
+#
+# Why the path search: on Debian, pam_motd reads only the cached
+# /run/motd.dynamic; the cache is rebuilt by run-parts running as root,
+# so $HOME is /root and a user-level nix profile under /home/<user>/ is
+# not on PATH. Iterate common locations so root-time rebuilds still find
+# fastfetch wherever it actually lives.
+for ff in \
+    /nix/var/nix/profiles/default/bin/fastfetch \
+    "$HOME/.nix-profile/bin/fastfetch" \
+    /home/*/.nix-profile/bin/fastfetch \
+    /usr/local/bin/fastfetch \
+    /usr/bin/fastfetch
+do
+    [ -x "$ff" ] && exec "$ff" --config /etc/fastfetch/motd.jsonc
+done
+echo "50-sysinfo: fastfetch not found in any expected path" >&2
+exit 1
 SH
 sudo chmod +x /etc/update-motd.d/50-sysinfo
 
