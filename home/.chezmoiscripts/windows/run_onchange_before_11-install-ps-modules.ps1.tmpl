@@ -1,0 +1,36 @@
+# Reload Path
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+# Install PowerShell modules from PSGallery into the pwsh (PS7) user scope,
+# which the user's profile imports. We invoke pwsh.exe explicitly so modules
+# land under ~/Documents/PowerShell/Modules.
+
+# Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
+
+{{- $modules := list -}}
+{{- $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml -}}
+{{- range $packages -}}
+{{- if hasKey . "ps-module" -}}
+{{- $modules = append $modules (get . "ps-module") -}}
+{{- end -}}
+{{- end }}
+
+$psScript = @'
+$modules = @({{ range $i, $m := $modules }}{{ if $i }}, {{ end }}'{{ $m }}'{{ end }})
+if (-not (Get-PSRepository -Name PSGallery -ErrorAction SilentlyContinue)) {
+    Register-PSRepository -Default
+}
+Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+foreach ($m in $modules) {
+    # Use Install-Module -Force unconditionally: Update-Module refuses to act on
+    # modules not originally installed via Install-Module (e.g. ones we used to
+    # get from scoop), and Install-Module -Force happily replaces those.
+    Install-Module -Name $m -Scope CurrentUser -Force -AllowClobber -ErrorAction Stop
+}
+'@
+
+pwsh -NoProfile -NonInteractive -Command $psScript
+if ($lastexitcode -ne 0) {
+    Write-Host -ForegroundColor Red "PowerShell module install failed with exit code $lastexitcode"
+    exit 1
+}

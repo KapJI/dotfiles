@@ -156,8 +156,6 @@
 
 - nix: poppler
 
-- scoop: posh-git
-
 - winget: Microsoft.PowerShell
 
 - winget: Microsoft.PowerToys
@@ -166,7 +164,10 @@
 
 - winget: Microsoft.Sysinternals.ProcessMonitor
 
-- scoop: psfzf
+# PowerShell modules from PSGallery, installed via pwsh Install-Module.
+# Loaded from ~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1.
+- ps-module: posh-git
+- ps-module: PSFzf
 
 - nix: pv
 

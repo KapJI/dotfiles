@@ -1,6 +1,18 @@
 # Reload Path
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
+# When chezmoi spawns Windows PowerShell 5.1 from a pwsh (PS7) parent, PS7's
+# module paths leak via $env:PSModulePath and PS5.1 then auto-loads PS7's
+# Microsoft.PowerShell.Utility, which lacks Get-FileHash. Scoop's hash check
+# then fails with "Get-FileHash is not recognized as the name of a cmdlet".
+# Strip PS7-shipped paths so PS5.1 picks up its own module.
+$env:PSModulePath = ($env:PSModulePath -split ';' | Where-Object {
+    $_ -notmatch '\\PowerShell\\7\\Modules$' -and
+    $_ -notmatch '\\Program Files\\PowerShell\\Modules$' -and
+    $_ -notmatch '\\Documents\\PowerShell\\Modules$' -and
+    $_ -notmatch 'WindowsApps\\Microsoft\.PowerShell_'
+}) -join ';'
+
 # Install packages
 {{- $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml -}}
 {{- range $packages -}}
