@@ -6,7 +6,7 @@ local keyset = vim.keymap.set
 -- Toggle verbose listchars
 local full_listchars    = { eol = "¬", tab = ">·", trail = "~", extends = ">", precedes = "<", space = "␣" }
 local minimal_listchars = { extends = ">", precedes = "<", tab = "  ", trail = "~" }
-keyset("n", "<c-L>", function()
+keyset("n", "<C-l>", function()
   if vim.opt.listchars:get().eol then
     vim.opt.listchars = minimal_listchars
   else
