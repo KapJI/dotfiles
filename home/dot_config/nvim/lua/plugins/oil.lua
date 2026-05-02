@@ -6,7 +6,7 @@ return {
   dependencies = { "nvim-tree/nvim-web-devicons" },
   lazy = false,
   keys = {
-    { "-", "<cmd>Oil<CR>", silent = true, desc = "Open file explorer" },
+    { "-", "<Cmd>Oil<CR>", silent = true, desc = "Open file explorer" },
   },
   opts = {
     default_file_explorer = true, -- replaces netrw on directory open

@@ -28,14 +28,14 @@ return {
       -- range, rendered by Symbols Nerd Font Mono — same range as the
       -- working Lazy moon glyph.
       dashboard.section.buttons.val = {
-        dashboard.button("f", "󰈞  Find file",     "<cmd>FzfLua files<cr>"),
-        dashboard.button("r", "󰋚  Recent files",  "<cmd>FzfLua oldfiles<cr>"),
-        dashboard.button("g", "󰍉  Live grep",     "<cmd>FzfLua live_grep<cr>"),
-        dashboard.button("e", "󰈙  New file",      "<cmd>enew<cr>"),
-        dashboard.button(".", "󰉋  Browse cwd",    "<cmd>Oil<cr>"),
-        dashboard.button("l", "󰒲  Lazy",          "<cmd>Lazy<cr>"),
-        dashboard.button("m", "󰏖  Mason",         "<cmd>Mason<cr>"),
-        dashboard.button("q", "󰗼  Quit",          "<cmd>qa<cr>"),
+        dashboard.button("f", "󰈞  Find file",     "<Cmd>FzfLua files<CR>"),
+        dashboard.button("r", "󰋚  Recent files",  "<Cmd>FzfLua oldfiles<CR>"),
+        dashboard.button("g", "󰍉  Live grep",     "<Cmd>FzfLua live_grep<CR>"),
+        dashboard.button("e", "󰈙  New file",      "<Cmd>enew<CR>"),
+        dashboard.button(".", "󰉋  Browse cwd",    "<Cmd>Oil<CR>"),
+        dashboard.button("l", "󰒲  Lazy",          "<Cmd>Lazy<CR>"),
+        dashboard.button("m", "󰏖  Mason",         "<Cmd>Mason<CR>"),
+        dashboard.button("q", "󰗼  Quit",          "<Cmd>qa<CR>"),
       }
 
       -- Curated vim/nvim tips, drawn from the same teaching content as the

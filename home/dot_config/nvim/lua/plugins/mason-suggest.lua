@@ -7,7 +7,7 @@ return {
     "mason-org/mason.nvim",
     optional = true, -- piggyback on the existing mason spec
     keys = {
-      { "<leader>cM", "<cmd>MasonSuggest<cr>", desc = "Mason: suggest tools for current filetype" },
+      { "<leader>cM", "<Cmd>MasonSuggest<CR>", desc = "Mason: suggest tools for current filetype" },
     },
     init = function()
       local recommendations = {

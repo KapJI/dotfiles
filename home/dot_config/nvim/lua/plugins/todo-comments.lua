@@ -10,7 +10,7 @@ return {
     cmd = { "TodoFzfLua", "TodoQuickFix", "TodoLocList" },
     dependencies = { "nvim-lua/plenary.nvim" },
     keys = {
-      { "<leader>ct", "<cmd>TodoFzfLua<cr>",                            desc = "List TODOs (project)" },
+      { "<leader>ct", "<Cmd>TodoFzfLua<CR>",                            desc = "List TODOs (project)" },
       { "]t",         function() require("todo-comments").jump_next() end, desc = "Next TODO comment" },
       { "[t",         function() require("todo-comments").jump_prev() end, desc = "Previous TODO comment" },
     },

@@ -12,7 +12,7 @@ return {
     lazy = false,                       -- load early so PATH is set before lspconfig event fires
     priority = 200,                     -- before mason-lspconfig (default priority 100)
     build = ":MasonUpdate",
-    keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason: LSP/tools manager" } },
+    keys = { { "<leader>cm", "<Cmd>Mason<CR>", desc = "Mason: LSP/tools manager" } },
     opts = {
       ui = {
         border = "rounded",

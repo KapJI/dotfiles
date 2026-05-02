@@ -6,7 +6,7 @@ return {
     "Wansmer/treesj",
     cmd = { "TSJToggle", "TSJSplit", "TSJJoin" },
     keys = {
-      { "<leader>j", "<cmd>TSJToggle<cr>", desc = "Toggle split/join (treesj)" },
+      { "<leader>j", "<Cmd>TSJToggle<CR>", desc = "Toggle split/join (treesj)" },
     },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
     opts = {
