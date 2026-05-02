@@ -29,3 +29,13 @@ vim.opt.termguicolors = true        -- 24-bit color support
 
 vim.opt.list = true
 vim.opt.listchars = { extends = ">", precedes = "<", tab = "  ", trail = "~" }
+
+-- Treesitter-based folding. Start fully unfolded (foldlevel 99) so the
+-- fold column shows markers only on lines that are currently folded.
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldtext = ""                  -- inline text-only fold preview
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
+vim.opt.foldcolumn = "auto:1"          -- show only when something foldable is in view
+vim.opt.fillchars:append({ fold = " " })
