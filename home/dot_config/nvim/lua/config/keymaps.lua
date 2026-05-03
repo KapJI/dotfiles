@@ -63,6 +63,6 @@ keyset("n", "<C-d>", "<C-d>zz", { desc = "Scroll down half page" })
 keyset("n", "<C-u>", "<C-u>zz", { desc = "Scroll up half page" })
 
 -- Diagnostic navigation (global, not per-buffer)
-keyset("n", "[g", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
-keyset("n", "]g", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+keyset("n", "[g", function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = "Previous diagnostic" })
+keyset("n", "]g", function() vim.diagnostic.jump({ count =  1, float = true }) end, { desc = "Next diagnostic" })
 keyset("n", "<leader>ce", vim.diagnostic.open_float, { desc = "Diagnostic float" })
