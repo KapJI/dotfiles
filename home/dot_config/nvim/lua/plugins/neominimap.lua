@@ -19,11 +19,12 @@ return {
                 close_if_last_window = true,
             },
 
-            -- Skip minimap on UI / scratch buffers.
+            -- Skip minimap on UI / scratch buffers and on big files
+            -- (snacks.bigfile remaps oversized buffers to filetype "bigfile").
             exclude_filetypes = {
                 "help", "alpha", "snacks_dashboard", "oil",
                 "fzf", "TelescopePrompt", "lazy", "mason",
-                "undotree", "diff",
+                "undotree", "diff", "bigfile",
             },
             exclude_buftypes  = {
                 "nofile", "nowrite", "quickfix", "terminal", "prompt", "help",

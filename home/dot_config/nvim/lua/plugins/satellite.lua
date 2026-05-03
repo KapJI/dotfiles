@@ -15,6 +15,7 @@ return {
       "oil",
       "DiffviewFiles",
       "DiffviewFileHistory",
+      "bigfile",  -- snacks.bigfile remaps oversized buffers; skip the scrollbar
     },
     handlers = {
       cursor      = { enable = true, symbols = { "⎺", "⎻", "⎼", "⎽" } },
