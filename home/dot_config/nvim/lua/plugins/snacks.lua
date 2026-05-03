@@ -21,21 +21,27 @@ return {
           "                                                ",
         }, "\n"),
         keys = {
-          { icon = "󰈞", key = "f", desc = "Find file",    action = ":FzfLua files" },
-          { icon = "󰋚", key = "r", desc = "Recent files", action = ":FzfLua oldfiles" },
-          { icon = "󰍉", key = "g", desc = "Live grep",    action = ":FzfLua live_grep" },
-          { icon = "󰈙", key = "e", desc = "New file",     action = ":enew" },
-          { icon = "󰉋", key = ".", desc = "Browse cwd",   action = ":Oil" },
-          { icon = "󰒲", key = "l", desc = "Lazy",         action = ":Lazy" },
-          { icon = "󰏖", key = "m", desc = "Mason",        action = ":Mason" },
-          { icon = "󰗼", key = "q", desc = "Quit",         action = ":qa" },
+          { icon = "󰈞", key = "f", desc = "Find file",       action = ":FzfLua files" },
+          { icon = "󰋚", key = "r", desc = "Recent files",    action = ":FzfLua oldfiles" },
+          { icon = "󰦛", key = "s", desc = "Restore session", section = "session" },
+          { icon = "󰍉", key = "g", desc = "Live grep",       action = ":FzfLua live_grep" },
+          { icon = "󰈙", key = "e", desc = "New file",        action = ":enew" },
+          { icon = "󰉋", key = ".", desc = "Browse cwd",      action = ":Oil" },
+          { icon = "󰒲", key = "l", desc = "Lazy",            action = ":Lazy" },
+          { icon = "󰏖", key = "m", desc = "Mason",           action = ":Mason" },
+          { icon = "󰗼", key = "q", desc = "Quit",            action = ":qa" },
         },
       },
-      -- Two-pane layout: left = banner + buttons, right = recents/projects/git/tips
+      -- Two-pane layout: left = banner + buttons + startup line,
+      -- right = recents + projects + tips.
       sections = {
         { section = "header" },
         { section = "keys", gap = 1, padding = 1 },
 
+        -- Pad right pane down so its first section (Recent Files) aligns
+        -- vertically with "Find file" on the left. The NEOVIM ASCII header
+        -- is 8 lines tall; tweak this if alignment drifts.
+        { pane = 2, text = "\n\n\n\n\n\n\n\n\n" },
         { pane = 2, title = "󰋚 Recent Files", section = "recent_files", indent = 2, padding = 1 },
         { pane = 2, title = "󰉋 Projects",     section = "projects",     indent = 2, padding = 1 },
         function()
@@ -50,14 +56,7 @@ return {
           }
         end,
 
-        function()
-          -- Built-in startup section hardcodes align="center"; wrap it
-          -- to override alignment + place into right pane.
-          local s = require("snacks.dashboard").sections.startup()
-          s.pane  = 2
-          s.align = "left"
-          return s
-        end,
+        { section = "startup" },
       },
     },
 
