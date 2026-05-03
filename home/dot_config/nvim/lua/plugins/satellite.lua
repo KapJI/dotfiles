@@ -1,23 +1,36 @@
--- Scrollbar with gitsigns/diagnostics integration
+-- satellite.nvim: lightweight, treesitter-aware scrollbar with handlers for
+-- diagnostics, gitsigns hunks, search results, marks, and the cursor.
+-- Replaces petertriho/nvim-scrollbar; same niche, fewer redraw glitches and
+-- a single-window rendering path instead of dozens of extmarks per buffer.
 return {
-  "petertriho/nvim-scrollbar",
+  "lewis6991/satellite.nvim",
   event = "VeryLazy",
-  dependencies = { "lewis6991/gitsigns.nvim" },
-  config = function()
-    require("scrollbar").setup({
-      handle = { color = "#585b70" },   -- Surface2
-      marks = {
-        Search    = { color = "#f9e2af" },  -- Yellow
-        Error     = { color = "#f38ba8" },  -- Red
-        Warn      = { color = "#fab387" },  -- Peach
-        Info      = { color = "#89b4fa" },  -- Blue
-        Hint      = { color = "#94e2d5" },  -- Teal
-        Misc      = { color = "#cba6f7" },  -- Mauve
-        GitAdd    = { color = "#a6e3a1" },  -- Green
-        GitChange = { color = "#f9e2af" },  -- Yellow
-        GitDelete = { color = "#f38ba8" },  -- Red
-      },
+  opts = {
+    current_only = false,           -- show on every window, not just the active one
+    winblend     = 50,              -- transparency for the bar background
+    zindex       = 40,
+    excluded_filetypes = {
+      "alpha",
+      "fzf",
+      "oil",
+      "DiffviewFiles",
+      "DiffviewFileHistory",
+    },
+    handlers = {
+      cursor      = { enable = true, symbols = { "⎺", "⎻", "⎼", "⎽" } },
+      search      = { enable = true },
+      diagnostic  = { enable = true, signs = { "-", "=", "≡" }, min_severity = vim.diagnostic.severity.HINT },
+      gitsigns    = { enable = true, signs = { add = "│", change = "│", delete = "-" } },
+      marks       = { enable = true, show_builtins = false },  -- only user marks (a-z, A-Z)
+      quickfix    = { signs = { "-", "=", "≡" } },
+    },
+  },
+  config = function(_, opts)
+    require("satellite").setup(opts)
+    -- marks.nvim has no User events; refresh on idle so dm{x}/dm-/dm<space>
+    -- propagate to the bar without manual :SatelliteRefresh.
+    vim.api.nvim_create_autocmd("CursorHold", {
+      callback = function() pcall(vim.cmd, "SatelliteRefresh") end,
     })
-    require("scrollbar.handlers.gitsigns").setup()
   end,
 }
