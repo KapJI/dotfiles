@@ -100,6 +100,12 @@ bind v copy-mode
 # Prevent mouse drag in normal mode from entering copy mode
 unbind -T root MouseDrag1Pane
 
+# Announce tmux to the outer terminal (e.g. wezterm) via OSC user-var so
+# Alt-hjkl gets forwarded to us through SSH/et. Symmetric to smart-splits.nvim's
+# IS_NVIM signal. Requires `allow-passthrough on` (set above).
+set-hook -g client-attached  'run-shell "printf \"\\033]1337;SetUserVar=IS_TMUX=%s\\007\" $(printf true  | base64)"'
+set-hook -g client-detached  'run-shell "printf \"\\033]1337;SetUserVar=IS_TMUX=%s\\007\" $(printf false | base64)"'
+
 # Use Alt-hjkl to switch panes (compatible with smart-splits.nvim)
 is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf)(diff)?$'"
 bind -n M-h if-shell "$is_vim" "send-keys M-h" "select-pane -L"
@@ -197,7 +203,8 @@ set -g @extrakto_grab_area "recent"
 
 set -g @fingers-key G
 bind -n M-g run -b "#{@fingers-cli} start #{pane_id}"
-bind -n M-j run -b "#{@fingers-cli} start #{pane_id} --mode jump"
+# Jump-mode shortcut moved off M-j (which is pane-down) to M-y. Mnemonic: "yank".
+bind -n M-y run -b "#{@fingers-cli} start #{pane_id} --mode jump"
 
 # Load tmux-fingers from the nix-server profile (nixpkgs ships a pre-built
 # binary + wrapper — no Crystal toolchain or RPATH gymnastics needed).
