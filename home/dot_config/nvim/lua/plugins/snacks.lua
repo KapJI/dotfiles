@@ -88,5 +88,31 @@ return {
     input        = { enabled = true },
     picker       = { enabled = false },
     explorer     = { enabled = false },
+
+    -- Hotkey-toggle floating shell. Real terminal work still belongs in
+    -- wezterm / tmux panes (persistent scrollback, fingers, full copy-mode);
+    -- this is just a quick scratch shell for one-off commands without
+    -- leaving nvim's window focus. Toggle with <leader>tt; <Esc><Esc>
+    -- exits terminal mode (snacks default).
+    terminal     = { enabled = true },
+  },
+  keys = {
+    {
+      "<leader>tt",
+      function()
+        Snacks.terminal.toggle(nil, {
+          win = {
+            position    = "float",
+            border      = "rounded",
+            title       = " Terminal ",
+            title_pos   = "center",
+            width       = 0.8,    -- 80% of editor width
+            height      = 0.8,    -- 80% of editor height
+          },
+        })
+      end,
+      mode = { "n", "t" },
+      desc = "Toggle floating terminal",
+    },
   },
 }

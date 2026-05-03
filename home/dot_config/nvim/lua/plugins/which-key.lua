@@ -12,6 +12,7 @@ return {
       { "<leader>n", group = "Navigation" },
       { "<leader>q", group = "Quickfix" },
       { "<leader>s", group = "Session" },
+      { "<leader>t", group = "Terminal" },
       { "<leader>w", group = "Window swap" },
       { "<leader>x", group = "eXchange (swap)" },
     })
