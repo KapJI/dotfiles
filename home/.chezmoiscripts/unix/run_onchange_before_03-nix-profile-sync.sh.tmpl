@@ -69,7 +69,14 @@ cat > "$HOME/.config/nix-profile/flake.nix" <<'NIXEOF'
 NIXEOF
 
 profile_target="{{ if .is_desktop }}desktop{{ else }}default{{ end }}"
-nix profile remove "${profile_target}" 2>/dev/null || true
+
+# Nix auto-names path: profile entries by the path basename, so our entry
+# is always "nix-profile". Remove it before re-adding so the new flake
+# content actually rebuilds (otherwise Nix short-circuits as "already
+# installed at this priority" and serverExtras / desktopExtras additions
+# silently drop on the floor).
+nix profile remove nix-profile 2>/dev/null || true
+
 nix profile add --priority 5 \
     "path:$HOME/.config/nix-profile#${profile_target}"
 {{ end -}}
