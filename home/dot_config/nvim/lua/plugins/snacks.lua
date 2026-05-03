@@ -65,8 +65,16 @@ return {
     -- large logs, JSON dumps, or minified bundles.
     bigfile      = { enabled = true },
 
+    -- Replace vim.notify with stacked corner toasts that auto-dismiss and
+    -- keep a history (`:lua Snacks.notifier.show_history()`). Without this,
+    -- LSP / mason / lazy / plugin warnings vanish into the cmdline.
+    notifier     = {
+      enabled = true,
+      timeout = 4000,
+      style   = "compact",
+    },
+
     -- Other snacks modules — disabled until we explicitly want them.
-    notifier     = { enabled = false },
     quickfile    = { enabled = false },
     scope        = { enabled = false },
     scroll       = { enabled = false },
