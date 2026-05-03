@@ -79,6 +79,27 @@ return {
                 end)
             end,
         })
+
+        -- Hide the minimap panel while the snacks dashboard is shown — the
+        -- startup [No Name] buffer auto-enables minimap before snacks takes
+        -- over the buffer and sets filetype=snacks_dashboard, leaving an
+        -- empty side panel. snacks.dashboard fires User SnacksDashboard{Opened,Closed}
+        -- which we use to bracket the visibility.
+        local dash_group = vim.api.nvim_create_augroup("user_neominimap_dashboard", { clear = true })
+        vim.api.nvim_create_autocmd("User", {
+            group = dash_group,
+            pattern = "SnacksDashboardOpened",
+            callback = function()
+                vim.schedule(function() pcall(vim.cmd, "Neominimap Disable") end)
+            end,
+        })
+        vim.api.nvim_create_autocmd("User", {
+            group = dash_group,
+            pattern = "SnacksDashboardClosed",
+            callback = function()
+                vim.schedule(function() pcall(vim.cmd, "Neominimap Enable") end)
+            end,
+        })
     end,
     keys    = {
         { "<leader>nm", "<Cmd>Neominimap Toggle<CR>", desc = "Toggle minimap" },
