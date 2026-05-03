@@ -12,10 +12,13 @@ return {
       zindex = 20,
     },
     keys = {
-      -- gitsigns owns [c / ]c for hunk navigation; use [x / ]x for context.
-      -- (No "next context" — context lives above the cursor by definition.)
+      -- Jump to whichever surrounding scope the sticky header is showing
+      -- (function / class / for-block / etc., whatever's nearest). Pairs
+      -- with mini.bracketed [x/]x (conflict markers): lowercase x for
+      -- inline marker pairs, capital X for enclosing scope. Asymmetric —
+      -- no ]X because context is always above the cursor.
       {
-        "[x",
+        "[X",
         function() require("treesitter-context").go_to_context(vim.v.count1) end,
         desc = "Jump to surrounding context",
       },
