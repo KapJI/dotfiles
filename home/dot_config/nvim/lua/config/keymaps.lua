@@ -64,3 +64,14 @@ keyset("n", "<C-u>", "<C-u>zz", { desc = "Scroll up half page" })
 
 -- Diagnostic navigation (global, not per-buffer)
 keyset("n", "<leader>ce", vim.diagnostic.open_float, { desc = "Diagnostic float" })
+
+-- Emacs-style readline keys missing from default vim cmdline.
+-- Vim already provides: <C-e> eol, <C-w> del-word-back, <C-u> del-to-start,
+-- <S-Left>/<S-Right> word movement. We add <C-a> bol (overriding vim's
+-- complete-all-matches) and <C-k> kill-to-end (no vim equivalent).
+keyset("c", "<C-a>", "<Home>", { desc = "Cmdline: beginning of line (emacs)" })
+keyset("c", "<C-k>", function()
+  local pos  = vim.fn.getcmdpos()
+  local line = vim.fn.getcmdline()
+  return line:sub(1, pos - 1)
+end, { expr = true, desc = "Cmdline: kill to end" })
