@@ -35,10 +35,4 @@ return {
     event = "VeryLazy",
     config = function() require("marks").setup() end,
   },
-
-  -- Multiple cursors
-  {
-    "mg979/vim-visual-multi",
-    event = "VeryLazy",
-  },
 }
