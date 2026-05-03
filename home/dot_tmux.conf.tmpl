@@ -103,8 +103,13 @@ unbind -T root MouseDrag1Pane
 # Announce tmux to the outer terminal (e.g. wezterm) via OSC user-var so
 # Alt-hjkl gets forwarded to us through SSH/et. Symmetric to smart-splits.nvim's
 # IS_NVIM signal. Requires `allow-passthrough on` (set above).
-set-hook -g client-attached  'run-shell "printf \"\\033]1337;SetUserVar=IS_TMUX=%s\\007\" $(printf true  | base64)"'
-set-hook -g client-detached  'run-shell "printf \"\\033]1337;SetUserVar=IS_TMUX=%s\\007\" $(printf false | base64)"'
+#
+# Important: write directly to #{client_tty} (the wezterm-facing tty);
+# `run-shell` captures stdout to tmux's message area, so without the redirect
+# the OSC never leaves tmux. base64("true") = "dHJ1ZQ==" hard-coded for clarity.
+# No client-detached hook: by the time it fires, the client tty is gone, and
+# the staleness ("IS_TMUX=true sticks after detach") is acceptable per workflow.
+set-hook -g client-attached 'run-shell -b "printf \"\\033]1337;SetUserVar=IS_TMUX=dHJ1ZQ==\\007\" > #{client_tty}"'
 
 # Use Alt-hjkl to switch panes (compatible with smart-splits.nvim)
 is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf)(diff)?$'"
