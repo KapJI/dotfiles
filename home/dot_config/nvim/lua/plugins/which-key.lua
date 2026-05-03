@@ -5,10 +5,14 @@ return {
   config = function()
     require("which-key").setup({ delay = 1000 })
     require("which-key").add({
-      { "<leader>f", group = "Find" },
       { "<leader>c", group = "Code" },
+      { "<leader>f", group = "Find" },
       { "<leader>g", group = "Git" },
+      { "<leader>m", group = "Multicursor / Markdown" },
       { "<leader>q", group = "Quickfix" },
+      { "<leader>s", group = "Session" },
+      { "<leader>w", group = "Window swap" },
+      { "<leader>x", group = "eXchange (swap)" },
     })
   end,
 }
