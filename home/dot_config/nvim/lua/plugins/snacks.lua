@@ -60,8 +60,12 @@ return {
       },
     },
 
+    -- Disable expensive features (treesitter, LSP, syntax, folds, undofile)
+    -- when a buffer's file is above ~1.5MB. Saves nvim from stalls on
+    -- large logs, JSON dumps, or minified bundles.
+    bigfile      = { enabled = true },
+
     -- Other snacks modules — disabled until we explicitly want them.
-    bigfile      = { enabled = false },
     notifier     = { enabled = false },
     quickfile    = { enabled = false },
     scope        = { enabled = false },
