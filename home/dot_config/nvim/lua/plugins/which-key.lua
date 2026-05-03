@@ -9,6 +9,7 @@ return {
       { "<leader>f", group = "Find" },
       { "<leader>g", group = "Git" },
       { "<leader>m", group = "Multicursor / Markdown" },
+      { "<leader>n", group = "Navigation" },
       { "<leader>q", group = "Quickfix" },
       { "<leader>s", group = "Session" },
       { "<leader>w", group = "Window swap" },
