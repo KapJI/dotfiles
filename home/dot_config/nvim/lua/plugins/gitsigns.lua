@@ -6,6 +6,10 @@ return {
     local keyset = vim.keymap.set
     require("gitsigns").setup({
       on_attach = function(bufnr)
+        -- snacks.bigfile remaps oversized buffers to filetype "bigfile";
+        -- skip gitsigns there to avoid running diff on huge buffers.
+        if vim.bo[bufnr].filetype == "bigfile" then return false end
+
         local gs = require("gitsigns")
         keyset("n", "]c", function() gs.nav_hunk("next") end, { buffer = bufnr, silent = true, desc = "Next git hunk" })
         keyset("n", "[c", function() gs.nav_hunk("prev") end, { buffer = bufnr, silent = true, desc = "Previous git hunk" })
