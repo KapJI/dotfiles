@@ -33,9 +33,14 @@ return {
         k(xo, "ab", function() sel.select_textobject("@block.outer",     "textobjects") end, { desc = "around block"    })
         k(xo, "ib", function() sel.select_textobject("@block.inner",     "textobjects") end, { desc = "inner block"     })
 
-        -- Function-start movement
+        -- Function-start movement. [f from inside a function jumps to its
+        -- declaration (enclosing-scope replacement for [x).
         k(nxo, "]f", function() move.goto_next_start("@function.outer",     "textobjects") end, { desc = "next function start" })
         k(nxo, "[f", function() move.goto_previous_start("@function.outer", "textobjects") end, { desc = "prev function start" })
+
+        -- Class-start movement. Capital C avoids collision with gitsigns ]c/[c.
+        k(nxo, "]C", function() move.goto_next_start("@class.outer",     "textobjects") end, { desc = "next class start" })
+        k(nxo, "[C", function() move.goto_previous_start("@class.outer", "textobjects") end, { desc = "prev class start" })
 
         -- Argument swap
         k("n", "<leader>xa", function() swap.swap_next("@parameter.inner")     end, { desc = "swap argument with next" })

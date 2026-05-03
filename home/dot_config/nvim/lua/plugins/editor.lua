@@ -29,10 +29,20 @@ return {
     config = function() require("guess-indent").setup() end,
   },
 
-  -- Visual marks in sign column
+  -- Visual marks in sign column. Bracket nav remapped to ]m/[m for
+  -- consistency with mini.bracketed's ]<key> family (overrides vim's
+  -- method-jump on those keys; we use treesitter-textobjects ]f/[f
+  -- for function navigation instead).
   {
     "chentoast/marks.nvim",
     event = "VeryLazy",
-    config = function() require("marks").setup() end,
+    config = function()
+      require("marks").setup({
+        mappings = {
+          next = "]m",
+          prev = "[m",
+        },
+      })
+    end,
   },
 }
