@@ -206,6 +206,7 @@
     id: 904280696
 
 - nix: tmux
+  nix-server: crystal   # build dep for tmux-fingers; only needed where tmux is configured
 
 - nix: tree
   winget: GnuWin32.Tree

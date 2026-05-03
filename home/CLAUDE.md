@@ -62,6 +62,7 @@ All packages are defined in a single central manifest: `.data/packages.yaml`. Ea
 ```yaml
 - nix: ripgrep           # Nix (macOS arm64 + Linux x86_64/aarch64; cross-platform CLI tools)
   nix-desktop: ...       # Nix, included only when is_desktop=true
+  nix-server: ...        # Nix, included only when is_desktop=false (Linux server)
   brew-cask: ...         # macOS GUI apps
   brew-tap: ...          # Homebrew taps
   brew-appstore: ...     # mas (Mac App Store)
@@ -86,7 +87,7 @@ Install scripts in `.chezmoiscripts/` read this YAML and install packages for th
 
 #### Nix flake
 
-A flake at `~/.config/nix-profile/flake.nix` is rendered inline by `home/.chezmoiscripts/unix/run_onchange_before_03-nix-profile-sync.sh.tmpl` from the `nix:` / `nix-desktop:` keys. It has two flake inputs:
+A flake at `~/.config/nix-profile/flake.nix` is rendered inline by `home/.chezmoiscripts/unix/run_onchange_before_03-nix-profile-sync.sh.tmpl` from the `nix:` / `nix-desktop:` / `nix-server:` keys. It has two flake inputs:
 - `nixpkgs` (nixos-unstable channel) — most CLI tools.
 - `claude-code-nix` (`github:sadjow/claude-code-nix`) — daily-fresh `claude-code`, decoupled from nixpkgs cadence so it gets bumped within hours of upstream releases.
 

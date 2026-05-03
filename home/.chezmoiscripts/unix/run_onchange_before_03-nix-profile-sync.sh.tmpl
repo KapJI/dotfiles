@@ -45,6 +45,14 @@ cat > "$HOME/.config/nix-profile/flake.nix" <<'NIXEOF'
 {{- end }}
       ];
 
+      serverExtras = pkgs: system: with pkgs; [
+{{- range $packages }}
+{{-   if hasKey . "nix-server" }}
+        {{ get . "nix-server" }}
+{{-   end }}
+{{- end }}
+      ];
+
       mkProfile = system: extras:
         let pkgs = nixpkgs.legacyPackages.${system};
         in pkgs.buildEnv {
@@ -53,8 +61,8 @@ cat > "$HOME/.config/nix-profile/flake.nix" <<'NIXEOF'
         };
     in {
       packages = forAllSystems (system: {
-        default = mkProfile system (_: _: []);
-        desktop = mkProfile system desktopExtras;
+        default = mkProfile system serverExtras;     # Linux server (is_desktop=false)
+        desktop = mkProfile system desktopExtras;    # macOS or Linux desktop
       });
     };
 }
