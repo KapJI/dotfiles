@@ -28,6 +28,44 @@ config.use_fancy_tab_bar = true
 
 config.color_scheme = 'Arthur'
 
+-- ── Tab bar styling ──────────────────────────────────────────────────────
+-- iTerm2 model: active tab BLENDS with window content bg, inactive is
+-- DARKER (recedes into titlebar), hover is BRIGHTER (lifts off). Colors
+-- are derived from the active color_scheme's background so they track
+-- automatically if the scheme changes.
+local scheme = wezterm.color.get_builtin_schemes()[config.color_scheme]
+local window_bg = scheme.background
+local bg = wezterm.color.parse(window_bg)
+
+local titlebar_bg  = bg:darken(0.30)   -- a touch darker than window
+local inactive_bg  = bg:darken(0.50)   -- noticeably recessed
+local hover_bg     = bg:lighten(0.08)  -- subtly raised above window bg
+
+config.window_frame = {
+    font_size = wezterm.target_triple:find('darwin') and 15.0 or 13.0,
+    active_titlebar_bg   = titlebar_bg,
+    inactive_titlebar_bg = titlebar_bg,
+}
+
+config.colors = {
+    tab_bar = {
+        active_tab = {
+            bg_color  = window_bg,            -- blends with content area
+            fg_color  = '#ffffff',
+            intensity = 'Bold',
+        },
+        inactive_tab = {
+            bg_color = inactive_bg,           -- recedes into the bar
+            fg_color = '#9a9a9a',
+        },
+        inactive_tab_hover = {
+            bg_color = hover_bg,              -- lifts off when hovered
+            fg_color = '#ffffff',
+        },
+        inactive_tab_edge = '#575757',
+    },
+}
+
 -- ── smart-splits.nvim / tmux passthrough ─────────────────────────────────
 -- Alt+hjkl       → navigate panes (forward to nvim or tmux if either is the
 --                   foreground process; otherwise wezterm handles it)
