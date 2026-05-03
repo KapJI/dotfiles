@@ -85,6 +85,8 @@ Default routing:
 
 Install scripts in `.chezmoiscripts/` read this YAML and install packages for their platform. When adding a new CLI tool, prefer `nix:` and skip `brew:` / `deb:` unless you have a reason (system lib, GUI integration).
 
+**One entry per logical package.** Multiple keys on the same `- ` entry are for cross-platform install methods of the *same* package (e.g. `brew-cask: 1password` + `deb-desktop: 1password` + `winget: AgileBits.1Password`). Distinct packages — even if functionally related (e.g. `tmux` and `tmuxPlugins.fingers`) — get separate top-level entries.
+
 #### Nix flake
 
 A flake at `~/.config/nix-profile/flake.nix` is rendered inline by `home/.chezmoiscripts/unix/run_onchange_before_03-nix-profile-sync.sh.tmpl` from the `nix:` / `nix-desktop:` / `nix-server:` keys. It has two flake inputs:

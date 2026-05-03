@@ -199,6 +199,10 @@ set -g @fingers-key G
 bind -n M-g run -b "#{@fingers-cli} start #{pane_id}"
 bind -n M-j run -b "#{@fingers-cli} start #{pane_id} --mode jump"
 
+# Load tmux-fingers from the nix-server profile (nixpkgs ships a pre-built
+# binary + wrapper — no Crystal toolchain or RPATH gymnastics needed).
+run-shell ~/.nix-profile/share/tmux-plugins/tmux-fingers/tmux-fingers.tmux
+
 
 ##### Resurrect & Continuum #####
 
@@ -213,7 +217,6 @@ set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'catppuccin/tmux#v2.1.3'
 set -g @plugin 'MunifTanjim/tmux-mode-indicator'
 set -g @plugin 'laktak/extrakto'
-set -g @plugin 'Morantron/tmux-fingers'
 set -g @plugin 'tmux-plugins/tmux-resurrect'
 set -g @plugin 'tmux-plugins/tmux-continuum'
 run '~/.tmux/plugins/tpm/tpm'

@@ -206,8 +206,8 @@
     id: 904280696
 
 - nix: tmux
-  nix-server: crystal   # tmux-fingers build dep (server hosts only)
-- nix-server: shards    # crystal's package manager — tmux-fingers installer checks for this, not crystal
+
+- nix-server: tmuxPlugins.fingers   # nixpkgs ships the pre-built binary + wrapper
 
 - nix: tree
   winget: GnuWin32.Tree
