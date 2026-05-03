@@ -81,7 +81,11 @@ return {
     statuscolumn = { enabled = false },
     words        = { enabled = false },
     indent       = { enabled = false },
-    input        = { enabled = false },
+
+    -- Replace vim.ui.input (cmdline prompt) with a floating window.
+    -- Most input prompts already go through inc-rename / fzf-lua;
+    -- this catches the remaining vim.ui.input calls for visual consistency.
+    input        = { enabled = true },
     picker       = { enabled = false },
     explorer     = { enabled = false },
   },
