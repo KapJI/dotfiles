@@ -70,12 +70,14 @@ NIXEOF
 
 profile_target="{{ if .is_desktop }}desktop{{ else }}default{{ end }}"
 
-# Nix auto-names path: profile entries by the path basename, so our entry
-# is always "nix-profile". Remove it before re-adding so the new flake
-# content actually rebuilds (otherwise Nix short-circuits as "already
-# installed at this priority" and serverExtras / desktopExtras additions
-# silently drop on the floor).
-nix profile remove nix-profile 2>/dev/null || true
+# Remove our previous entry before re-adding so a new flake content
+# actually rebuilds (otherwise Nix short-circuits as "already installed
+# at this priority" and packages.yaml additions silently drop on the
+# floor). Older nix versions named the entry by path basename
+# ("nix-profile"); newer versions name it by the flake attribute
+# ("desktop"/"default"). Try both — at most one matches.
+nix profile remove "${profile_target}" 2>/dev/null || true
+nix profile remove nix-profile          2>/dev/null || true
 
 nix profile add --priority 5 \
     "path:$HOME/.config/nix-profile#${profile_target}"
