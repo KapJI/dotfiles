@@ -2,21 +2,24 @@
 -- rendering. Mark layers (diagnostic/git/search/marks) are disabled to
 -- avoid duplicating what satellite.nvim already shows on the right edge;
 -- the value here is the visual *shape* of the file.
+--
+-- Layout = "float": minimap is a translucent overlay on the right edge
+-- of the source window, NOT a separate split. This avoids a class of
+-- data-loss bugs that split layout has when it becomes the last window
+-- (upstream's close_if_last_window cascades into a forced `:qa!`).
 return {
     "Isrothy/neominimap.nvim",
     version = "v3.x.x",
     enabled = true,
-    lazy    = false,  -- per upstream guidance
+    lazy    = false, -- per upstream guidance
     init    = function()
         -- Configuration must be set on vim.g before the plugin loads (mini-style).
         vim.g.neominimap = {
             auto_enable       = true,
-            layout            = "split",
-            split             = {
-                direction            = "right",
-                minimap_width        = 16,
-                fix_width            = true, -- not affected by <C-w>=
-                close_if_last_window = true,
+            layout            = "float",
+            float             = {
+                minimap_width      = 16,
+                max_minimap_height = nil, -- match source window height
             },
 
             -- Skip minimap on UI / scratch buffers and on big files
@@ -44,47 +47,23 @@ return {
             mark              = { enabled = false }, -- letter marks, low value at this scale
             lsp               = { enabled = false }, -- semantic tokens, mostly invisible at this scale
 
-            -- Mouse click on minimap → jump cursor in main buffer.
-            -- NOTE: `auto_switch_focus` is only honored in the FLOAT layout
-            -- (see lua/neominimap/window/float/init.lua); for split layout
-            -- it's a no-op. The bounce-focus-back behavior is implemented
-            -- by the WinEnter autocmd registered below. Value here matches
-            -- intent ("don't keep focus on minimap") even though ignored.
+            -- Click on minimap moves the source cursor; auto_switch_focus
+            -- = false makes upstream bounce focus back to the source window
+            -- automatically (float-layout-only feature; works natively here).
             click             = { enabled = true, auto_switch_focus = false },
 
-            -- Slight transparency so the panel doesn't feel like a wall.
+            -- Slight transparency so the overlay doesn't feel like a wall
+            -- over the right edge of the buffer.
             winopt            = function(opt, _)
                 opt.winblend = 30
             end,
         }
 
-        -- Split-layout click → bounce focus back to source window.
-        -- Upstream's `click.auto_switch_focus` is only wired in the float
-        -- layout, so we replicate the bounce here. The minimap's CursorMoved
-        -- handler still fires first (it runs synchronously on entering the
-        -- window and moves the source cursor); we then schedule a return to
-        -- the previous window so navigation keys land in the editor again.
-        vim.api.nvim_create_autocmd("WinEnter", {
-            group = vim.api.nvim_create_augroup("user_neominimap_bounce", { clear = true }),
-            callback = function()
-                if vim.bo.filetype ~= "neominimap" then return end
-                local prev = vim.fn.win_getid(vim.fn.winnr("#"))
-                if prev == 0 or prev == vim.api.nvim_get_current_win() then return end
-                vim.schedule(function()
-                    if vim.bo.filetype == "neominimap"
-                        and vim.api.nvim_win_is_valid(prev)
-                    then
-                        vim.api.nvim_set_current_win(prev)
-                    end
-                end)
-            end,
-        })
-
-        -- Hide the minimap panel while the snacks dashboard is shown — the
-        -- startup [No Name] buffer auto-enables minimap before snacks takes
-        -- over the buffer and sets filetype=snacks_dashboard, leaving an
-        -- empty side panel. snacks.dashboard fires User SnacksDashboard{Opened,Closed}
-        -- which we use to bracket the visibility.
+        -- Hide the minimap while the snacks dashboard is shown — the
+        -- startup [No Name] buffer auto-enables minimap before snacks
+        -- takes over and sets filetype=snacks_dashboard, leaving a stale
+        -- overlay. snacks.dashboard fires User SnacksDashboard{Opened,
+        -- Closed} which we bracket here.
         local dash_group = vim.api.nvim_create_augroup("user_neominimap_dashboard", { clear = true })
         vim.api.nvim_create_autocmd("User", {
             group = dash_group,
