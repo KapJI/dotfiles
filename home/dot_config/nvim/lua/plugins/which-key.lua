@@ -10,6 +10,7 @@ return {
       { "<leader>g", group = "Git" },
       { "<leader>m", group = "Multicursor / Markdown" },
       { "<leader>n", group = "Navigation" },
+      { "<leader>N", group = "Notifications" },
       { "<leader>q", group = "Quickfix" },
       { "<leader>s", group = "Session" },
       { "<leader>t", group = "Terminal" },

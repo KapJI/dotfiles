@@ -75,3 +75,8 @@ keyset("c", "<C-k>", function()
   local line = vim.fn.getcmdline()
   vim.fn.setcmdline(line:sub(1, pos - 1))
 end, { desc = "Cmdline: kill to end" })
+
+-- Notification history (noice routes vim.notify → nvim-notify).
+keyset("n", "<leader>Nh", "<Cmd>NoiceFzf<CR>",     { desc = "Notifications: history (fzf)" })
+keyset("n", "<leader>Nl", "<Cmd>NoiceLast<CR>",    { desc = "Notifications: last popup" })
+keyset("n", "<leader>Nd", "<Cmd>NoiceDismiss<CR>", { desc = "Notifications: dismiss visible" })

@@ -65,14 +65,10 @@ return {
     -- large logs, JSON dumps, or minified bundles.
     bigfile      = { enabled = true },
 
-    -- Replace vim.notify with stacked corner toasts that auto-dismiss and
-    -- keep a history (`:lua Snacks.notifier.show_history()`). Without this,
-    -- LSP / mason / lazy / plugin warnings vanish into the cmdline.
-    notifier     = {
-      enabled = true,
-      timeout = 4000,
-      style   = "compact",
-    },
+    -- Notifications are owned by noice.nvim → nvim-notify (see noice.lua).
+    -- snacks.notifier is left here only as a documented off-switch so its
+    -- prior config is recoverable in git history if we want to flip back.
+    notifier     = { enabled = false },
 
     -- Other snacks modules — disabled until we explicitly want them.
     quickfile    = { enabled = false },

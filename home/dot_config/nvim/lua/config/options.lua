@@ -24,6 +24,8 @@ vim.opt.inccommand = "split"        -- live preview of :s substitutions
 vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.undofile = true             -- persistent undo across sessions
+vim.opt.confirm = true              -- save/discard/cancel dialog instead of E37 + Press-ENTER prompt
+                                    -- (works correctly with noice + the cmdline.on_show monkey-patch in noice.lua)
 
 vim.opt.termguicolors = true        -- 24-bit color support
 
