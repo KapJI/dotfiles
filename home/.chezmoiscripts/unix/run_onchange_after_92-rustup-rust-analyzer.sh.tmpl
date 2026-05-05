@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Ensure the rust-analyzer component is installed in the active rustup
+# toolchain. Without it, ~/.nix-profile/bin/rust-analyzer (which is just a
+# rustup shim) infinite-recurses trying to resolve itself.
+#
+# Desktop-only: server profiles don't need rust development tooling.
+
+{{ if .is_desktop }}
+set -e
+
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
+
+if ! command -v rustup >/dev/null 2>&1; then
+  echo "rustup not on PATH; skipping rust-analyzer component install"
+  exit 0
+fi
+
+# Idempotent: rustup component add is a no-op if already present.
+rustup component add rust-analyzer
+{{ end }}

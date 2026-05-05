@@ -44,6 +44,8 @@ vim.lsp.config("pyright", {
 
 vim.lsp.config("ruff", {})
 
+vim.lsp.config("rust_analyzer", {})
+
 vim.lsp.config("lua_ls", {
   settings = {
     Lua = {
@@ -65,4 +67,5 @@ local servers = {}
 if executable("nil") then table.insert(servers, "nil_ls") end
 if executable("pyright-langserver") or executable("pyright") then table.insert(servers, "pyright") end
 if executable("ruff") then table.insert(servers, "ruff") end
+if executable("rust-analyzer") then table.insert(servers, "rust_analyzer") end
 if #servers > 0 then vim.lsp.enable(servers) end
