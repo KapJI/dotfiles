@@ -121,6 +121,9 @@
 - nix: jq
   winget: jqlang.jq
 
+- nix: lazygit
+  winget: JesseDuffield.lazygit
+
 - brew-cask: logi-options+
 
 - brew-cask: notion

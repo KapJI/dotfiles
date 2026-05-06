@@ -110,5 +110,10 @@ return {
       mode = { "n", "t" },
       desc = "Toggle floating terminal",
     },
+    {
+      "<leader>gg",
+      function() Snacks.lazygit() end,
+      desc = "Lazygit (floating)",
+    },
   },
 }
