@@ -4,7 +4,25 @@
 # Antidote plugins hash: {{ include $antidote_plugins | sha256sum }}
 # Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 
-# Update antidote plugins
+# Update antidote plugins.
+#
+# Force git/ssh into non-interactive mode. Antidote's git wrappers redirect
+# stderr to /dev/null (antidote.zsh's git_fetch/git_pull), so any
+# interactive prompt (SSH host-key confirmation, credential ask) would
+# hang silently waiting on stdin. With these flags any such prompt fails
+# fast with a visible error instead of an invisible deadlock.
+#   GIT_TERMINAL_PROMPT=0       — git refuses to ask for usernames/passwords.
+#   ssh BatchMode=yes           — ssh refuses to ask for passwords.
+#   ssh StrictHostKeyChecking=accept-new — auto-accept never-seen-before
+#                                  hosts (added to known_hosts), still
+#                                  reject changed keys (MITM protection).
 if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
-    zsh -c 'source ~/.config/zsh/antidote/antidote.zsh; antidote update'
+    export GIT_TERMINAL_PROMPT=0
+    export GIT_SSH_COMMAND="ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new"
+
+    if ! zsh -c 'source ~/.config/zsh/antidote/antidote.zsh; antidote update'; then
+        echo "antidote update failed — likely an auth or host-key issue." >&2
+        echo "Reproduce with stderr visible: antidote update" >&2
+        exit 1
+    fi
 fi
