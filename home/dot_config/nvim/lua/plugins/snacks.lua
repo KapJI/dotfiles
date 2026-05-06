@@ -112,7 +112,71 @@ return {
     },
     {
       "<leader>gg",
-      function() Snacks.lazygit() end,
+      function()
+        -- Two issues with snacks.lazygit's defaults:
+        --
+        -- 1. snacks.lazygit uses style = "lazygit" (empty) instead of
+        --    style = "minimal", so global statuscolumn (statuscol.nvim),
+        --    number, foldcolumn, list all leak into the float and trim
+        --    5+ cells off lazygit's render area. Clear via wo overrides.
+        --
+        -- 2. snacks.terminal auto-enters terminal mode immediately after
+        --    termopen. gocui (lazygit's TUI library) races with nvim's
+        --    mode entry: lazygit's first paint lands while nvim is still
+        --    transitioning to terminal mode, ending up 1 col left-shifted.
+        --    Bare `:terminal lazygit` (no auto-startinsert) doesn't trip
+        --    this; deferring startinsert by ~50 ms also doesn't.
+        --    Disable snacks's auto-insert and call `startinsert` ourselves
+        --    after a short defer.
+        Snacks.lazygit({
+          win = {
+            wo = {
+              statuscolumn   = "",
+              number         = false,
+              relativenumber = false,
+              foldcolumn     = "0",
+              list           = false,
+            },
+          },
+          start_insert = false,
+          auto_insert  = false,
+          interactive  = false, -- avoids the gocui+startinsert render race
+          auto_close   = true,  -- override the `interactive=false` cascade so the float still closes when lazygit exits (otherwise we'd be stuck on "[Process exited 0]" needing a second q)
+        })
+
+        -- Wait for lazygit's first paint to STABILIZE before entering
+        -- terminal mode — going to insert mode while gocui is still
+        -- emitting cells re-races the original shift bug. We use two
+        -- complementary signals:
+        --   1. Buffer reaches window height (lazygit renders full-screen).
+        --   2. Line count stops changing for two consecutive polls.
+        -- Whichever fires first wins. Hard cap of 2 s as a safety belt.
+        local buf   = vim.api.nvim_get_current_buf()
+        local win   = vim.api.nvim_get_current_win()
+        local timer = vim.uv.new_timer()
+        local last_count = -1
+        local stable_for = 0
+        local elapsed    = 0
+        timer:start(50, 50, vim.schedule_wrap(function()
+          elapsed = elapsed + 50
+          if not vim.api.nvim_buf_is_valid(buf) or not vim.api.nvim_win_is_valid(win) then
+            timer:stop(); timer:close()
+            return
+          end
+          local count    = vim.api.nvim_buf_line_count(buf)
+          local target   = vim.api.nvim_win_get_height(win)
+          stable_for     = (count == last_count) and (stable_for + 1) or 0
+          last_count     = count
+
+          local done = count >= target or stable_for >= 2 or elapsed >= 2000
+          if done then
+            timer:stop(); timer:close()
+            if vim.api.nvim_get_current_win() == win then
+              vim.cmd("startinsert")
+            end
+          end
+        end))
+      end,
       desc = "Lazygit (floating)",
     },
   },
