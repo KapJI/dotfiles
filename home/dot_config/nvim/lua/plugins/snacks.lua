@@ -70,10 +70,19 @@ return {
     -- prior config is recoverable in git history if we want to flip back.
     notifier     = { enabled = false },
 
+    -- Smooth scroll animation for <C-d>/<C-u>/<C-f>/<C-b>/zz/etc.
+    -- Override snacks defaults (total=200ms / repeat 50ms) with snappier
+    -- timings so motion feels closer to instant. Step kept at 10ms so
+    -- the animation still has multiple frames.
+    scroll       = {
+      enabled        = true,
+      animate        = { duration = { total = 150 } },
+      animate_repeat = { duration = { total = 40 } },
+    },
+
     -- Other snacks modules — disabled until we explicitly want them.
     quickfile    = { enabled = false },
     scope        = { enabled = false },
-    scroll       = { enabled = false },
     statuscolumn = { enabled = false },
     words        = { enabled = false },
     indent       = { enabled = false },
