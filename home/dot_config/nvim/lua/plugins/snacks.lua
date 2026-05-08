@@ -85,7 +85,17 @@ return {
     scope        = { enabled = false },
     statuscolumn = { enabled = false },
     words        = { enabled = false },
-    indent       = { enabled = false },
+
+    -- Replaces lukas-reineke/indent-blankline. Same indent guides plus
+    -- animated current-scope highlight (the unique-vs-ibl bit).
+    -- Chunk mode (┌──└── bracket around current scope) left off — try
+    -- toggling if you want it more visible.
+    indent       = {
+      enabled  = true,
+      animate  = { enabled = true },
+      scope    = { enabled = true },
+      chunk    = { enabled = false },
+    },
 
     -- Replace vim.ui.input (cmdline prompt) with a floating window.
     -- Most input prompts already go through inc-rename / fzf-lua;

@@ -14,14 +14,6 @@ return {
     config = function() require("nvim-autopairs").setup() end,
   },
 
-  -- Indent guides
-  {
-    "lukas-reineke/indent-blankline.nvim",
-    main = "ibl",
-    event = "VeryLazy",
-    config = function() require("ibl").setup() end,
-  },
-
   -- Auto-detect indentation style from file content
   {
     "NMAC427/guess-indent.nvim",
