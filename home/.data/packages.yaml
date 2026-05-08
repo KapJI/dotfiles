@@ -62,6 +62,9 @@
 - nix: dos2unix
   winget: waterlan.dos2unix
 
+- nix: dust
+  winget: bootandy.dust
+
 - brew-cask: dropbox
   deb-desktop: dropbox
   winget: Dropbox.Dropbox
