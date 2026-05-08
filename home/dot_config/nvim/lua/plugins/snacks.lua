@@ -6,6 +6,41 @@ return {
   "folke/snacks.nvim",
   priority = 1000,
   lazy     = false,
+  -- Override LSP reference highlight groups to use underline instead of
+  -- the colorscheme's default background-fill. snacks.words drives these
+  -- groups via vim.lsp.buf.document_highlight(); the underline style
+  -- matches vim-illuminate's look. Re-applied on every ColorScheme so
+  -- theme switches don't lose the override.
+  init = function()
+    -- Underline LSP reference highlights (used by snacks.words). The
+    -- default colorscheme renders these as a background fill that's
+    -- often invisible — underline matches the vim-illuminate look.
+    local function apply_underline()
+      for _, group in ipairs({ "LspReferenceText", "LspReferenceRead", "LspReferenceWrite" }) do
+        vim.api.nvim_set_hl(0, group, { underline = true, bg = "NONE" })
+      end
+    end
+    apply_underline()
+    vim.api.nvim_create_autocmd("ColorScheme", {
+      group    = vim.api.nvim_create_augroup("snacks_words_underline", { clear = true }),
+      callback = apply_underline,
+    })
+
+    -- Bind ]r/[r as buffer-local on LspAttach to navigate snacks.words
+    -- references. Buffer-local so the keymap only exists where it's
+    -- meaningful (LSP-attached buffers). ]] / [[ stay as ftplugin's
+    -- section-motion (next/prev def/class) on Python, Lua, etc.
+    vim.api.nvim_create_autocmd("LspAttach", {
+      group    = vim.api.nvim_create_augroup("snacks_words_keys", { clear = true }),
+      callback = function(args)
+        local buf = args.buf
+        vim.keymap.set({ "n", "x" }, "]r", function() Snacks.words.jump(1, true) end,
+          { buffer = buf, desc = "Next reference" })
+        vim.keymap.set({ "n", "x" }, "[r", function() Snacks.words.jump(-1, true) end,
+          { buffer = buf, desc = "Previous reference" })
+      end,
+    })
+  end,
   ---@type snacks.Config
   opts = {
     dashboard = {
@@ -201,5 +236,9 @@ return {
       end,
       desc = "Lazygit (floating)",
     },
+
+    -- ]] / [[ for snacks.words navigation are bound buffer-local on
+    -- LspAttach (see init above) — global keymaps lose to ftplugin's
+    -- buffer-local section-motion mappings on Python, Lua, JS, etc.
   },
 }
