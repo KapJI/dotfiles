@@ -16,6 +16,7 @@ return {
       { "<leader>t", group = "Terminal" },
       { "<leader>w", group = "Window swap" },
       { "<leader>x", group = "eXchange (swap)" },
+      { "<leader>X", group = "Trouble" },
     })
   end,
 }
