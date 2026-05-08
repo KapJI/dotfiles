@@ -7,6 +7,7 @@ oh-my-posh init pwsh --config ~/Documents/ohmyposh-themes/thecyberden.omp.json |
 $env:BAT_PAGER = "ov"
 $env:BAT_THEME = "1337"
 $env:EZA_CONFIG_DIR="$HOME\.config\eza"
+$env:TEALDEER_CONFIG_DIR="$HOME\.config\tealdeer"
 
 # Delayed modules load
 $DelayedLoadProfileRunspace = [RunspaceFactory]::CreateRunspace()
