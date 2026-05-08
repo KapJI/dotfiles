@@ -16,6 +16,20 @@ alias czmcd="cd $(chezmoi source-path)"
 # After running, review/commit: chezmoi cd && git diff home/dot_config/nix-profile/flake.lock
 alias nix-bump-lock='nix flake update --flake ~/.config/nix-profile && chezmoi re-add ~/.config/nix-profile/flake.lock'
 
+# yazi wrapper: cd shell to whatever directory yazi was in when you quit.
+# Without this, quitting yazi leaves you in the dir you started from,
+# defeating the point of using it as a navigator. Canonical wrapper from
+# yazi-rs.github.io/docs/quick-start#shell-wrapper. Named yz to avoid
+# colliding with vim-yank muscle memory; type yz to launch.
+function yz() {
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+  yazi "$@" --cwd-file="$tmp"
+  if cwd="$(< "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+    builtin cd -- "$cwd"
+  fi
+  rm -f -- "$tmp"
+}
+
 # Git aliases from oh-my-zsh
 alias g="git"
 alias ga="git add"

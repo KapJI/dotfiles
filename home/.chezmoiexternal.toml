@@ -10,6 +10,24 @@
     url = "https://raw.githubusercontent.com/eza-community/eza-themes/refs/heads/main/themes/catppuccin-mocha.yml"
     refreshPeriod = {{ $default_refresh }}
 
+# Yazi catppuccin-mocha-blue theme.
+# The catppuccin/yazi repo dropped flavor.yazi packs in favor of single
+# .toml files; we just rename the chosen one to theme.toml at fetch time.
+[".config/yazi/theme.toml"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/catppuccin/yazi/main/themes/mocha/catppuccin-mocha-blue.toml"
+    refreshPeriod = {{ $default_refresh }}
+
+# tmTheme for yazi's preview-pane syntax highlighting (syntect engine).
+# Per catppuccin/yazi README: source the .tmTheme from catppuccin/bat,
+# not catppuccin/yazi. Fetched filename is "Catppuccin Mocha.tmTheme"
+# but the yazi theme.toml's syntect_theme path is the hyphenated form,
+# so we rename at fetch time.
+[".config/yazi/Catppuccin-mocha.tmTheme"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/catppuccin/bat/main/themes/Catppuccin%20Mocha.tmTheme"
+    refreshPeriod = {{ $default_refresh }}
+
 
 {{ if ne .osid "windows" }}
 [".config/zsh/antidote"]
