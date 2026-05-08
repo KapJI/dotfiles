@@ -84,7 +84,10 @@ return {
     quickfile    = { enabled = false },
     scope        = { enabled = false },
     statuscolumn = { enabled = false },
-    words        = { enabled = false },
+
+    -- Highlights all occurrences of the word under the cursor after a
+    -- short idle. Like vim-illuminate but in-ecosystem.
+    words        = { enabled = true },
 
     -- Replaces lukas-reineke/indent-blankline. Same indent guides plus
     -- animated current-scope highlight (the unique-vs-ibl bit).
