@@ -11,6 +11,8 @@
 
 - nix: autoconf
 
+- nix: bandwhich
+
 - brew-cask: bartender
 
 - nix: bat
@@ -99,6 +101,9 @@
 - nix: go
   winget: GoLang.Go
 
+- nix: gping
+  winget: orf.gping
+
 - nix: graphviz
   winget: Graphviz.Graphviz
 
@@ -177,6 +182,9 @@
 
 - nix: pv
 
+- nix: procs
+  winget: dalance.procs
+
 # User-CLI Python via nix on Unix, scoop on Windows. Linux apt pulls
 # `python3` transitively as a dep of nala / command-not-found / GUI apps,
 # so no explicit deb: python3 needed.
@@ -190,6 +198,9 @@
 
 - nix: rustup
   winget: Rustlang.Rustup
+
+- nix: sd
+  winget: chmln.sd
 
 - brew-cask: spotify
   deb-desktop: spotify-client
@@ -214,6 +225,12 @@
 - nix: tmux
 
 - nix-server: tmuxPlugins.fingers   # nixpkgs ships the pre-built binary + wrapper
+
+- nix: tealdeer
+  winget: dbrgn.tealdeer
+
+- nix: tokei
+  winget: XAMPPRocky.Tokei
 
 - nix: tree
   winget: GnuWin32.Tree
