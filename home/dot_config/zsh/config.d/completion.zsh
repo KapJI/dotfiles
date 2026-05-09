@@ -43,6 +43,18 @@ zstyle -e ':completion:*' special-dirs '[[ ${PREFIX##*/} == ".." ]] && reply=(..
 # Preview directory's content with eza when completing cd
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons=always $realpath'
 
+# Preview files (bat) and directories (eza) when completing common
+# file-opening commands. $realpath is fzf-tab's resolved absolute path
+# for the candidate; falls back to a directory listing for dirs.
+zstyle ':fzf-tab:complete:(nvim|vim|nano|cat|bat|less|head|tail|cp|mv|rm|chmod|chown|wc|file|stat|du):*' \
+    fzf-preview '
+        if [[ -d $realpath ]]; then
+            eza -1 --color=always --icons=always $realpath
+        else
+            bat --color=always --style=numbers --line-range=:200 $realpath 2>/dev/null
+        fi
+    '
+
 # Switch group using `<` and `>`
 zstyle ':fzf-tab:*' switch-group '<' '>'
 
