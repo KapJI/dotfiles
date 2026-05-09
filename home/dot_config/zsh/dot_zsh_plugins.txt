@@ -15,15 +15,9 @@ mattmc3/zephyr path:plugins/completion
 getantidote/use-omz
 ohmyzsh/ohmyzsh path:lib
 ohmyzsh/ohmyzsh path:plugins/colored-man-pages
-ohmyzsh/ohmyzsh path:plugins/colorize
-ohmyzsh/ohmyzsh path:plugins/command-not-found
 ohmyzsh/ohmyzsh path:plugins/dirhistory
 ohmyzsh/ohmyzsh path:plugins/extract
 ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z
-ohmyzsh/ohmyzsh path:plugins/rust
 ohmyzsh/ohmyzsh path:plugins/safe-paste
+# shrink-path provides shrink_path() called by config.d/auto_title.zsh.
 ohmyzsh/ohmyzsh path:plugins/shrink-path
-
-# Need compinit
-ohmyzsh/ohmyzsh path:plugins/pip
-babarot/enhancd

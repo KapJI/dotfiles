@@ -41,7 +41,7 @@ zstyle ':completion:*' menu no
 zstyle -e ':completion:*' special-dirs '[[ ${PREFIX##*/} == ".." ]] && reply=(..)'
 
 # Preview directory's content with eza when completing cd
-zstyle ':fzf-tab:complete:__enhancd::cd:*' fzf-preview 'eza -1 --color=always --icons=always $realpath'
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons=always $realpath'
 
 # Switch group using `<` and `>`
 zstyle ':fzf-tab:*' switch-group '<' '>'
