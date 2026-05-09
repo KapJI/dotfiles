@@ -89,6 +89,8 @@
 
 - nix: ffmpegthumbnailer
 
+- nix: figlet
+
 - nix: fzf
   winget: junegunn.fzf
 
