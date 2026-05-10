@@ -25,6 +25,12 @@ zsh_plugins_txt=$ZDOTDIR/.zsh_plugins.txt
 
 if [[ ! -e $zsh_plugins || $zsh_plugins_txt -nt $zsh_plugins ]]; then
     antidote bundle <$zsh_plugins_txt >| $zsh_plugins
+    # Plugin set changed (added/removed/reordered) — the cached
+    # compdump may reference completion functions from plugins that
+    # are no longer loaded. Drop it so zephyr's run_compinit does a
+    # full rebuild against the new fpath. Without this, removing a
+    # plugin can leave tab-completion broken until the 168h fallback.
+    rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*
 fi
 
 if [[ ! -e $zsh_plugins.zwc || $zsh_plugins -nt $zsh_plugins.zwc ]]; then
