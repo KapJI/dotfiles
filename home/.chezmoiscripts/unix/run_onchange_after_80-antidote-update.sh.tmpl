@@ -71,4 +71,22 @@ if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
         rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*
         rm -f -- "$HOME/.config/zsh/.zsh_plugins.zsh.zwc"
     fi
+
+    # fzf-tab's active-group-style upstream supports only bold|underline|none.
+    # Patch ftb-switch-group so the `bold` case emits bold + reverse video,
+    # giving the active group a real background highlight (bold alone is
+    # barely visible on most themes). Idempotent: grep guard short-circuits
+    # once the patch is in place; re-applied automatically whenever antidote
+    # refetches the lib file.
+    fzf_tab_lib="$antidote_home/Aloxaf/fzf-tab/lib/ftb-switch-group"
+    if [ -f "$fzf_tab_lib" ] && ! grep -qF "x1b[1;7m" "$fzf_tab_lib"; then
+        python3 - "$fzf_tab_lib" <<'PY'
+import pathlib, sys
+p = pathlib.Path(sys.argv[1])
+s = p.read_text()
+s = s.replace(r"$'\x1b[1m'",  r"$'\x1b[1;7m'")
+s = s.replace(r"$'\x1b[22m'", r"$'\x1b[22;27m'")
+p.write_text(s)
+PY
+    fi
 fi

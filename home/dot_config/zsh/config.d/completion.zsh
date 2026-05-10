@@ -78,6 +78,12 @@ zstyle ':fzf-tab:complete:(nvim|vim|nano|cat|bat|less|head|tail|cp|mv|rm|chmod|c
 # Switch group using `<` and `>`
 zstyle ':fzf-tab:*' switch-group '<' '>'
 
+# Make the active group header more noticeable (default is bold alone,
+# which barely shows). The `bold` case in fzf-tab's ftb-switch-group is
+# patched at antidote-update time to emit bold + reverse video; setting
+# bold here picks that up.
+zstyle ':fzf-tab:*' active-group-style bold
+
 # Remove prefix from every option
 zstyle ':fzf-tab:*' prefix ''
 
