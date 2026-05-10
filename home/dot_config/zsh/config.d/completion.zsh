@@ -18,6 +18,18 @@ fi
 # Third rule enables completion on the left. Example: bar -> foobar
 zstyle ':completion:*' matcher-list 'm:{[:lower:]-_}={[:upper:]_-}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 
+# Skip per-component path completion (`/u/lo/sh` → `/usr/local/share`).
+# That feature walks every directory along the path which is slow on
+# huge trees (nix store, monorepos). With fzf-tab handling the visual
+# fuzzy matching anyway, the abbreviation expansion isn't needed.
+zstyle ':completion:*' path-completion false
+
+# Try standard completion first, then spelling-correction, then near-
+# match approximate completion. Costs nothing on successful completes
+# (later completers only run if the previous returned nothing); pays
+# off on typos: `gti` → `git`, `/usr/lcoal` → `/usr/local`.
+zstyle ':completion:*' completer _complete _correct _approximate
+
 # Disable hashing for list of executables
 zstyle ':completion:*:commands' rehash 1
 
@@ -25,6 +37,13 @@ zstyle ':completion:*:commands' rehash 1
 zstyle ':completion:*:git-checkout:*' sort false
 
 # Set descriptions format without escape sequences (like '%F{red}%d%f')
+# — fzf-tab doesn't process zsh prompt-expansion codes, so %F{...}%f
+# would render as literal text in popups. zephyr/compstyle sets the
+# colored variants by default; override them back to plain brackets.
+# The catchall handles `_describe -t <tag>` calls (zsh's `_description`
+# looks up `:completion:${curcontext}:${tag}` first — matches `*` here —
+# before falling back to `:descriptions`); `:corrections` is consulted
+# by `_correct` directly.
 zstyle ':completion:*' format '[%d]'
 zstyle ':completion:*:corrections' format '[%d (errors: %e)]'
 
@@ -40,8 +59,9 @@ zstyle ':completion:*' menu no
 # Hide "." and ".." for completion list. Show ".." only when it's explicitly given.
 zstyle -e ':completion:*' special-dirs '[[ ${PREFIX##*/} == ".." ]] && reply=(..)'
 
-# Preview directory's content with eza when completing cd
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons=always $realpath'
+# Preview directory contents with eza for cd-like commands.
+# Covers cd, z (zoxide jump), zi (zoxide interactive picker).
+zstyle ':fzf-tab:complete:(cd|z|zi):*' fzf-preview 'eza -1 --color=always --icons=always $realpath'
 
 # Preview files (bat) and directories (eza) when completing common
 # file-opening commands. $realpath is fzf-tab's resolved absolute path
