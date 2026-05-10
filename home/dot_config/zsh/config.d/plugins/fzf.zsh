@@ -38,3 +38,32 @@ _fzf_comprun() {
         *)            fzf "$@" ;;
     esac
 }
+
+# fzf-tab + FSH workaround: pressing Escape in fzf-tab's popup left
+# the prompt without FSH highlighting until the next keystroke.
+#
+# Cause: fzf-tab invokes the underlying completion widget
+# (expand-or-complete) which uses region_highlight internally for
+# menu-select; on Escape it clears region_highlight. FSH's
+# _zsh_highlight on return sees BUFFER unchanged and skips
+# repopulating, leaving the line un-highlighted.
+#
+# Fix: wrap fzf-tab-complete one more layer to force FSH to
+# recompute (by clearing its buffer-cache marker) and force a
+# redisplay. Must run AFTER fzf-tab and FSH have wired their
+# widgets — the current binding here is FSH's wrap (autosuggest
+# adds its own outer wrap later via its precmd hook).
+if [[ -n ${widgets[fzf-tab-complete]-} ]]; then
+    zle -N _fzf_tab_complete_orig "${widgets[fzf-tab-complete]#user:}"
+
+    _fzf_tab_complete_with_redisplay() {
+        zle _fzf_tab_complete_orig -- "$@"
+        local ret=$?
+        # Trick FSH into re-running its full-line highlighter.
+        typeset -g _ZSH_HIGHLIGHT_PRIOR_BUFFER=""
+        _zsh_highlight 2>/dev/null
+        zle -R
+        return $ret
+    }
+    zle -N fzf-tab-complete _fzf_tab_complete_with_redisplay
+fi
