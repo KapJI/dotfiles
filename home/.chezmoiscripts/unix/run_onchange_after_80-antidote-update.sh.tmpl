@@ -20,12 +20,40 @@ if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
     export GIT_TERMINAL_PROMPT=0
     export GIT_SSH_COMMAND="ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new"
 
+    antidote_home="${ANTIDOTE_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/antidote}"
+    [ -d "$antidote_home" ] || antidote_home="$HOME/Library/Caches/antidote"
+
+    # Purge cached bundles no longer in dot_zsh_plugins.txt. antidote
+    # update walks the on-disk cache, not the current plugin list, so
+    # a removed plugin keeps getting fetched. If its upstream branch
+    # was renamed/deleted (e.g. b4b4r07/enhancd's master), the fetch
+    # errors on every run. Uses antidote's official `purge` command
+    # so cache layout assumptions stay in upstream.
+    zsh_plugins_txt="$HOME/.config/zsh/.zsh_plugins.txt"
+    if [ -f "$zsh_plugins_txt" ]; then
+        zsh -c '
+            source ~/.config/zsh/antidote/antidote.zsh
+            local -A expected
+            local line bundle
+            while IFS= read -r line; do
+                bundle=${line%%[[:space:]]*}
+                [[ -z $bundle || $bundle == \#* ]] && continue
+                expected[$bundle]=1
+            done < "'"$zsh_plugins_txt"'"
+            antidote list 2>/dev/null | while read -r _path url; do
+                bundle=${${url#https://github.com/}%.git}
+                if [[ -z ${expected[$bundle]:-} ]]; then
+                    echo "antidote: purging stale bundle: $bundle"
+                    antidote purge "$bundle" </dev/null
+                fi
+            done
+        '
+    fi
+
     # Snapshot plugin-cache HEAD refs BEFORE update so we can detect
     # whether anything actually changed. This script runs weekly but
     # most weeks no plugin has updates; we want to invalidate the
     # zsh compdump cache only when at least one plugin's HEAD moved.
-    antidote_home="${ANTIDOTE_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/antidote}"
-    [ -d "$antidote_home" ] || antidote_home="$HOME/Library/Caches/antidote"
     hash_before=$(find "$antidote_home" -maxdepth 4 -name HEAD -type f -exec cat {} + 2>/dev/null | sha256sum)
 
     if ! zsh -c 'source ~/.config/zsh/antidote/antidote.zsh; antidote update'; then

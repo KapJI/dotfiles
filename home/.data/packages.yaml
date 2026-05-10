@@ -224,7 +224,7 @@
     name: Things
     id: 904280696
 
-- nix: tmux
+- nix-server: tmux
 
 - nix-server: tmuxPlugins.fingers   # nixpkgs ships the pre-built binary + wrapper
 
