@@ -1,12 +1,20 @@
 # Make plugin folder names pretty
 zstyle ':antidote:bundle' use-friendly-names 'yes'
 
-# Tell zephyr's completion plugin to skip the security audit on
-# every shell start. With this flag, zephyr runs `compinit` fully
-# at most once per 20 hours and uses the faster `compinit -C` for
-# every shell start in between. The chezmoi run_onchange hooks
-# (nix sync, brew, antidote update) and the bundle-regen branch
-# below invalidate the compdump cache when fpath actually changes.
+# Run compinit synchronously when zephyr's completion plugin loads,
+# rather than via post_zshrc precmd hook. fzf-tab needs compinit done
+# before it loads (see ordering in dot_zsh_plugins.txt) and the
+# precmd-hook deferral can't satisfy that. Side effect: marginally
+# higher first-prompt-lag, but compinit -C (cache mode) keeps it
+# negligible.
+zstyle ':zephyr:plugin:completion' immediate 'yes'
+
+# Skip the security audit on every shell start. With this flag,
+# zephyr runs `compinit` fully at most once per 20 hours and uses
+# the faster `compinit -C` for every shell start in between. The
+# chezmoi run_onchange hooks (nix sync, brew, antidote update) and
+# the bundle-regen branch below invalidate the compdump cache when
+# fpath actually changes.
 zstyle ':zephyr:plugin:completion' use-cache 'yes'
 
 # Static-load mode (antidote's recommended fast path, ~30ms saving vs
