@@ -87,7 +87,12 @@ sudo tee /etc/update-motd.d/50-sysinfo >/dev/null <<'SH'
 
 # Top banner: ANSI Shadow figlet of $(hostname); per-line gradient
 # colors are already baked into the file by the chezmoi installer.
-[ -f /etc/fastfetch/hostname-banner.txt ] && cat /etc/fastfetch/hostname-banner.txt
+# Leading blank line gives the banner some breathing room below
+# pam_motd's "Last login: ..." line.
+if [ -f /etc/fastfetch/hostname-banner.txt ]; then
+    echo
+    cat /etc/fastfetch/hostname-banner.txt
+fi
 
 for ff in \
     /nix/var/nix/profiles/default/bin/fastfetch \
