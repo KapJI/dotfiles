@@ -102,7 +102,13 @@ for ff in \
     /usr/local/bin/fastfetch \
     /usr/bin/fastfetch
 do
-    [ -x "$ff" ] && exec "$ff" --config /etc/fastfetch/motd.jsonc
+    if [ -x "$ff" ]; then
+        # Don't exec — we need a trailing blank line after the panel
+        # to give breathing room before the shell prompt.
+        "$ff" --config /etc/fastfetch/motd.jsonc
+        echo
+        exit 0
+    fi
 done
 echo "50-sysinfo: fastfetch not found in any expected path" >&2
 exit 1
