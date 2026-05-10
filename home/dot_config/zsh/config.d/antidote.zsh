@@ -28,8 +28,9 @@ if [[ ! -e $zsh_plugins || $zsh_plugins_txt -nt $zsh_plugins ]]; then
     # Plugin set changed (added/removed/reordered) — the cached
     # compdump may reference completion functions from plugins that
     # are no longer loaded. Drop it so zephyr's run_compinit does a
-    # full rebuild against the new fpath.
-    rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*
+    # full rebuild against the new fpath. (N) glob qualifier =
+    # expand to nothing if no match, instead of zsh's default error.
+    rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*(N)
 fi
 
 if [[ ! -e $zsh_plugins.zwc || $zsh_plugins -nt $zsh_plugins.zwc ]]; then
