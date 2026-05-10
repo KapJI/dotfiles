@@ -5,7 +5,7 @@ set -euo pipefail
 
 # Install / update the fastfetch-based motd panel. Layout:
 #
-#   <hostname figlet banner — full width, blue>
+#   <hostname figlet banner — full width, blue→mauve gradient>
 #   <small auto-detected distro logo>   <fastfetch info modules>
 #
 # - /etc/fastfetch/hostname-banner.txt  figlet of $(hostname), printed
@@ -25,13 +25,27 @@ set -euo pipefail
 
 sudo install -d -m 0755 /etc/fastfetch
 
-# figlet generates the hostname banner with the standard font (6 lines,
-# most readable for hostnames). -w 200 disables figlet's auto-wrap to
-# keep long hostnames on a single banner row; modern terminals handle
-# the resulting >80-col line via wrap or scroll. The script runs in
-# the user's interactive PATH (so user-level nix profile is available);
-# the rendered file is written under /etc with sudo.
-figlet -w 200 "$(hostname)" | sudo tee /etc/fastfetch/hostname-banner.txt >/dev/null
+# Hostname banner: ANSI Shadow font with a per-line blue→mauve
+# gradient. Font lives at ~/.local/share/figlet-fonts/ANSI Shadow.flf
+# (fetched via .chezmoiexternal.toml). Coloring uses 24-bit ANSI
+# escape codes linearly interpolated between two RGB endpoints
+# (catppuccin-mocha blue → mauve), one color per banner row.
+# Colors are baked into the static file at chezmoi-apply time, so the
+# motd wrapper just cats the result. -w 200 disables figlet's auto-
+# wrap; modern terminals handle long lines.
+figlet -d "$HOME/.local/share/figlet-fonts" -f "ANSI Shadow" -w 200 "$(hostname)" \
+    | python3 -c '
+import sys
+def hex2rgb(h): return tuple(int(h[i:i+2], 16) for i in (0,2,4))
+def lerp(a,b,t): return tuple(int(a[i]+(b[i]-a[i])*t) for i in range(3))
+START = hex2rgb("89b4fa")  # catppuccin-mocha blue
+END   = hex2rgb("cba6f7")  # catppuccin-mocha mauve
+lines = sys.stdin.read().rstrip("\n").splitlines()
+n = max(len(lines)-1, 1)
+for i, line in enumerate(lines):
+    r,g,b = lerp(START, END, i/n)
+    print(f"\033[38;2;{r};{g};{b}m{line}\033[0m")
+' | sudo tee /etc/fastfetch/hostname-banner.txt >/dev/null
 
 sudo tee /etc/fastfetch/motd.jsonc >/dev/null <<'JSONC'
 {
@@ -58,8 +72,8 @@ JSONC
 sudo tee /etc/update-motd.d/50-sysinfo >/dev/null <<'SH'
 #!/bin/sh
 # Render the fastfetch-based system info panel.
-# Layout: hostname banner on top (blue), then small distro logo + info
-# columns from fastfetch below.
+# Layout: hostname banner on top (gradient pre-baked into the file),
+# then small distro logo + info columns from fastfetch below.
 #
 # Errors are NOT silenced — visible via `journalctl -t update-motd` or by
 # running `run-parts /etc/update-motd.d/`. update-motd tolerates per-script
@@ -71,12 +85,9 @@ sudo tee /etc/update-motd.d/50-sysinfo >/dev/null <<'SH'
 # not on PATH. Iterate common locations so root-time rebuilds still find
 # fastfetch wherever it actually lives.
 
-# Top banner: hostname figlet, blue, full width.
-if [ -f /etc/fastfetch/hostname-banner.txt ]; then
-    printf '\033[1;34m'
-    cat /etc/fastfetch/hostname-banner.txt
-    printf '\033[0m'
-fi
+# Top banner: ANSI Shadow figlet of $(hostname); per-line gradient
+# colors are already baked into the file by the chezmoi installer.
+[ -f /etc/fastfetch/hostname-banner.txt ] && cat /etc/fastfetch/hostname-banner.txt
 
 for ff in \
     /nix/var/nix/profiles/default/bin/fastfetch \

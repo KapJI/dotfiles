@@ -28,6 +28,14 @@
     url = "https://raw.githubusercontent.com/catppuccin/bat/main/themes/Catppuccin%20Mocha.tmTheme"
     refreshPeriod = {{ $default_refresh }}
 
+# ANSI Shadow figlet font (used by the Linux server motd hostname banner;
+# see .chezmoiscripts/linux/run_onchange_after_60-install-fastfetch-motd.sh.tmpl).
+# Static file from xero/figlet-fonts; refresh yearly since fonts don't change.
+[".local/share/figlet-fonts/ANSI Shadow.flf"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/xero/figlet-fonts/master/ANSI%20Shadow.flf"
+    refreshPeriod = "8760h"
+
 
 {{ if ne .osid "windows" }}
 [".config/zsh/antidote"]
