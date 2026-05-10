@@ -6,12 +6,13 @@ set -euo pipefail
 # Install / update the fastfetch-based motd panel. Layout:
 #
 #   <hostname figlet banner — full width, blue→mauve gradient>
-#   <small auto-detected distro logo>   <fastfetch info modules>
+#   <full auto-detected distro logo>   <fastfetch info modules>
 #
 # - /etc/fastfetch/hostname-banner.txt  figlet of $(hostname), printed
 #                                       by the wrapper as a top banner
 # - /etc/fastfetch/motd.jsonc           fastfetch config (logo.type =
-#                                       "small" auto-detects distro)
+#                                       "builtin" auto-detects distro,
+#                                       full ASCII art variant)
 # - /etc/update-motd.d/50-sysinfo       wrapper that prints the banner
 #                                       then exec's fastfetch
 #
@@ -50,7 +51,7 @@ for i, line in enumerate(lines):
 sudo tee /etc/fastfetch/motd.jsonc >/dev/null <<'JSONC'
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
-  "logo": { "type": "small" },
+  "logo": { "type": "builtin" },
   "display": { "separator": "  " },
   "modules": [
     "title",
