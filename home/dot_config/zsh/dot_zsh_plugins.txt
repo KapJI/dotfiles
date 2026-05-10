@@ -4,11 +4,13 @@
 #  - fzf-tab must load AFTER compinit (it wires into compsys at load
 #    time). zephyr's completion plugin runs compinit synchronously
 #    when its `immediate` zstyle is set (see config.d/antidote.zsh).
-#  - fast-syntax-highlighting must load AFTER compinit + fzf-tab.
-#    Otherwise its widget wrappers (complete-word, expand-or-complete,
-#    fzf-tab-complete) end up applied to placeholder widgets that get
-#    redefined later, leaving completed text un-highlighted until a
-#    subsequent keystroke triggers a redraw.
+#  - OMZ lib must load BEFORE fast-syntax-highlighting. OMZ's
+#    lib/misc.zsh does `zle -N self-insert url-quote-magic` which
+#    REPLACES (not wraps) whatever's bound to self-insert. If fsh
+#    runs first, that binding wipes out fsh's self-insert wrapper
+#    and typed text never triggers re-highlighting.
+#  - fast-syntax-highlighting must load AFTER OMZ + fzf-tab.
+#    Wraps the final widget set so highlighting fires on key events.
 #  - zsh-autosuggestions must be LAST: it wraps the final ZLE widget
 #    set, including fsh's already-wrapped versions.
 
@@ -23,11 +25,9 @@ mattmc3/zephyr path:plugins/completion
 # fzf-tab requires compinit to have run.
 Aloxaf/fzf-tab
 
-# fsh wraps widgets at source time; must come AFTER fzf-tab so
-# fzf-tab-complete and friends are already created.
-zdharma-continuum/fast-syntax-highlighting
-
-# OMZ
+# OMZ — must come BEFORE fsh. OMZ's lib/misc.zsh binds self-insert
+# to url-quote-magic, which would overwrite fsh's self-insert wrap
+# if fsh loaded first.
 getantidote/use-omz
 ohmyzsh/ohmyzsh path:lib
 ohmyzsh/ohmyzsh path:plugins/colored-man-pages
@@ -37,6 +37,11 @@ ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z
 ohmyzsh/ohmyzsh path:plugins/safe-paste
 # shrink-path provides shrink_path() called by config.d/auto_title.zsh.
 ohmyzsh/ohmyzsh path:plugins/shrink-path
+
+# fsh wraps widgets at source time; must come AFTER OMZ + fzf-tab so
+# the bindings (self-insert → url-quote-magic, fzf-tab-complete, etc.)
+# are already created.
+zdharma-continuum/fast-syntax-highlighting
 
 # Must be last — wraps the final widget set from everything above.
 zsh-users/zsh-autosuggestions
