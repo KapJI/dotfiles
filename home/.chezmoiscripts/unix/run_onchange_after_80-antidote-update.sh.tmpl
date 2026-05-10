@@ -20,9 +20,27 @@ if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
     export GIT_TERMINAL_PROMPT=0
     export GIT_SSH_COMMAND="ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new"
 
+    # Snapshot plugin-cache HEAD refs BEFORE update so we can detect
+    # whether anything actually changed. This script runs weekly but
+    # most weeks no plugin has updates; we want to invalidate the
+    # zsh compdump cache only when at least one plugin's HEAD moved.
+    antidote_home="${ANTIDOTE_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/antidote}"
+    [ -d "$antidote_home" ] || antidote_home="$HOME/Library/Caches/antidote"
+    hash_before=$(find "$antidote_home" -maxdepth 4 -name HEAD -type f -exec cat {} + 2>/dev/null | sha256sum)
+
     if ! zsh -c 'source ~/.config/zsh/antidote/antidote.zsh; antidote update'; then
         echo "antidote update failed — likely an auth or host-key issue." >&2
         echo "Reproduce with stderr visible: antidote update" >&2
         exit 1
+    fi
+
+    hash_after=$(find "$antidote_home" -maxdepth 4 -name HEAD -type f -exec cat {} + 2>/dev/null | sha256sum)
+    if [ "$hash_before" != "$hash_after" ]; then
+        # At least one plugin moved. Invalidate compdump in case the
+        # update added/removed completion files, and drop the static
+        # bundle's .zwc so antidote.zsh regenerates it on next shell
+        # against the updated plugin store.
+        rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*
+        rm -f -- "$HOME/.config/zsh/.zsh_plugins.zsh.zwc"
     fi
 fi

@@ -70,6 +70,12 @@ NIXEOF
 
 profile_target="{{ if .is_desktop }}desktop{{ else }}default{{ end }}"
 
+# Snapshot the resolved nix profile path BEFORE rebuild. Nix store
+# paths are content-addressed, so identical inputs → identical paths.
+# If the rebuild produces the same store path, completions didn't
+# change and we shouldn't invalidate the compdump cache.
+profile_before=$(readlink -f "$HOME/.nix-profile" 2>/dev/null || true)
+
 # Remove our previous entry before re-adding so a new flake content
 # actually rebuilds (otherwise Nix short-circuits as "already installed
 # at this priority" and packages.yaml additions silently drop on the
@@ -81,4 +87,13 @@ nix profile remove nix-profile          2>/dev/null || true
 
 nix profile add --priority 5 \
     "path:$HOME/.config/nix-profile#${profile_target}"
+
+profile_after=$(readlink -f "$HOME/.nix-profile" 2>/dev/null || true)
+
+# Only invalidate when the resolved store path actually changed.
+# Catches the no-op case where packages.yaml's content hash flipped
+# (e.g. comment edit) but the resulting derivation is identical.
+if [ -n "$profile_after" ] && [ "$profile_before" != "$profile_after" ]; then
+    rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*
+fi
 {{ end -}}

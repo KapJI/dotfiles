@@ -26,6 +26,20 @@
     {{ end -}}
 {{ end }}
 
+# Snapshot the brew completions dir BEFORE bundling. We compare
+# afterwards to skip cache invalidation when no formula changed
+# (this script runs weekly regardless of whether anything's new).
+# Hashes filename + content of every regular file: catches add,
+# remove, and content modification of any completion script.
+brew_completions_dir="$(brew --prefix 2>/dev/null)/share/zsh/site-functions"
+# Homebrew's site-functions/ entries are all symlinks into Cellar/<formula>/<version>/...
+# `-L` follows symlinks so `-type f` matches the target file. Without
+# -L, find sees only the symlinks (type l) and returns nothing for -f.
+hash_completions() {
+    find -L "$1" -type f -print0 2>/dev/null | sort -z | xargs -0 sha256sum 2>/dev/null | sha256sum
+}
+hash_before=$(hash_completions "$brew_completions_dir")
+
 brew bundle --verbose --file=/dev/stdin <<EOF
 {{ range $taps -}}
 tap "{{ . }}"
@@ -43,3 +57,10 @@ mas "{{ .name }}", id: {{ .id }}
 vscode "{{ . }}"
 {{ end -}}
 EOF
+
+# Only invalidate the compdump cache if brew actually changed any
+# completion file (added, removed, or modified content).
+hash_after=$(hash_completions "$brew_completions_dir")
+if [ "$hash_before" != "$hash_after" ]; then
+    rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*
+fi
