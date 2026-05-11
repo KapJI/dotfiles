@@ -260,7 +260,7 @@
   deb-desktop: vlc
   winget: VideoLAN.VLC
 
-- brew-cask: wezterm
+- brew-cask: wezterm@nightly
   deb-desktop: wezterm-nightly
   winget: wez.wezterm
 
