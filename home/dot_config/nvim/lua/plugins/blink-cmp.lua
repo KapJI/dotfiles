@@ -10,10 +10,20 @@ return {
       ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
       ["<C-j>"] = { "snippet_forward", "fallback" },
       ["<C-k>"] = { "snippet_backward", "fallback" },
-      -- Tab when menu hidden: open it (more useful than literal tab in
-      -- editing contexts). When visible: cycle. Falls through to a real
-      -- tab character only if blink has nothing to show.
-      ["<Tab>"] = { "show", "select_next", "fallback" },
+      -- Tab is context-sensitive:
+      --   menu visible      → cycle to next item
+      --   after a word char → open menu (request completion)
+      --   col 0 or after whitespace → real tab (so indentation works)
+      ["<Tab>"] = {
+        function(cmp)
+          if cmp.is_visible() then return cmp.select_next() end
+          local col = vim.fn.col(".") - 1
+          if col > 0 and not vim.fn.getline("."):sub(col, col):match("%s") then
+            return cmp.show()
+          end
+        end,
+        "fallback",
+      },
       ["<S-Tab>"] = { "select_prev", "fallback" },
     },
     snippets = { preset = "luasnip" },
