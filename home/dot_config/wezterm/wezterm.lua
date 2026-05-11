@@ -26,6 +26,13 @@ config.window_padding       = {
 config.default_cursor_style = 'BlinkingBar'
 config.use_fancy_tab_bar    = true
 
+-- Cap to 120fps (ProMotion ceiling); vsync caps lower on 60/90Hz
+-- displays automatically, so this is safe on any monitor. Default is
+-- 60 for max_fps and 10 for animation_fps — the latter makes cursor
+-- blink and scroll feel sluggish on high-refresh panels.
+config.max_fps              = 120
+config.animation_fps        = 120
+
 config.color_scheme         = 'Arthur'
 
 -- ── Tab bar styling ──────────────────────────────────────────────────────
