@@ -1,3 +1,26 @@
+# Clean-env reload. Plain `exec zsh` inherits FPATH/MANPATH/etc from the
+# parent process; on NixOS those still point at the previous generation
+# even after `nix-rebuild`, so antidote re-sources stale plugin files
+# (fzf-tab loaded from a now-gc'd store path was the trigger). `env -i`
+# strips everything and lets /etc/zshenv + ~/.zshenv repopulate from the
+# current generation. Cost on top of `exec zsh` is sub-100ms; benefit is
+# one reload command that behaves identically on macOS/Debian/NixOS.
+reload() {
+    local -a preserve=(
+        HOME USER SHELL TERM LANG LC_ALL
+        XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME
+        COLORTERM TERM_PROGRAM TERM_PROGRAM_VERSION
+        SSH_AUTH_SOCK SSH_CONNECTION SSH_CLIENT SSH_TTY
+        TMUX TMUX_PANE
+        DISPLAY WAYLAND_DISPLAY
+    )
+    local -a env_args=() v
+    for v in $preserve; do
+        [[ -n ${(P)v} ]] && env_args+=("$v=${(P)v}")
+    done
+    exec env -i "${env_args[@]}" zsh -l
+}
+
 # Aliases
 alias fd="fd --hidden"
 alias rg="rg --hidden"
