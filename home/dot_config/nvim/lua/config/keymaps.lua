@@ -22,6 +22,11 @@ keyset("n", "<leader>p", '"+p', { desc = "Paste from clipboard" })
 keyset("n", "<leader>/", "gcc", { remap = true, desc = "Toggle comment" })
 keyset("v", "<leader>/", "gc", { remap = true, desc = "Toggle comment" })
 
+-- Keep selection after indenting, so you can press > or < repeatedly
+-- instead of re-selecting with `gv` each time.
+keyset("v", "<", "<gv", { desc = "Indent left, keep selection" })
+keyset("v", ">", ">gv", { desc = "Indent right, keep selection" })
+
 -- Clear search highlight
 keyset("n", "<leader>h", ":nohlsearch<CR>", { silent = true, desc = "Clear search highlight" })
 
