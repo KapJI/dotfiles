@@ -18,9 +18,16 @@
 ## OSC 1337 SetUserVar with base64-encoded value (per iTerm2 / WezTerm spec):
 ##   echo -n true  | base64  →  dHJ1ZQ==
 ##   echo -n false | base64  →  ZmFsc2U=
+##
+## Inside tmux, the OSC must be wrapped in tmux's DCS passthrough
+## (\ePtmux;…\e\\) so tmux forwards it to the outer terminal instead
+## of stripping it. Modern tmux removes unknown OSCs from pane output
+## even with `allow-passthrough on`; the DCS wrap is the explicit
+## "pass this through unchanged" mechanism. Outside tmux, emit the
+## bare OSC directly to the terminal.
 _wezterm_emit_is_tmux() {
     if [[ -n "$TMUX" ]]; then
-        printf '\033]1337;SetUserVar=IS_TMUX=dHJ1ZQ==\007'
+        printf '\033Ptmux;\033\033]1337;SetUserVar=IS_TMUX=dHJ1ZQ==\007\033\\'
     else
         printf '\033]1337;SetUserVar=IS_TMUX=ZmFsc2U=\007'
     fi
