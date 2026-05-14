@@ -242,8 +242,14 @@ run-shell ~/.nix-profile/share/tmux-plugins/tmux-fingers/tmux-fingers.tmux
 
 ##### Resurrect & Continuum #####
 
+# Continuum still auto-SAVES every 10 minutes (so a manual restore has
+# something to restore). Auto-RESTORE is disabled — restore by hand
+# with `prefix + C-r` (tmux-resurrect's default binding). Auto-restore
+# fires during the initial client attach, and the resulting spawn
+# flurry can interact badly with OSC user-var emissions reaching
+# wezterm (see Alt-hjkl forwarding chain).
 set -g @resurrect-capture-pane-contents 'on'
-set -g @continuum-restore 'on'
+set -g @continuum-restore 'off'
 set -g @continuum-save-interval '10'
 
 
