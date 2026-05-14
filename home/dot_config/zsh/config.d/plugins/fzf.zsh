@@ -10,27 +10,6 @@ if [[ -n ${widgets[fzf-tab-complete]-} ]]; then
     fzf_default_completion=fzf-tab-complete
 fi
 
-# fzf-tab on Linux + wezterm: first Tab printed a newline, second Tab
-# fired fzf. Cause: the typeahead-capture line in `-ftb-fzf`
-#   _ftb_query+="$(dd bs=1G count=1 status=none iflag=nonblock </dev/tty)"
-# reads bytes the *terminal* sent back into /dev/tty (DSR responses,
-# OSC echoes from p10k/shell-integration). On the first Tab those
-# bytes either stall dd or become escape garbage appended to fzf's
-# --query, so fzf bails out before drawing. macOS without coreutils
-# escapes this because BSD `dd` doesn't support `iflag=nonblock`, so
-# the line errors and `|| true` swallows it.
-# Strip the line by reloading -ftb-fzf from source without it. Cost:
-# user keystrokes typed during the brief window before fzf draws are
-# lost instead of becoming the initial query — acceptable trade.
-if (( ${+functions[-ftb-fzf]} )); then
-    autoload +X -- -ftb-fzf 2>/dev/null
-    if [[ -r ${FZF_TAB_HOME:-/dev/null}/lib/-ftb-fzf ]]; then
-        eval "function -ftb-fzf {
-$(sed '/iflag=nonblock/d' "$FZF_TAB_HOME/lib/-ftb-fzf")
-}"
-    fi
-fi
-
 # Configure fzf to use fd
 export FZF_DEFAULT_COMMAND="fd --type file --color=always --hidden --exclude .git --exclude .hg --exclude node_modules"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
