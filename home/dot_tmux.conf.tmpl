@@ -22,14 +22,19 @@ setw -g pane-base-index 1
 
 ##### Window & session behaviour #####
 
-# Auto-rename window from active command
-setw -g automatic-rename on
-
 # Renumber windows after closing
 set -g renumber-windows on
 
-# Allow apps (ssh, vim) to rename windows
-set -g allow-rename on
+# Per-pane window titles: programs set OSC 2 → tmux updates each pane's
+# `pane_title` independently. With `allow-rename off` the OSC does NOT
+# also rename the window itself; the window name is instead derived
+# from the active pane's title via `automatic-rename-format` below, so
+# switching panes re-derives the window name from whichever split is
+# focused. Fall back to `pane_current_command` for panes whose program
+# hasn't emitted a title yet.
+set -g allow-rename off
+setw -g automatic-rename on
+setw -g automatic-rename-format '#{?pane_title,#{pane_title},#{pane_current_command}}'
 
 # Set terminal title from active window
 set -g set-titles on

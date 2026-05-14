@@ -77,3 +77,26 @@ _set_term_title_precmd() {
 }
 
 add-zsh-hook precmd _set_term_title_precmd
+
+# Inside tmux, override OMZ's `title` (from path:lib/termsupport.zsh)
+# to always emit OSC 2. OMZ uses the screen DCS escape `\ek...\e\\`
+# under TERM=tmux*, which sets the WINDOW name directly (or is
+# blocked entirely by `allow-rename off`) — neither does what we want.
+# OSC 2 instead updates the PANE's title, which tmux's
+# `automatic-rename-format = '#{pane_title}'` turns into the window
+# name. Net effect: each split tracks its own title and the window
+# name follows the focused split.
+#
+# The override is gated on $TMUX so non-tmux contexts — local wezterm
+# / ghostty / kitty etc. — keep OMZ's original behaviour, which is
+# already OSC 2/1 for xterm-class terminals and natively supports
+# per-pane tab title tracking in those terminals.
+if [[ -n $TMUX ]]; then
+    function title {
+        [[ ${DISABLE_AUTO_TITLE:-} == true ]] && return
+        [[ $EMACS == *term* ]] && return
+        : ${2=$1}
+        print -Pn "\e]2;${2:q}\a"
+        print -Pn "\e]1;${1:q}\a"
+    }
+fi
