@@ -96,7 +96,12 @@ if [[ -n $TMUX ]]; then
         [[ ${DISABLE_AUTO_TITLE:-} == true ]] && return
         [[ $EMACS == *term* ]] && return
         : ${2=$1}
-        print -Pn "\e]2;${2:q}\a"
+        # Inside tmux, OSC 2 → pane_title → window name (via our
+        # automatic-rename hooks). Emit the SHORT string here so the
+        # window name is concise; OMZ's convention of putting the long
+        # version in OSC 2 makes sense for non-tmux terminals but
+        # produces a full-path window name in tmux.
+        print -Pn "\e]2;${1:q}\a"
         print -Pn "\e]1;${1:q}\a"
     }
 fi
