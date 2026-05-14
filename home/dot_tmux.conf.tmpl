@@ -25,16 +25,35 @@ setw -g pane-base-index 1
 # Renumber windows after closing
 set -g renumber-windows on
 
-# Per-pane window titles: programs set OSC 2 → tmux updates each pane's
-# `pane_title` independently. With `allow-rename off` the OSC does NOT
-# also rename the window itself; the window name is instead derived
-# from the active pane's title via `automatic-rename-format` below, so
-# switching panes re-derives the window name from whichever split is
-# focused. Fall back to `pane_current_command` for panes whose program
-# hasn't emitted a title yet.
+# Per-pane window titles. Programs set OSC 2 → tmux updates each pane's
+# `pane_title` independently. With `allow-rename off`, the OSC does NOT
+# also rename the window directly. We then rename the window from the
+# active pane's title via hooks fired on the relevant events:
+#
+#   pane-focus-in       — when a pane gains focus, take its title.
+#   pane-title-changed  — when the ACTIVE pane's title changes, take
+#                         it. Guarded on #{pane_active} so a title
+#                         update in a background split doesn't
+#                         clobber the window name.
+#
+# Falls back to #{pane_current_command} for panes whose program hasn't
+# emitted a title yet.
+#
+# automatic-rename is left off because its internal re-evaluation is
+# multi-second and doesn't fire on pane_title or focus changes — using
+# it instead of these hooks produces a visible lag after `cd` and on
+# split switches.
 set -g allow-rename off
-setw -g automatic-rename on
-setw -g automatic-rename-format '#{?pane_title,#{pane_title},#{pane_current_command}}'
+setw -g automatic-rename off
+
+set-hook -g pane-focus-in {
+  rename-window "#{?pane_title,#{pane_title},#{pane_current_command}}"
+}
+set-hook -g pane-title-changed {
+  if-shell -F "#{pane_active}" {
+    rename-window "#{?pane_title,#{pane_title},#{pane_current_command}}"
+  }
+}
 
 # Set terminal title from active window
 set -g set-titles on
