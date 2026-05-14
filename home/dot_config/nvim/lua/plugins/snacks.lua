@@ -236,5 +236,52 @@ return {
     -- ]] / [[ for snacks.words navigation are bound buffer-local on
     -- LspAttach (see init above) — global keymaps lose to ftplugin's
     -- buffer-local section-motion mappings on Python, Lua, JS, etc.
+
+    -- Toggle profiler + save a flattened trace as JSON. Press once to
+    -- start, reproduce the lag, press again to stop — writes a
+    -- timestamped file under stdpath("state")/profiler/ that you can
+    -- inspect / grep / share. Sort by time so the hottest call is at
+    -- the top of the JSON.
+    {
+      "<leader>P",
+      function()
+        if Snacks.profiler.running() then
+          Snacks.profiler.stop()
+          local ok_traces, traces = pcall(Snacks.profiler.find,
+            { structure = false, sort = "time", group = false })
+          if not ok_traces then
+            vim.notify("Profiler stopped, but failed to read traces: " .. tostring(traces),
+              vim.log.levels.ERROR, { title = "Profiler" })
+            return
+          end
+          local out = vim.tbl_map(function(t)
+            return { name = t.name, time = t.time, count = t.count, loc = t.loc, modname = t.modname }
+          end, traces)
+          local ok_json, json = pcall(vim.json.encode, out)
+          if not ok_json then
+            vim.notify("Profiler stopped, but failed to encode JSON: " .. tostring(json),
+              vim.log.levels.ERROR, { title = "Profiler" })
+            return
+          end
+          local dir = vim.fn.stdpath("state") .. "/profiler"
+          vim.fn.mkdir(dir, "p")
+          local file = dir .. "/profile-" .. os.date("%Y%m%d-%H%M%S") .. ".json"
+          local ok_write, err = pcall(vim.fn.writefile, { json }, file)
+          if not ok_write then
+            vim.notify("Failed to write profile: " .. tostring(err),
+              vim.log.levels.ERROR, { title = "Profiler" })
+            return
+          end
+          local size_kb = math.floor(vim.fn.getfsize(file) / 1024)
+          vim.notify(string.format("Profiler stopped (%d traces, %d KB)\n%s", #out, size_kb, file),
+            vim.log.levels.INFO, { title = "Profiler" })
+        else
+          Snacks.profiler.start()
+          vim.notify("Profiler started. Reproduce lag, then press <leader>P again to stop.",
+            vim.log.levels.INFO, { title = "Profiler" })
+        end
+      end,
+      desc = "Toggle profiler & save trace",
+    },
   },
 }
