@@ -7,3 +7,9 @@ WORDCHARS='_-.'
 
 # Bash style Ctrl+U
 bindkey \^U backward-kill-line
+
+# Alt+e — edit the current command line in $EDITOR. A faster single
+# chord for the `edit-command-line` widget; the readline-standard
+# `^X^E` (autoloaded by OMZ's lib) still works too. Alt+e is unbound
+# in zsh's default emacs keymap, so no collision.
+bindkey '^[e' edit-command-line
