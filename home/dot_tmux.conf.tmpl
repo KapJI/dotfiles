@@ -58,13 +58,12 @@ set-hook -g pane-title-changed {
 # Set terminal title from active window
 set -g set-titles on
 
-# Only window index, title and hostname
-# Compact outer-terminal title (wezterm tab name): just the short
-# hostname. host_short strips FQDN suffix (server.example.com →
-# server). The current window/pane info is already visible in tmux's
-# own status bar inside the pane, so we don't repeat it in the
-# outer-terminal tab.
-set -g set-titles-string '#{host_short}'
+# Compact outer-terminal title (wezterm tab name): a server glyph
+# (nf-fa-server) + the short hostname. host_short strips the FQDN
+# suffix (server.example.com → server). The glyph makes SSH'd tabs
+# instantly scannable; window/pane detail stays in tmux's own status
+# bar inside the pane rather than being repeated in the outer tab.
+set -g set-titles-string ' #{host_short}'
 
 # Match window size to current client (vs largest attached)
 setw -g aggressive-resize on

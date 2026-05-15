@@ -73,10 +73,27 @@ _atit_short_pwd() {
 _set_term_title_precmd() {
     local short=$(_atit_short_pwd)
     local full=${PWD/#$HOME/\~}
-    title "$short" "$full"
+    # Folder glyph prefix marks "a shell sitting at a prompt in this
+    # directory" — visually distinct from running-program titles,
+    # which the preexec hook below prefixes with a gear glyph.
+    title " $short" "$full"
 }
 
 add-zsh-hook precmd _set_term_title_precmd
+
+# Prefix running-command titles with a gear glyph so a tool running
+# in a pane is instantly distinguishable from a shell idling in a
+# directory (folder glyph, above). Runs after OMZ's
+# omz_termsupport_preexec and overrides its plain title. The
+# CMD-extraction mirrors OMZ's: the first command-line word that
+# isn't an env-assignment, a wrapper (sudo/ssh/…), or a -flag.
+_atit_preexec_glyph() {
+    [[ ${DISABLE_AUTO_TITLE:-} == true ]] && return
+    local cmd="${1[(wr)^(*=*|sudo|ssh|mosh|rake|-*)]:gs/%/%%}"
+    title " $cmd"
+}
+
+add-zsh-hook preexec _atit_preexec_glyph
 
 # Inside tmux, override OMZ's `title` (from path:lib/termsupport.zsh)
 # to always emit OSC 2. OMZ uses the screen DCS escape `\ek...\e\\`

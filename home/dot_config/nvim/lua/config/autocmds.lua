@@ -29,9 +29,16 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 do
   local TITLE_MAX, TITLE_HEAD = 25, 16
 
+  -- Neovim glyph prefix (nf-custom-neovim) identifies the title as
+  -- nvim — its own dedicated icon, distinct from the gear the zsh
+  -- preexec hook puts on other running commands and the folder glyph
+  -- on shell-prompt (idle terminal) titles. The glyph replaces the
+  -- "nvim" word entirely; the icon already says which tool this is.
+  local TITLE_PREFIX = " "
+
   local function title_for_buf()
     local name = vim.fn.expand("%:t")
-    if name == "" then return "nvim" end
+    if name == "" then return vim.trim(TITLE_PREFIX) end
     if vim.fn.strchars(name) > TITLE_MAX then
       local tail = TITLE_MAX - TITLE_HEAD - 1
       name = vim.fn.strcharpart(name, 0, TITLE_HEAD)
@@ -39,7 +46,7 @@ do
         .. vim.fn.strcharpart(name, vim.fn.strchars(name) - tail)
     end
     -- Escape `%` because vim parses titlestring as a format string.
-    return (("nvim " .. name):gsub("%%", "%%%%"))
+    return ((TITLE_PREFIX .. name):gsub("%%", "%%%%"))
   end
 
   vim.opt.title = true
