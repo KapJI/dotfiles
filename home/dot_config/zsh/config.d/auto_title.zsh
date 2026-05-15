@@ -105,3 +105,15 @@ if [[ -n $TMUX ]]; then
         print -Pn "\e]1;${1:q}\a"
     }
 fi
+
+# `edit-command-line` (bound to Alt+e / ^X^E) launches $EDITOR, which
+# sets its own terminal title. On return it lands on the SAME prompt —
+# no `precmd` fires — so the title stays stuck on the editor's. Wrap
+# the widget to re-emit the directory title once the editor exits.
+# `key_bindings.zsh` (sourced later) points Alt+e and ^X^E at this
+# wrapper instead of the bare `edit-command-line` widget.
+_atit_edit_command_line() {
+    zle edit-command-line
+    _set_term_title_precmd
+}
+zle -N _atit_edit_command_line

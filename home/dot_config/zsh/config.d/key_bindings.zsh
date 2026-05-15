@@ -9,7 +9,11 @@ WORDCHARS='_-.'
 bindkey \^U backward-kill-line
 
 # Alt+e — edit the current command line in $EDITOR. A faster single
-# chord for the `edit-command-line` widget; the readline-standard
-# `^X^E` (autoloaded by OMZ's lib) still works too. Alt+e is unbound
-# in zsh's default emacs keymap, so no collision.
-bindkey '^[e' edit-command-line
+# chord than the readline-standard `^X^E`; Alt+e is unbound in zsh's
+# default emacs keymap, so no collision. Both keys point at the
+# `_atit_edit_command_line` wrapper (defined in auto_title.zsh) rather
+# than the bare `edit-command-line` widget — the wrapper re-emits the
+# directory title after the editor exits (the editor sets its own
+# title and no precmd fires on return).
+bindkey '^[e'  _atit_edit_command_line
+bindkey '^X^E' _atit_edit_command_line
