@@ -43,11 +43,12 @@ return {
     cmdline = {
       keymap = {
         preset = "cmdline",
-        -- Match insert-mode behavior: Tab when menu hidden opens it
-        -- (cmdline auto-show usually beats us to it, but covers the
-        -- bare-`:` case). Subsequent Tab/S-Tab cycle without overwriting
-        -- the typed prefix (auto_insert=false). Commit with C-y.
-        ["<Tab>"] = { "show", "select_next", "fallback" },
+        -- Tab when menu hidden: open it — but if there's exactly one
+        -- match, `show_and_insert_or_accept_single` accepts it outright
+        -- instead of showing a one-item menu. Subsequent Tab/S-Tab
+        -- cycle without overwriting the typed prefix (auto_insert=false).
+        -- Commit a selected item with C-y.
+        ["<Tab>"] = { "show_and_insert_or_accept_single", "select_next", "fallback" },
         ["<S-Tab>"] = { "select_prev", "fallback" },
       },
       completion = {
