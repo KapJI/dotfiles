@@ -11,8 +11,17 @@ return {
   keys = {
     { "-", "<Cmd>Yazi<CR>", desc = "Open yazi at the current file" },
   },
+  init = function()
+    -- Disable netrw. yazi.nvim's open_for_directories opens yazi as a
+    -- float but, unlike oil's default_file_explorer, does not disable
+    -- netrw — so netrw's own explorer buffer ends up stacked under the
+    -- float. lazy.nvim runs init() during startup before runtime
+    -- plugins load, so setting these globals here suppresses netrw.
+    vim.g.loaded_netrw = 1
+    vim.g.loaded_netrwPlugin = 1
+  end,
   opts = {
-    open_for_directories = true, -- replace netrw on `nvim <dir>`
+    open_for_directories = true, -- open yazi on `nvim <dir>`
     -- Point the embedded yazi at a dedicated config dir
     -- (~/.config/yazi-nvim) where image preview is disabled. nvim's
     -- :terminal can't render terminal graphics protocols, so yazi's
