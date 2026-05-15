@@ -12,7 +12,6 @@ return {
     excluded_filetypes = {
       "alpha",
       "fzf",
-      "oil",
       "DiffviewFiles",
       "DiffviewFileHistory",
       "bigfile",  -- snacks.bigfile remaps oversized buffers; skip the scrollbar

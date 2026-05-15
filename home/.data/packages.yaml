@@ -40,6 +40,12 @@
   deb-desktop: google-chrome-stable
   winget: Google.Chrome
 
+# Terminal image-to-Unicode renderer. yazi's image-preview fallback
+# chain inside Neovim's terminal (which has no graphics protocol) is
+# X11 → Wayland → Chafa; chafa is the only link that works on macOS,
+# so without it yazi emits raw graphics escapes that corrupt the pane.
+- nix: chafa
+
 - nix: cmake
   winget: Kitware.CMake
 

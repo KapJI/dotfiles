@@ -22,13 +22,13 @@ return {
     bar = {
       -- Skip UI / scratch / non-file buffers. The default `enable`
       -- already excludes most, but we add our project-specific
-      -- filetypes (snacks panes, neominimap, oil, etc.) so the
+      -- filetypes (snacks panes, neominimap, etc.) so the
       -- breadcrumb only renders on real source buffers.
       enable = function(buf, win, _)
         local ft = vim.bo[buf].filetype
         if vim.tbl_contains({
           "snacks_terminal", "snacks_dashboard", "neominimap",
-          "oil", "TelescopePrompt", "lazy", "mason",
+          "TelescopePrompt", "lazy", "mason",
           "trouble", "qf", "help", "Outline", "aerial",
         }, ft) then
           return false

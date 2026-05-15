@@ -1,0 +1,14 @@
+# yazi config for the instance embedded in Neovim (yazi.nvim points
+# YAZI_CONFIG_HOME here via its `config_home` opt). Identical to the
+# standalone ~/.config/yazi config — theme.toml and init.lua are
+# symlinked back to it — except image preview is disabled.
+#
+# Why: nvim's built-in :terminal has no terminal-graphics-protocol
+# support, so yazi's kitty/iTerm2 image escapes corrupt the pane.
+# Tracked upstream in neovim/neovim#32189 (PR #39496). The `noop`
+# previewer makes image files show no preview instead. Standalone
+# `yz` in wezterm keeps real image preview via ~/.config/yazi.
+[plugin]
+prepend_previewers = [
+  { mime = "image/*", run = "noop" },
+]

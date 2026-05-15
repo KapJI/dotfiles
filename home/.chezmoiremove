@@ -33,3 +33,9 @@ AppData/Local/nvim-data/site/autoload/plug.vim
 {{ $nvim_dir }}/plugins/fzf.vim
 {{ $nvim_dir }}/plugins/lightline.vim
 {{ $nvim_dir }}/plugins/signify.vim
+
+# Removed Lua plugin specs. chezmoi leaves a target file in place when
+# its source file is deleted, so an orphaned spec keeps getting loaded
+# by lazy.nvim until removed here.
+#   - oil.lua: oil.nvim replaced by yazi.nvim.
+{{ $nvim_dir }}/lua/plugins/oil.lua

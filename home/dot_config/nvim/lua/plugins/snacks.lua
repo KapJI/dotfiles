@@ -61,7 +61,7 @@ return {
           { icon = "󰦛", key = "s", desc = "Restore session", section = "session" },
           { icon = "󰍉", key = "g", desc = "Live grep",       action = ":FzfLua live_grep" },
           { icon = "󰈙", key = "e", desc = "New file",        action = ":enew" },
-          { icon = "󰉋", key = ".", desc = "Browse cwd",      action = ":Oil" },
+          { icon = "󰉋", key = ".", desc = "Yazi",            action = ":Yazi cwd" },
           { icon = "󰒲", key = "l", desc = "Lazy",            action = ":Lazy" },
           { icon = "󰏖", key = "m", desc = "Mason",           action = ":Mason" },
           { icon = "󰗼", key = "q", desc = "Quit",            action = ":qa" },

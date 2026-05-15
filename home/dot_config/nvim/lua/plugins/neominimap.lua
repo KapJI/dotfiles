@@ -25,7 +25,7 @@ return {
             -- Skip minimap on UI / scratch buffers and on big files
             -- (snacks.bigfile remaps oversized buffers to filetype "bigfile").
             exclude_filetypes = {
-                "help", "alpha", "snacks_dashboard", "oil",
+                "help", "alpha", "snacks_dashboard",
                 "fzf", "TelescopePrompt", "lazy", "mason",
                 "undotree", "diff", "bigfile",
             },
