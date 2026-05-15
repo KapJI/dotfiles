@@ -59,7 +59,12 @@ set-hook -g pane-title-changed {
 set -g set-titles on
 
 # Only window index, title and hostname
-set -g set-titles-string '#I: #W (#{host})'
+# Compact outer-terminal title (wezterm tab name): just the short
+# hostname. host_short strips FQDN suffix (server.example.com →
+# server). The current window/pane info is already visible in tmux's
+# own status bar inside the pane, so we don't repeat it in the
+# outer-terminal tab.
+set -g set-titles-string '#{host_short}'
 
 # Match window size to current client (vs largest attached)
 setw -g aggressive-resize on
