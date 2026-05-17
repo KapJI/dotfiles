@@ -45,13 +45,13 @@ do
         .. "…"
         .. vim.fn.strcharpart(name, vim.fn.strchars(name) - tail)
     end
-    -- Escape `%` because vim parses titlestring as a format string.
-    return ((TITLE_PREFIX .. name):gsub("%%", "%%%%"))
+    return TITLE_PREFIX .. name
   end
 
   vim.opt.title = true
   local function update_title()
-    vim.opt.titlestring = title_for_buf()
+    -- Escape `%` because vim parses titlestring as a format string.
+    vim.opt.titlestring = (title_for_buf():gsub("%%", "%%%%"))
   end
   -- vim.schedule defers to the main loop so rapid-fire events
   -- (e.g. fzf-lua picker close → window switch → file edit) settle
@@ -62,5 +62,25 @@ do
     { "BufEnter", "BufWinEnter", "BufFilePost", "BufWritePost", "WinEnter" },
     { callback = function() vim.schedule(update_title) end }
   )
+
+  -- A TUI run inside a :terminal (lazygit) sets the wezterm tab title
+  -- itself with an OSC escape. Neovim only re-sends 'titlestring' to the
+  -- host terminal when the string *changes*; closing the float lands us
+  -- back on the same buffer, so the string is unchanged, Neovim stays
+  -- silent, and the tab is left showing the program's title. On
+  -- TermClose, write the current title to the host terminal directly
+  -- (OSC 2) so it overwrites whatever the exited program left behind —
+  -- snacks.nvim pushes OSC the same way for its lazygit theme colors.
+  vim.api.nvim_create_autocmd("TermClose", {
+    callback = function()
+      vim.schedule(function()
+        pcall(function()
+          io.write("\27]2;" .. title_for_buf() .. "\7")
+          io.flush()
+        end)
+      end)
+    end,
+  })
+
   update_title()
 end
