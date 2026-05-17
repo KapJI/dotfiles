@@ -195,6 +195,11 @@ return {
           auto_insert  = false,
           interactive  = false, -- avoids the gocui+startinsert render race
           auto_close   = true,  -- override the `interactive=false` cascade so the float still closes when lazygit exits (otherwise we'd be stuck on "[Process exited 0]" needing a second q)
+          -- Theme + editor preset come from the chezmoi-managed
+          -- ~/.config/lazygit/config.yml (catppuccin mocha). Left enabled,
+          -- `configure` appends snacks's auto-derived theme last in
+          -- LG_CONFIG_FILE and overrides it — so opt out entirely.
+          configure    = false,
         })
 
         -- Wait for lazygit's first paint to STABILIZE before entering
