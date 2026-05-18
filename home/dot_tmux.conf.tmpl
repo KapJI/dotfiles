@@ -167,27 +167,31 @@ bind -T copy-mode-vi End  send -X end-of-line
 bind -T copy-mode-vi y send -X copy-selection
 bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection
 
-# Copy last command output
-bind Y if-shell -b "tmux capture-pane -p -J | tail -n 2 | grep -q '❯'" {
-    copy-mode
-    send -X search-backward '❯'
-    send -X search-backward '❯'
-    send -X begin-selection
-    send -X search-forward '❯'
-    send -X cursor-up
-    send -X cursor-up
-    send -X end-of-line
-    send -X copy-pipe-and-cancel "tmux load-buffer -w -b lastcmd -"
-    display-message 'Copied last command output'
-} {
-    copy-mode
-    send -X search-backward '❯'
-    send -X begin-selection
-    send -X bottom-line
-    send -X end-of-line
-    send -X copy-selection-and-cancel
-    send -X copy-pipe-and-cancel "tmux load-buffer -w -b lastcmd -"
-    display-message 'Copied last command output'
+# Copy last command output — Alt-Y, the same key as the zsh widget of
+# the same name (zsh/config.d/copy_last_output.zsh). In a vim/nvim pane
+# forward Alt-Y to the app instead, like the M-hjkl bindings above.
+bind -n M-Y if-shell "$is_vim" "send-keys M-Y" {
+    if-shell -b "tmux capture-pane -p -J | tail -n 2 | grep -q '❯'" {
+        copy-mode
+        send -X search-backward '❯'
+        send -X search-backward '❯'
+        send -X begin-selection
+        send -X search-forward '❯'
+        send -X cursor-up
+        send -X cursor-up
+        send -X end-of-line
+        send -X copy-pipe-and-cancel "tmux load-buffer -w -b lastcmd -"
+        display-message 'Copied last command output'
+    } {
+        copy-mode
+        send -X search-backward '❯'
+        send -X begin-selection
+        send -X bottom-line
+        send -X end-of-line
+        send -X copy-selection-and-cancel
+        send -X copy-pipe-and-cancel "tmux load-buffer -w -b lastcmd -"
+        display-message 'Copied last command output'
+    }
 }
 
 # Quickly jump between shell prompts
