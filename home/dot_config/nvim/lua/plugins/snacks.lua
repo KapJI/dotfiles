@@ -1,7 +1,7 @@
--- snacks.nvim — adopting only the dashboard module for now.
--- Replaces alpha-nvim with built-in recents/projects/git sections and
--- a 2-pane layout. All other snacks modules are off by default;
--- enable individually when needed (see the bottom of this file for a list).
+-- snacks.nvim — modules are opted into individually in `opts` below,
+-- each with a comment on why it's on or off. Notably replaces
+-- alpha-nvim (dashboard, with a 2-pane recents/projects/git layout),
+-- indent-blankline (indent) and vim-illuminate (words).
 return {
   "folke/snacks.nvim",
   priority = 1000,
@@ -135,8 +135,44 @@ return {
     -- Most input prompts already go through inc-rename / fzf-lua;
     -- this catches the remaining vim.ui.input calls for visual consistency.
     input        = { enabled = true },
-    picker       = { enabled = false },
-    explorer     = { enabled = false },
+    -- snacks.picker is enabled only as the engine snacks.explorer rides
+    -- on — fzf-lua stays the finder for <leader>f*. `ui_select = false`
+    -- so it doesn't take over vim.ui.select. The explorer is a picker
+    -- source, so its file-tree tweaks live under `sources.explorer`:
+    -- `hidden` shows dotfiles; gitignored files stay out (snacks defaults
+    -- both `hidden` and `ignored` to false).
+    picker       = {
+      enabled   = true,
+      ui_select = false,
+      sources   = {
+        explorer = {
+          hidden = true,
+          -- snacks tags every hidden entry — file *and* directory —
+          -- with the single SnacksPickerPathHidden group (dimmed). Wrap
+          -- the `file` formatter to recolour that name segment per type:
+          -- hidden files → normal file colour, hidden directories →
+          -- SnacksPickerDirectory (blue), same as non-hidden ones.
+          -- Couples to snacks internals (the `file` formatter and that
+          -- hl group); revisit if a snacks update changes either.
+          format = function(item, picker)
+            local ret = require("snacks.picker.format").file(item, picker)
+            for _, seg in ipairs(ret) do
+              if seg[2] == "SnacksPickerPathHidden" then
+                seg[2] = item.dir and "SnacksPickerDirectory" or "SnacksPickerFile"
+              end
+            end
+            return ret
+          end,
+        },
+      },
+    },
+
+    -- File-tree sidebar with git + diagnostic decorations — the bit yazi
+    -- can't show. `replace_netrw = false`: yazi.nvim already disables
+    -- netrw and hijacks `nvim <dir>`, and two directory-buffer handlers
+    -- would race. Defaults give a left sidebar that follows the current
+    -- file with git_status + diagnostics on. Toggle: <leader>e.
+    explorer     = { enabled = true, replace_netrw = false },
 
     -- Hotkey-toggle floating shell. Real terminal work still belongs in
     -- wezterm / tmux panes (persistent scrollback, fingers, full copy-mode);
@@ -146,6 +182,20 @@ return {
     terminal     = { enabled = true },
   },
   keys = {
+    {
+      "<leader>e",
+      function()
+        -- Toggle the explorer sidebar: close it if one is already open
+        -- in this tab, else open it revealing the current file.
+        local explorer = Snacks.picker.get({ source = "explorer" })[1]
+        if explorer then
+          explorer:close()
+        else
+          Snacks.explorer.reveal()
+        end
+      end,
+      desc = "Explorer sidebar (toggle)",
+    },
     {
       "<leader>tt",
       function()
