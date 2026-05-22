@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+#
+# Install the Мефодица keyboard layout system-wide and make it the only
+# enabled keyboard layout.
+#
+# chezmoi applies the bundle to ~/.local/share/keyboard-layouts/ — a
+# staging copy, not a directory macOS scans. It is installed into
+# /Library/Keyboard Layouts/ so it is available to every user and at the
+# login window; a per-user ~/Library install is not. Re-runs when the
+# layout bundle changes.
+#
+# keylayout: {{ joinPath .chezmoi.sourceDir "dot_local/share/keyboard-layouts/Мефодица.bundle/Contents/Resources/Мефодица.keylayout" | include | sha256sum }}
+# Info:      {{ joinPath .chezmoi.sourceDir "dot_local/share/keyboard-layouts/Мефодица.bundle/Contents/Info.plist" | include | sha256sum }}
+
+set -eu
+
+staged="$HOME/.local/share/keyboard-layouts/Мефодица.bundle"
+system="/Library/Keyboard Layouts/Мефодица.bundle"
+user_local="$HOME/Library/Keyboard Layouts/Мефодица.bundle"
+
+if [ ! -f "$staged/Contents/Resources/Мефодица.keylayout" ]; then
+    echo "mefodica: staged bundle missing at $staged — did chezmoi apply it?" >&2
+    exit 1
+fi
+
+# 1. Install system-wide, root-owned like the /System/Library layouts.
+echo "mefodica: installing layout -> $system (sudo)"
+sudo rm -rf "$system"
+sudo cp -R "$staged" "$system"
+sudo chown -R root:wheel "$system"
+
+# 2. Drop the superseded per-user copy so the layout has a single home
+#    (a duplicate in ~/Library would shadow it with the same layout ID).
+if [ -d "$user_local" ]; then
+    echo "mefodica: removing superseded per-user install -> $user_local"
+    rm -rf "$user_local"
+fi
+
+# 3. Make Мефодица the only enabled keyboard layout, keeping the three
+#    standard non-keyboard input methods (character palette, press-and-
+#    hold, dictation). Editing an exported copy of the HIToolbox prefs
+#    domain leaves every other key — selection, history — untouched.
+echo "mefodica: enabling as the sole keyboard input source"
+tmp="$(mktemp -t hitoolbox)"
+trap 'rm -f "$tmp"' EXIT
+defaults export com.apple.HIToolbox "$tmp"
+plutil -replace AppleEnabledInputSources -xml '<array>
+  <dict>
+    <key>Bundle ID</key><string>com.apple.CharacterPaletteIM</string>
+    <key>InputSourceKind</key><string>Non Keyboard Input Method</string>
+  </dict>
+  <dict>
+    <key>InputSourceKind</key><string>Keyboard Layout</string>
+    <key>KeyboardLayout ID</key><integer>19567</integer>
+    <key>KeyboardLayout Name</key><string>Мефодица</string>
+  </dict>
+  <dict>
+    <key>Bundle ID</key><string>com.apple.PressAndHold</string>
+    <key>InputSourceKind</key><string>Non Keyboard Input Method</string>
+  </dict>
+  <dict>
+    <key>Bundle ID</key><string>com.apple.inputmethod.ironwood</string>
+    <key>InputSourceKind</key><string>Non Keyboard Input Method</string>
+  </dict>
+</array>' "$tmp"
+if [ -s "$tmp" ]; then
+    defaults import com.apple.HIToolbox "$tmp"
+    echo "mefodica: input sources updated — log out and back in for the"
+    echo "          change to take full effect (the layout is already active)."
+else
+    echo "mefodica: HIToolbox export was empty — input-source change skipped" >&2
+fi

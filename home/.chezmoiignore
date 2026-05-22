@@ -7,6 +7,9 @@ CLAUDE.md
 {{ if ne .osid "darwin" }}
 .chezmoiscripts/macos/**
 Library
+# Staging copy of the Мефодица keyboard layout. macOS-only — a chezmoi
+# script installs it system-wide (see .chezmoiscripts/macos/).
+.local/share/keyboard-layouts
 {{ end }}
 
 {{ if ne .osid "windows" }}
