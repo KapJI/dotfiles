@@ -3,7 +3,7 @@
 -- so this is strictly additive to the existing LSP setup.
 --
 -- Install missing formatter binaries via :MasonInstall <name> (e.g. stylua,
--- shfmt, prettier, nixpkgs-fmt, taplo). conform finds them on PATH the same
+-- shfmt, prettier, taplo). conform finds them on PATH the same
 -- way mason-lspconfig finds language servers.
 return {
   {
@@ -29,7 +29,7 @@ return {
         json           = { "prettier" },
         jsonc          = { "prettier" },
         markdown       = { "prettier" },
-        nix            = { "nixpkgs_fmt" },
+        nix            = { "nixfmt" },
         go             = { "goimports", "gofmt" },
         rust           = { "rustfmt" },
         terraform      = { "terraform_fmt" },

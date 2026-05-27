@@ -158,6 +158,8 @@
 
 - deb: ncat
 
+- nix: nixfmt
+
 - nix: ninja
   winget: Ninja-build.Ninja
 

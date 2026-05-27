@@ -20,7 +20,7 @@ return {
         json       = { "json-lsp", "prettier" },
         jsonc      = { "json-lsp", "prettier" },
         markdown   = { "markdownlint-cli2", "prettier" },
-        nix        = { "nil", "nixpkgs-fmt" },
+        nix        = { "nil" },
         go         = { "gopls", "gofumpt" },
         rust       = { "rust-analyzer" },
         toml       = { "taplo" },
