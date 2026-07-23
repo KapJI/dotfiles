@@ -80,8 +80,8 @@ set -s focus-events on
 # Use vi keys in copy mode
 setw -g mode-keys vi
 
-# Remove vim Esc delay
-set -s escape-time 40
+# Esc delay — pin the modern default (10ms) explicitly
+set -s escape-time 10
 
 # Time window for repeatable key bindings (ms)
 set -g repeat-time 500
