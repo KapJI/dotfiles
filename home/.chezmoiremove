@@ -38,7 +38,9 @@ AppData/Local/nvim-data/site/autoload/plug.vim
 # its source file is deleted, so an orphaned spec keeps getting loaded
 # by lazy.nvim until removed here.
 #   - oil.lua: oil.nvim replaced by yazi.nvim.
+#   - vim-be-good.lua: motion-practice game; removed.
 {{ $nvim_dir }}/lua/plugins/oil.lua
+{{ $nvim_dir }}/lua/plugins/vim-be-good.lua
 
 # Dead nvm loader: nvm isn't installed anywhere (node comes via nix /
 # ~/.npm prefix), and eager nvm.sh sourcing is a notorious startup cost
