@@ -22,12 +22,19 @@ return {
         -- zsh   = { "shellcheck" },
       }
 
-      -- Trigger lints on save and when leaving insert mode (so you see
-      -- diagnostics quickly without spamming linters on every keystroke).
-      vim.api.nvim_create_autocmd({ "BufWritePost", "InsertLeave" }, {
+      -- Trigger lints on open, save, and when leaving insert mode (so you
+      -- see diagnostics quickly without spamming linters on every
+      -- keystroke).
+      vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost", "InsertLeave" }, {
         group = vim.api.nvim_create_augroup("nvim-lint", { clear = true }),
         callback = function() lint.try_lint() end,
       })
+
+      -- The autocmd can't cover the buffer whose BufReadPost triggered
+      -- this very load: lazy re-fires the event after setup, but before
+      -- filetype detection has settled, so try_lint finds no linter for
+      -- it. Lint the initial buffer with one direct, scheduled pass.
+      vim.schedule(function() lint.try_lint() end)
 
       -- Manual trigger
       vim.keymap.set("n", "<leader>cl", function() lint.try_lint() end,
