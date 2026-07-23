@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# Install global npm packages from packages.yaml (`npm:` key) into the
+# ~/.npm prefix (~/.npm/bin is already on PATH via zsh config.d/path.zsh).
+# macOS-only for now: this is the sole consumer of the `npm:` key.
+#
+# An `after` script deliberately: node comes from the nix profile, and
+# macos/before_* scripts sort ahead of unix/before_03-nix-profile-sync,
+# so on a fresh machine node would not exist yet in the before phase.
+#
+# Run weekly (npm install -g always fetches latest).
+# Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
+
+{{- $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml -}}
+{{ $npm := list -}}
+{{ range $packages -}}
+    {{ if hasKey . "npm" -}}
+        {{ $npm = append $npm (get . "npm") -}}
+    {{ end -}}
+{{ end }}
+
+set -e
+
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
+
+if ! command -v node >/dev/null 2>&1; then
+    echo "node not on PATH; skipping npm package install"
+    exit 0
+fi
+
+# Explicit prefix: the nix node's default global prefix is its read-only
+# store path.
+npm_prefix="$HOME/.npm"
+
+{{ range $npm -}}
+npm install --global --prefix "$npm_prefix" "{{ . }}"
+{{ end }}
+
+# agent-tty renders screenshots/recordings through Playwright Chromium.
+# Install the browser build via agent-tty's own playwright binary so it
+# matches the exact-pinned playwright dependency (a floating
+# `npx playwright install` can fetch a build that version can't find).
+playwright="$npm_prefix/lib/node_modules/agent-tty/node_modules/.bin/playwright"
+if [ -x "$playwright" ]; then
+    "$playwright" install chromium
+fi
+
+"$npm_prefix/bin/agent-tty" doctor \
+    || echo "agent-tty doctor reported problems (non-fatal)"

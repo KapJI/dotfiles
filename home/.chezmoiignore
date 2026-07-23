@@ -10,6 +10,9 @@ Library
 # Staging copy of the Мефодица keyboard layout. macOS-only — a chezmoi
 # script installs it system-wide (see .chezmoiscripts/macos/).
 .local/share/keyboard-layouts
+# agent-tty Claude Code skill: macOS-only, matching where agent-tty
+# itself is installed (see the npm: key in .data/packages.yaml).
+.claude/skills/agent-tty
 {{ end }}
 
 {{ if ne .osid "windows" }}

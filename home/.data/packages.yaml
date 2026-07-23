@@ -9,6 +9,13 @@
 - nix: _7zz
   winget: 7zip.7zip
 
+# Terminal automation CLI for AI agents: real PTY sessions with wait
+# primitives, semantic snapshots, and PNG screenshots (drives nvim/TUIs
+# without tmux send-keys + sleep guesswork). npm-only upstream (no brew
+# formula, not in nixpkgs). macOS-only for now: the npm: key is consumed
+# solely by the macOS npm-packages script. Requires node >=24 <27.
+- npm: agent-tty
+
 - nix: autoconf
 
 - nix: bandwhich
@@ -164,7 +171,7 @@
 - nix: ninja
   winget: Ninja-build.Ninja
 
-- nix: nodejs_22
+- nix: nodejs_24
   winget: OpenJS.NodeJS
 
 - winget: JanDeDobbeleer.OhMyPosh

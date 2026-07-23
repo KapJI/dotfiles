@@ -78,6 +78,7 @@ All packages are defined in a single central manifest: `.data/packages.yaml`. Ea
   scoop: ripgrep         # Windows Scoop
   uv-tool: ...           # Python tools via uv (Windows; Unix uses nix:)
   ps-module: ...         # PowerShell modules from PSGallery (Windows)
+  npm: agent-tty         # npm globals into the ~/.npm prefix (macOS-only for now)
 ```
 
 Default routing:
@@ -85,6 +86,7 @@ Default routing:
 - **macOS GUI apps** → `brew-cask:`. Mac App Store apps → `brew-appstore:`.
 - **Linux GUI apps / system libraries** → `deb:` / `deb-desktop:` (apt is intentionally retained for these).
 - **Windows** → `winget:` (preferred) / `scoop:` (fallback).
+- **npm-only tools** (no nix/brew packaging) → `npm:` — installed by `macos/run_onchange_after_75-install-npm-packages.sh.tmpl` (macOS-only for now; add a Linux consumer when needed).
 
 Install scripts in `.chezmoiscripts/` read this YAML and install packages for their platform. When adding a new CLI tool, prefer `nix:` and skip `brew:` / `deb:` unless you have a reason (system lib, GUI integration).
 
