@@ -8,10 +8,14 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 -- Remove trailing spaces on save. keeppatterns so the :s doesn't
 -- clobber the last search pattern (which `n` and `:%s//x/g` reuse);
 -- win{save,rest}view so the cursor doesn't jump to the last stripped
--- line.
+-- line. Skipped where trailing whitespace is meaningful: markdown
+-- (two trailing spaces = hard line break), diff/patch (context lines
+-- start with a significant space), mail (signature separator "-- ").
+local strip_whitespace_excluded = { markdown = true, diff = true, mail = true }
 vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*",
   callback = function()
+    if strip_whitespace_excluded[vim.bo.filetype] then return end
     local view = vim.fn.winsaveview()
     vim.cmd([[keeppatterns %s/\s\+$//e]])
     vim.fn.winrestview(view)
