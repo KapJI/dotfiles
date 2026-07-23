@@ -35,5 +35,4 @@ _wezterm_emit_is_tmux() {
 
 # Fire once at shell startup (covers fresh shells), then on every prompt.
 _wezterm_emit_is_tmux
-typeset -ag precmd_functions
-precmd_functions+=(_wezterm_emit_is_tmux)
+add-zsh-hook precmd _wezterm_emit_is_tmux

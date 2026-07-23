@@ -18,4 +18,3 @@ setopt HIST_SAVE_NO_DUPS       # never write a duplicate event to the history fi
 setopt HIST_FIND_NO_DUPS       # when searching history, skip already-shown matches
 setopt HIST_IGNORE_SPACE       # leading-space command → not recorded (one-off secrets)
 setopt HIST_REDUCE_BLANKS      # collapse runs of whitespace before saving
-setopt HIST_EXPIRE_DUPS_FIRST  # when HISTFILE is at capacity, evict dups before uniques

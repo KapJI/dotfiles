@@ -39,7 +39,8 @@ zstyle ':completion:*' path-completion false
 # off on typos: `gti` → `git`, `/usr/lcoal` → `/usr/local`.
 zstyle ':completion:*' completer _complete _correct _approximate
 
-# Disable hashing for list of executables
+# Re-hash $PATH on each command completion, so freshly installed
+# binaries complete immediately without a manual `rehash`
 zstyle ':completion:*:commands' rehash 1
 
 # Disable sorting when completing `git checkout`
