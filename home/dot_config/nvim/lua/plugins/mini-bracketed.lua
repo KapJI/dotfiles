@@ -4,7 +4,7 @@
 -- collisions are disabled below by setting suffix = ''.
 return {
     "echasnovski/mini.bracketed",
-    event = "BufReadPost",
+    event = { "BufReadPost", "BufNewFile" },
     opts = {
         buffer     = { suffix = "b", options = {} },  -- ]b/[b: cycle buffers
         conflict   = { suffix = "x", options = {} },  -- ]x/[x: git merge-conflict markers

@@ -24,7 +24,7 @@
 --   van]   visual around the next []
 return {
     "echasnovski/mini.ai",
-    event = "BufReadPost",
+    event = { "BufReadPost", "BufNewFile" },
     opts = {
         n_lines = 500, -- limit search range so massive files don't stall
         custom_textobjects = {

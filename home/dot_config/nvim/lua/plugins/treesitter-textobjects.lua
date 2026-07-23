@@ -14,7 +14,7 @@ return {
     "nvim-treesitter/nvim-treesitter-textobjects",
     branch = "main",
     dependencies = { "nvim-treesitter/nvim-treesitter" },
-    event = "BufReadPost",
+    event = { "BufReadPost", "BufNewFile" },
     config = function()
         local sel  = require("nvim-treesitter-textobjects.select")
         local move = require("nvim-treesitter-textobjects.move")
