@@ -1,10 +1,24 @@
 #!/usr/bin/env bash
+# Enable Touch ID for sudo via /etc/pam.d/sudo_local — Apple's supported
+# mechanism since Ventura (see /etc/pam.d/sudo_local.template). Unlike a
+# direct edit of /etc/pam.d/sudo, sudo_local survives OS updates.
+set -eu
 
-# MacOS build version: {{ output "sw_vers" "--buildVersion" }}
+PAM_TID_LINE="auth       sufficient     pam_tid.so"
+SUDO_LOCAL=/etc/pam.d/sudo_local
 
-if ! grep -q "pam_tid.so" /etc/pam.d/sudo; then
+if ! grep -q "pam_tid.so" "$SUDO_LOCAL" 2>/dev/null; then
+    printf '%s\n' "$PAM_TID_LINE" | sudo tee -a "$SUDO_LOCAL" >/dev/null
+fi
+
+# Migration: earlier versions of this script inserted the pam_tid line
+# directly into /etc/pam.d/sudo (chmod +w / -w dance included). Now that
+# sudo_local carries it, strip the legacy line so /etc/pam.d/sudo is
+# back to stock and OS updates have nothing to fight with. Guarded on
+# the sudo_local include being present so Touch ID can't be lost.
+if grep -q "include.*sudo_local" /etc/pam.d/sudo \
+        && grep -qxF "$PAM_TID_LINE" /etc/pam.d/sudo; then
     sudo chmod +w /etc/pam.d/sudo
-    sudo /usr/bin/sed -i '' -e '2s/^/auth       sufficient     pam_tid.so\'$'\n/' \
-        /etc/pam.d/sudo
+    sudo /usr/bin/sed -i '' -e "/^auth       sufficient     pam_tid\.so$/d" /etc/pam.d/sudo
     sudo chmod -w /etc/pam.d/sudo
 fi
