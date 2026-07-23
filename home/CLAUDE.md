@@ -48,10 +48,12 @@ Source filenames encode metadata via prefixes/suffixes:
 | `readonly_foo` | `foo` | Chmod 444 |
 | `executable_foo` | `foo` | Chmod 755 |
 | `foo.tmpl` | `foo` | Go template processed |
-| `run_foo.sh` | (runs once) | Script run on apply |
-| `run_onchange_foo.sh` | (runs on change) | Script run when content changes |
-| `before_foo.sh` | (before apply) | Script run before applying |
-| `after_foo.sh` | (after apply) | Script run after applying |
+| `symlink_foo` | `foo` | Symlink; file content is the target path |
+| `run_foo.sh` | (script) | Runs on **every** apply |
+| `run_once_foo.sh` | (script) | Runs once per unique content hash |
+| `run_onchange_foo.sh` | (script) | Runs when rendered content changes |
+| `run_[once_/onchange_]before_foo.sh` | (script) | `before_` runs before files are applied |
+| `run_[once_/onchange_]after_foo.sh` | (script) | `after_` runs after files are applied |
 
 ## Architecture
 
@@ -74,7 +76,8 @@ All packages are defined in a single central manifest: `.data/packages.yaml`. Ea
   snap-desktop: ...      # Snap (Linux desktop only) - for apps not in apt
   winget: BurntSushi.ripgrep  # Windows winget
   scoop: ripgrep         # Windows Scoop
-  uv-tool: ...           # Python tools via uv (all platforms)
+  uv-tool: ...           # Python tools via uv (Windows; Unix uses nix:)
+  ps-module: ...         # PowerShell modules from PSGallery (Windows)
 ```
 
 Default routing:
@@ -126,7 +129,7 @@ Use `{{ if eq .chezmoi.os "darwin" }}` for OS-specific blocks. Use `{{ if .is_de
 
 ### External Dependencies
 
-`.chezmoiexternal.toml` declares external files/archives to download (vim-plug, eza themes, binary completions, git repos like antidote and tpm). These are fetched automatically during `chezmoi apply`.
+`.chezmoiexternal.toml` declares external files/archives to download (eza/yazi themes, fonts, binary completions, the tree-sitter CLI, git repos like antidote and tpm). These are fetched automatically during `chezmoi apply`.
 
 ### Zsh Configuration
 

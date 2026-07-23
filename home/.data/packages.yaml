@@ -25,8 +25,9 @@
 - scoop: CascadiaCode-NF-Mono
 
 # Icon-only Nerd Font, used as fallback for glyphs missing from MesloLGS NF
-# (which is a limited subset). Linux desktop installs via run_onchange_before_16
-# from GitHub releases. Windows is covered by CascadiaCode-NF-Mono above.
+# (which is a limited subset). Linux desktop gets it via .chezmoiexternal.toml
+# (archive-file from GitHub releases). Windows is covered by
+# CascadiaCode-NF-Mono above.
 - brew-cask: font-symbols-only-nerd-font
 
 - brew-cask: chatgpt
