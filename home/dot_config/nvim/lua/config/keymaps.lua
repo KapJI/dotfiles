@@ -27,8 +27,8 @@ keyset("v", "<leader>/", "gc", { remap = true, desc = "Toggle comment" })
 keyset("v", "<", "<gv", { desc = "Indent left, keep selection" })
 keyset("v", ">", ">gv", { desc = "Indent right, keep selection" })
 
--- Clear search highlight
-keyset("n", "<leader>h", ":nohlsearch<CR>", { silent = true, desc = "Clear search highlight" })
+-- Search highlight is cleared with <Esc> (bound in multicursor.lua:
+-- clears cursors when active, :nohlsearch otherwise).
 
 -- "inside line" text object (excludes leading/trailing whitespace)
 keyset({ "x", "o" }, "il", ":<C-u>normal! ^vg_<CR>", { silent = true, desc = "Inside line" })
