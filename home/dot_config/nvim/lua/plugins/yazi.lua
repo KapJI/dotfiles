@@ -22,6 +22,13 @@ return {
   end,
   opts = {
     open_for_directories = true, -- open yazi on `nvim <dir>`
+    -- Disable yazi's copy-relative-path action (<c-y>). On macOS it
+    -- shells out to `grealpath` (GNU coreutils, g-prefixed), which isn't
+    -- installed — so :checkhealth yazi warns. The action is niche; turn
+    -- it off rather than pull coreutils-prefixed into the whole fleet
+    -- for a macOS-only, one-keymap benefit (Linux has realpath natively).
+    -- Deep-merged, so the rest of yazi's default keymaps are untouched.
+    keymaps = { copy_relative_path_to_selected_files = false },
     -- Point the embedded yazi at a dedicated config dir
     -- (~/.config/yazi-nvim) where image preview is disabled. nvim's
     -- :terminal can't render terminal graphics protocols, so yazi's
