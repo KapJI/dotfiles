@@ -1,7 +1,9 @@
 -- neominimap.nvim — Sublime-Text-style minimap with treesitter-colored
--- rendering. Mark layers (diagnostic/git/search/marks) are disabled to
--- avoid duplicating what satellite.nvim already shows on the right edge;
--- the value here is the visual *shape* of the file.
+-- rendering. The diagnostic/git/search layers are left ON even though
+-- satellite.nvim shows the same markers on the right edge — the overlap
+-- is intentional (see the render block below): the minimap conveys the
+-- visual *shape* of the file, satellite the precise right-edge bar. Only
+-- letter-marks and LSP semantic tokens are off (low value at this scale).
 --
 -- Layout = "float": minimap is a translucent overlay on the right edge
 -- of the source window, NOT a separate split. This avoids a class of
