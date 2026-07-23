@@ -10,7 +10,16 @@ return {
     "catgoose/nvim-colorizer.lua",
     event = { "BufReadPre", "BufNewFile" },
     opts = {
-      filetypes = { "*" },                       -- enable everywhere; opt-out via the user_default_options table below
+      -- Enable everywhere; per-filetype option overrides live INSIDE
+      -- this table (setup() only reads filetypes/buftypes/
+      -- user_default_options/user_commands/lazy_load at the top level).
+      filetypes = {
+        "*",
+        -- Turn on color names in CSS/theme files where they're useful.
+        css  = { names = true },
+        scss = { names = true },
+        html = { names = true },
+      },
       user_default_options = {
         RGB         = true,                       -- #RGB hex codes
         RRGGBB      = true,                       -- #RRGGBB hex codes
@@ -26,10 +35,6 @@ return {
         mode        = "background",               -- "background" | "foreground" | "virtualtext"; bg shows token over the actual color
         virtualtext = "■",
       },
-      -- Per-filetype overrides — turn on color names in CSS/theme files where they're useful.
-      ["css"]  = { names = true },
-      ["scss"] = { names = true },
-      ["html"] = { names = true },
     },
   },
 }

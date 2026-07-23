@@ -5,13 +5,15 @@
 return {
   "folke/persistence.nvim",
   event = "BufReadPre",
-  opts = {
-    -- Trim runtimepath out of the saved session: it doesn't change
-    -- between launches and bloats the file. Keep buffers, layout,
-    -- cwd, tabpages, help windows, and globals.
-    options = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp" },
-  },
+  opts = {},
   config = function(_, opts)
+    -- persistence v3 has no `options` opt (only dir/need/branch); the
+    -- session contents are controlled by 'sessionoptions'. Trim
+    -- runtimepath out of the saved session (it doesn't change between
+    -- launches and bloats the file); keep buffers, layout, cwd,
+    -- tabpages, help windows, and globals.
+    vim.o.sessionoptions = "buffers,curdir,tabpages,winsize,help,globals,skiprtp"
+
     require("persistence").setup(opts)
 
     -- Strip transient plugin buffers (neominimap, undotree, [No Name]

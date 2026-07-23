@@ -25,7 +25,7 @@ local tips = {
   { "\"0p",      "paste last yank (survives d/c)"             },
   { "\"+y",      "yank to system clipboard"                   },
   { "<C-r>=",    "expression register: live math in insert"   },
-  { "[x",        "jump up one treesitter scope (this config)" },
+  { "[X",        "jump up one treesitter scope (this config)" },
   { "<leader>j", "toggle split/join — treesj"                 },
   { "<C-a>",     "increment number / bool / date / semver"    },
 }

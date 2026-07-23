@@ -5,10 +5,17 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g`\"" | endif]],
 })
 
--- Remove trailing spaces on save
+-- Remove trailing spaces on save. keeppatterns so the :s doesn't
+-- clobber the last search pattern (which `n` and `:%s//x/g` reuse);
+-- win{save,rest}view so the cursor doesn't jump to the last stripped
+-- line.
 vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*",
-  command = [[%s/\s\+$//e]],
+  callback = function()
+    local view = vim.fn.winsaveview()
+    vim.cmd([[keeppatterns %s/\s\+$//e]])
+    vim.fn.winrestview(view)
+  end,
 })
 
 -- Suppress quickfix window from auto-opening (use <leader>qq to browse via fzf-lua instead)

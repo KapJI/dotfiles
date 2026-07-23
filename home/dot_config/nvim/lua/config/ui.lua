@@ -5,9 +5,18 @@ local active_bg = "#1e1e2e"
 local inactive_bg = "#24243a"
 local inactive_lualine_bg = "#1e1e31"
 
+-- Change only the bg of a highlight group, preserving fg and attributes
+-- (nvim_set_hl replaces the whole group definition — a bare { bg = ... }
+-- would drop catppuccin's Normal fg).
+local function set_bg(group, bg)
+  local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
+  hl.bg = bg
+  vim.api.nvim_set_hl(0, group, hl)
+end
+
 -- Match tmux active/inactive pane background colors
-vim.api.nvim_set_hl(0, "Normal", { bg = active_bg })
-vim.api.nvim_set_hl(0, "NormalNC", { bg = inactive_bg })
+set_bg("Normal", active_bg)
+set_bg("NormalNC", inactive_bg)
 
 -- Dim all nvim windows when tmux pane loses focus.
 -- We use the original lualine_c bg (set by the catppuccin-mocha lualine theme)
@@ -39,13 +48,13 @@ end
 
 vim.api.nvim_create_autocmd("FocusLost", {
   callback = function()
-    vim.api.nvim_set_hl(0, "Normal", { bg = inactive_bg })
+    set_bg("Normal", inactive_bg)
     set_lualine_c_bg(inactive_lualine_bg_int)
   end,
 })
 vim.api.nvim_create_autocmd("FocusGained", {
   callback = function()
-    vim.api.nvim_set_hl(0, "Normal", { bg = active_bg })
+    set_bg("Normal", active_bg)
     set_lualine_c_bg(original_c_bg_int)
   end,
 })

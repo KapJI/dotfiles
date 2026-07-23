@@ -6,7 +6,7 @@ return {
   keys = {
     { "<leader>ff", function() require("fzf-lua").files() end,                 desc = "Find files" },
     { "<leader>fg", function() require("fzf-lua").grep_project() end,          desc = "Fuzzy search project" },
-    { "<leader>fb", function() require("fzf-lua").lines() end,                 desc = "Fuzzy search buffer" },
+    { "<leader>fb", function() require("fzf-lua").blines() end,                desc = "Fuzzy search buffer" },
     { "<leader>fr", function() require("fzf-lua").oldfiles() end,              desc = "Recent files" },
     { "<leader>fs", function() require("fzf-lua").lsp_document_symbols() end,  desc = "Document symbols" },
     { "<leader>fS", function() require("fzf-lua").lsp_live_workspace_symbols() end, desc = "Workspace symbols (live)" },

@@ -24,7 +24,8 @@ return {
         python         = { "ruff_organize_imports", "ruff_format" },
         sh             = { "shfmt" },
         bash           = { "shfmt" },
-        zsh            = { "shfmt" },
+        -- No zsh entry: shfmt has no zsh dialect and errors out on
+        -- zsh-only syntax, turning every save into an error toast.
         yaml           = { "prettier" },
         json           = { "prettier" },
         jsonc          = { "prettier" },
