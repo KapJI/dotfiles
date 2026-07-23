@@ -188,7 +188,6 @@ bind -n M-Y if-shell "$is_vim" "send-keys M-Y" {
         send -X begin-selection
         send -X bottom-line
         send -X end-of-line
-        send -X copy-selection-and-cancel
         send -X copy-pipe-and-cancel "tmux load-buffer -w -b lastcmd -"
         display-message 'Copied last command output'
     }
