@@ -22,12 +22,21 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   end,
 })
 
--- Suppress quickfix window from auto-opening (use <leader>qq to browse via fzf-lua instead)
+-- Suppress quickfix/location-list windows from auto-opening (use
+-- <leader>qq to browse via fzf-lua instead). buftype "quickfix" covers
+-- both kinds, but :cclose only closes the quickfix window — a loclist
+-- window would survive it — so close qf-type windows directly instead.
 vim.api.nvim_create_autocmd("BufWinEnter", {
   callback = function()
-    if vim.bo.buftype == "quickfix" then
-      vim.schedule(function() vim.cmd("cclose") end)
-    end
+    if vim.bo.buftype ~= "quickfix" then return end
+    vim.schedule(function()
+      for _, win in ipairs(vim.api.nvim_list_wins()) do
+        local wintype = vim.fn.win_gettype(win)
+        if wintype == "quickfix" or wintype == "loclist" then
+          pcall(vim.api.nvim_win_close, win, true)
+        end
+      end
+    end)
   end,
 })
 
