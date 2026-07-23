@@ -10,7 +10,8 @@
     url = "https://raw.githubusercontent.com/eza-community/eza-themes/refs/heads/main/themes/catppuccin-mocha.yml"
     refreshPeriod = {{ $default_refresh }}
 
-# Yazi catppuccin-mocha-blue theme.
+{{ if ne .osid "windows" }}
+# Yazi catppuccin-mocha-blue theme (yazi is nix-only, so no Windows).
 # The catppuccin/yazi repo dropped flavor.yazi packs in favor of single
 # .toml files; we just rename the chosen one to theme.toml at fetch time.
 [".config/yazi/theme.toml"]
@@ -27,14 +28,17 @@
     type = "file"
     url = "https://raw.githubusercontent.com/catppuccin/bat/main/themes/Catppuccin%20Mocha.tmTheme"
     refreshPeriod = {{ $default_refresh }}
+{{ end }}
 
-# ANSI Shadow figlet font (used by the Linux server motd hostname banner;
+{{ if has .osid (list "linux-debian" "linux-ubuntu") }}
+# ANSI Shadow figlet font (used by the Linux motd hostname banner;
 # see .chezmoiscripts/linux/run_onchange_after_60-install-fastfetch-motd.sh.tmpl).
 # Static file from xero/figlet-fonts; refresh yearly since fonts don't change.
 [".local/share/figlet-fonts/ANSI Shadow.flf"]
     type = "file"
     url = "https://raw.githubusercontent.com/xero/figlet-fonts/master/ANSI%20Shadow.flf"
     refreshPeriod = "8760h"
+{{ end }}
 
 
 {{ if ne .osid "windows" }}

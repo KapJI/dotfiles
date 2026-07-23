@@ -19,6 +19,8 @@ Documents
 {{ else }}
 .chezmoiscripts/unix/**
 .config/1Password
+# The nix profile flake only exists on macOS/Linux.
+.config/nix-profile
 .config/zsh
 .iterm2
 .mysrc
