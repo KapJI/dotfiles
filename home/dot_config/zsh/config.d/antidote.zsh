@@ -51,6 +51,18 @@ unset zsh_plugins zsh_plugins_txt
 # — `immediate` zstyle is NOT set — so the function runs after this
 # patch lands, picking up the new constant. The `Nmh-20` guard means
 # this no-ops silently if upstream zephyr changes the format.
+#
+# HISTORY — read before "fixing" this patch or the deferral:
+# an earlier attempt at this patch coincided with broken tab
+# completion; the real culprit was plugin load order (fsh loading
+# before fzf-tab/compinit), fixed in 4d0fed2, and the patch was then
+# deliberately reintroduced (b3cad0a). Two rules keep it working:
+#   1. Do NOT set `zstyle ':zephyr:plugin:completion' immediate` —
+#      that runs compinit during the bundle source above, before this
+#      patch exists, silently shrinking the window back to 20h
+#      (b3cad0a removed `immediate` for exactly this reason).
+#   2. If tab completion breaks, suspect plugin load order in
+#      .zsh_plugins.txt (see its header) before suspecting this patch.
 if (( ${+functions[run_compinit]} )); then
     _patched=$(functions run_compinit)
     if [[ $_patched == *Nmh-20* ]]; then
