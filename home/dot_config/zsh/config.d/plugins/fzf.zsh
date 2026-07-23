@@ -30,6 +30,7 @@ _fzf_compgen_dir() {
 }
 
 _fzf_compgen_unalias() {
+    local tmpfile
     tmpfile=$(mktemp /tmp/zsh-complete.XXXXXX)
     alias > "$tmpfile"
     fzf "$@" --preview 'ESCAPED=$(printf "%s=" {} | sed -e '"'"'s/[]\/$*.^[]/\\&/g'"'"'); cat '"$tmpfile"' | grep "^$ESCAPED"'

@@ -12,8 +12,12 @@ if [[ ${VSCODE_TASK:-} == false ]] && [ -t 0 ] && [ -z "$TMUX" ] && command -v t
     # failure and unlink the stale socket so the next `new -A` starts
     # a fresh server.
     if ! tmux list-sessions &>/dev/null; then
-        local _tmux_sock="${TMUX_TMPDIR:-${XDG_RUNTIME_DIR:-/tmp}}/tmux-$(id -u)/default"
-        [[ -S $_tmux_sock ]] && rm -f -- "$_tmux_sock"
+        # Anonymous function keeps `sock` local — at file scope `local`
+        # would silently create a global.
+        () {
+            local sock="${TMUX_TMPDIR:-${XDG_RUNTIME_DIR:-/tmp}}/tmux-$(id -u)/default"
+            [[ -S $sock ]] && rm -f -- "$sock"
+        }
     fi
     # `&& exit` keeps the original UX (detach = logout) but lets us fall
     # through to plain zsh if tmux can't start — `exec`'s replace-shell
