@@ -242,7 +242,14 @@
 
 - nix-server: tmux
 
+# Tagless upstream — tpm can only pin tags, so flake.lock pins it and
+# .tmux.conf loads it from the nix profile via run-shell.
+- nix-server: tmuxPlugins.extrakto
+
 - nix-server: tmuxPlugins.fingers   # nixpkgs ships the pre-built binary + wrapper
+
+# Tagless upstream, same flake.lock pinning as extrakto.
+- nix-server: tmuxPlugins.mode-indicator
 
 - nix: tealdeer
   winget: dbrgn.tealdeer
