@@ -1,5 +1,13 @@
 -- vim.opt.* settings (no plugins required)
 
+-- Leader keys. Backslash is vim's default — the choice here is
+-- deliberate, not an omission. Set explicitly (and before lazy.setup,
+-- which init.lua guarantees by requiring this module first) because
+-- lazy.nvim resolves plugin `keys` specs against the leader at startup;
+-- changing the leader anywhere later would silently split the two.
+vim.g.mapleader = "\\"
+vim.g.maplocalleader = "\\"
+
 vim.opt.mouse = "a"
 vim.opt.smartindent = true
 vim.opt.wrap = false
