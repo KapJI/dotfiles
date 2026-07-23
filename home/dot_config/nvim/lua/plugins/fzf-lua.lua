@@ -19,7 +19,13 @@ return {
     { "<leader>qq", function() require("fzf-lua").quickfix() end,              desc = "Quickfix list" },
     { "<leader>qh", function() require("fzf-lua").quickfix_stack() end,        desc = "Quickfix history" },
     { "<leader>qa", function()
-        vim.fn.setqflist({}, "a", {
+        -- Append to a dedicated "Bookmarks" list. setqflist(_, "a", …)
+        -- appends to whatever list is CURRENT — which would clobber an
+        -- active Diagnostics/grep list and retitle it "Bookmarks". So
+        -- append only when the current list is already Bookmarks;
+        -- otherwise start a fresh list with action " ".
+        local action = vim.fn.getqflist({ title = 0 }).title == "Bookmarks" and "a" or " "
+        vim.fn.setqflist({}, action, {
           title = "Bookmarks",
           items = { {
             filename = vim.fn.expand("%"),
@@ -28,8 +34,8 @@ return {
             text = vim.fn.getline("."),
           } },
         })
-        vim.notify("Added to quickfix", vim.log.levels.INFO)
-      end, desc = "Add line to quickfix" },
+        vim.notify("Added to bookmarks", vim.log.levels.INFO)
+      end, desc = "Add line to bookmarks (quickfix)" },
     { "<leader>?", function() require("fzf-lua").keymaps() end,                desc = "Search keymaps" },
   },
   config = function()
