@@ -46,16 +46,17 @@ vim.lsp.config("ruff", {})
 
 vim.lsp.config("rust_analyzer", {})
 
+-- Workspace libraries (nvim runtime + require()d plugin modules) are
+-- supplied on demand by lazydev.nvim (lua/plugins/lazydev.lua) instead
+-- of a static workspace.library dump of the whole runtimepath.
 vim.lsp.config("lua_ls", {
   settings = {
     Lua = {
       runtime = { version = "LuaJIT" },
-      workspace = {
-        checkThirdParty = false,
-        library = vim.api.nvim_get_runtime_file("", true),  -- nvim runtime + plugin sources
-      },
+      workspace = { checkThirdParty = false },
+      -- lazydev's library also defines `vim`; kept here as a fallback
+      -- for lua buffers lazydev doesn't cover.
       diagnostics = { globals = { "vim" } },
-      telemetry = { enable = false },
     },
   },
 })
