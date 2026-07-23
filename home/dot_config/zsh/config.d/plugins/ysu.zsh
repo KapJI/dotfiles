@@ -1,6 +1,7 @@
 # you-should-use
 YSU_MESSAGE_POSITION="after"
-YSU_IGNORED_ALIASES=("vi")
+# Don't nag about the vim=nvim alias when typing nvim directly.
+YSU_IGNORED_ALIASES=("vim")
 COLOUR_NONE="$(tput sgr0)"
 COLOUR_BOLD="$(tput bold)"
 COLOUR_YELLOW="$(tput setaf 3)"

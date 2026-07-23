@@ -1,9 +1,15 @@
 # Antidote plugins
 #
 # Load order matters here. Constraints:
-#  - fzf-tab must load AFTER compinit (it wires into compsys at load
-#    time). zephyr's completion plugin runs compinit synchronously
-#    when its `immediate` zstyle is set (see config.d/antidote.zsh).
+#  - zephyr's completion plugin DEFERS compinit to its post_zshrc
+#    (precmd) hook — the `immediate` zstyle is deliberately NOT set,
+#    because config.d/antidote.zsh patches run_compinit after the
+#    bundle is sourced and the patch only takes effect if compinit
+#    runs later. Plugins loading before compinit still work: zephyr
+#    queues compdef calls and replays them when the real compinit
+#    runs at the first prompt, and fzf-tab autoloads _main_complete
+#    straight from fpath at source time. The first Tab press always
+#    comes after the first prompt, so compsys is live by then.
 #  - OMZ lib must load BEFORE fast-syntax-highlighting. OMZ's
 #    lib/misc.zsh does `zle -N self-insert url-quote-magic` which
 #    REPLACES (not wraps) whatever's bound to self-insert. If fsh
@@ -19,10 +25,12 @@ romkatv/powerlevel10k
 zsh-users/zsh-completions path:src kind:fpath
 MichaelAquilina/zsh-you-should-use
 
-# compinit runs synchronously here (zephyr `immediate` zstyle).
+# Queues compdef calls; the real compinit runs at the first prompt
+# (post_zshrc), after antidote.zsh's run_compinit patch has landed.
 mattmc3/zephyr path:plugins/completion
 
-# fzf-tab requires compinit to have run.
+# Hooks _main_complete (autoloaded from fpath at source time), so it
+# tolerates the deferred compinit — see the header note.
 Aloxaf/fzf-tab
 
 # OMZ — must come BEFORE fsh. OMZ's lib/misc.zsh binds self-insert
@@ -35,8 +43,6 @@ ohmyzsh/ohmyzsh path:plugins/dirhistory
 ohmyzsh/ohmyzsh path:plugins/extract
 ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z
 ohmyzsh/ohmyzsh path:plugins/safe-paste
-# shrink-path provides shrink_path() called by config.d/auto_title.zsh.
-ohmyzsh/ohmyzsh path:plugins/shrink-path
 
 # fsh wraps widgets at source time; must come AFTER OMZ + fzf-tab so
 # the bindings (self-insert → url-quote-magic, fzf-tab-complete, etc.)

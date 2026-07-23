@@ -34,7 +34,9 @@ alias sudo="sudo " # hack to make these aliases available for sudo
 alias usage="du -h -d1 | sort -h"
 alias vim="nvim"
 alias czm="chezmoi"
-alias czmcd="cd $(chezmoi source-path)"
+# Single quotes: defer `chezmoi source-path` to use time instead of
+# spawning chezmoi on every shell startup.
+alias czmcd='cd "$(chezmoi source-path)"'
 # Bump pinned nixpkgs + claude-code-nix in the flake, then re-add the lock to chezmoi source.
 # After running, review/commit: chezmoi cd && git diff home/dot_config/nix-profile/flake.lock
 alias nix-bump-lock='nix flake update --flake ~/.config/nix-profile && chezmoi re-add ~/.config/nix-profile/flake.lock'
@@ -45,7 +47,7 @@ alias nix-bump-lock='nix flake update --flake ~/.config/nix-profile && chezmoi r
 # yazi-rs.github.io/docs/quick-start#shell-wrapper. Named yz to avoid
 # colliding with vim-yank muscle memory; type yz to launch.
 function yz() {
-  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
   yazi "$@" --cwd-file="$tmp"
   if cwd="$(< "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
     builtin cd -- "$cwd"

@@ -11,6 +11,9 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
             debian|ubuntu|pop)
                 DEBIAN_BASED=true
                 ;;
+            nixos)
+                # Supported (see reload() in aliases.zsh); no flag needed.
+                ;;
             *)
                 echo "ERROR: running on unknown Linux distro: ${ID}!"
                 ;;
