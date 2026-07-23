@@ -138,7 +138,7 @@ function global:gd {
 
 function global:gds {
     if ($MyInvocation.ExpectingInput) {
-        $input | & git.exe diff $args
+        $input | & git.exe diff --staged $args
     } else {
         & git.exe diff --staged $args
     }
@@ -306,6 +306,9 @@ function global:which ($command) {
 
 function global:touch {
     param (
+        # ValueFromRemainingArguments so `touch a b c` binds every
+        # positional argument, not just the first.
+        [Parameter(ValueFromRemainingArguments = $true)]
         [string[]]$Paths
     )
 

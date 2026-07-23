@@ -18,6 +18,11 @@ if (!(Test-Path $OUTPUT)) {
         }
     }
 
+    if (!(Test-Path $OUTPUT)) {
+        Write-Error "Failed to decrypt the age key after 5 attempts; aborting."
+        exit 1
+    }
+
     # Set permissions so only the current user has read and write access
     $user = "$env:USERDOMAIN\$env:USERNAME"
     icacls $OUTPUT /inheritance:r /grant:r "${user}:(R,W)"

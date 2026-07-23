@@ -1,5 +1,5 @@
-# Enable-Symlinks.ps1
-# This script enables symlink creation for non-admin users on Windows 11 by enabling Developer Mode.
+# Disable UAC elevation prompts for administrators
+# (ConsentPromptBehaviorAdmin = 0: elevate without prompting).
 # It elevates permissions if necessary and waits for user input before exiting the elevated script.
 
 # Function to check if the script is running as administrator
