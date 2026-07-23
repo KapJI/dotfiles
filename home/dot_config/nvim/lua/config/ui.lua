@@ -39,28 +39,36 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 -- Dim all nvim windows when tmux pane loses focus.
 -- We use the original lualine_c bg (set by the catppuccin-mocha lualine theme)
 -- to detect which highlight groups belong to lualine and need dimming.
+-- dim_lualine stays a no-op if the theme fails to load, so the focus
+-- autocmds below — which also drive the Normal-bg dimming — register
+-- either way instead of silently dying with the lualine half.
+local dim_lualine = function(_) end
+
 local ok, lualine_theme = pcall(require, "lualine.themes.catppuccin-mocha")
-if not ok then return end
+if ok then
+  local original_c_bg_int = tonumber(lualine_theme.normal.c.bg:sub(2), 16)
+  local inactive_lualine_bg_int = tonumber(inactive_lualine_bg:sub(2), 16)
 
-local original_c_bg = lualine_theme.normal.c.bg
-local original_c_bg_int = tonumber(original_c_bg:sub(2), 16)
-local inactive_lualine_bg_int = tonumber(inactive_lualine_bg:sub(2), 16)
+  local function set_lualine_c_bg(bg_int)
+    for _, group in ipairs(vim.fn.getcompletion("lualine_", "highlight")) do
+      if group:match("_inactive") then goto continue end
+      local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
+      local changed = false
+      if hl.bg == original_c_bg_int or hl.bg == inactive_lualine_bg_int then
+        hl.bg = bg_int
+        changed = true
+      end
+      if hl.fg == original_c_bg_int or hl.fg == inactive_lualine_bg_int then
+        hl.fg = bg_int
+        changed = true
+      end
+      if changed then vim.api.nvim_set_hl(0, group, hl) end
+      ::continue::
+    end
+  end
 
-local function set_lualine_c_bg(bg_int)
-  for _, group in ipairs(vim.fn.getcompletion("lualine_", "highlight")) do
-    if group:match("_inactive") then goto continue end
-    local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
-    local changed = false
-    if hl.bg == original_c_bg_int or hl.bg == inactive_lualine_bg_int then
-      hl.bg = bg_int
-      changed = true
-    end
-    if hl.fg == original_c_bg_int or hl.fg == inactive_lualine_bg_int then
-      hl.fg = bg_int
-      changed = true
-    end
-    if changed then vim.api.nvim_set_hl(0, group, hl) end
-    ::continue::
+  dim_lualine = function(dimmed)
+    set_lualine_c_bg(dimmed and inactive_lualine_bg_int or original_c_bg_int)
   end
 end
 
@@ -69,7 +77,7 @@ vim.api.nvim_create_autocmd("FocusLost", {
   callback = function()
     focused = false
     apply_normal_bg()
-    set_lualine_c_bg(inactive_lualine_bg_int)
+    dim_lualine(true)
   end,
 })
 vim.api.nvim_create_autocmd("FocusGained", {
@@ -77,7 +85,7 @@ vim.api.nvim_create_autocmd("FocusGained", {
   callback = function()
     focused = true
     apply_normal_bg()
-    set_lualine_c_bg(original_c_bg_int)
+    dim_lualine(false)
   end,
 })
 
@@ -88,7 +96,7 @@ vim.api.nvim_create_autocmd("ColorScheme", {
   group = augroup,
   callback = function()
     vim.schedule(function()
-      if not focused then set_lualine_c_bg(inactive_lualine_bg_int) end
+      if not focused then dim_lualine(true) end
     end)
   end,
 })
