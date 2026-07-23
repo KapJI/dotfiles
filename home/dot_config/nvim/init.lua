@@ -27,6 +27,9 @@ require("lazy").setup("plugins", {
   install = { colorscheme = { "catppuccin-mocha" } },
   change_detection = { notify = false },
   ui = { border = "rounded" },
+  -- No plugin here needs luarocks; disabling it silences the hererocks
+  -- ERROR/WARNINGs in `:checkhealth lazy` (which suggests this line).
+  rocks = { enabled = false },
 })
 
 -- Post-plugin configuration (LSP, UI tweaks that depend on highlights/lualine)
