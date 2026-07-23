@@ -15,6 +15,12 @@ local strip_whitespace_excluded = { markdown = true, diff = true, mail = true }
 vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*",
   callback = function()
+    -- Skip special buffers (buftype ~= "") and read-only ones. The :s
+    -- below errors E21 on a nomodifiable buffer, and a failing
+    -- BufWritePre aborts the whole write — so a protected buffer
+    -- couldn't be saved at all. The buftype guard also covers exporting
+    -- a scratch/help buffer with `:w file` (e.g. :checkhealth output).
+    if vim.bo.buftype ~= "" or not vim.bo.modifiable then return end
     if strip_whitespace_excluded[vim.bo.filetype] then return end
     local view = vim.fn.winsaveview()
     vim.cmd([[keeppatterns %s/\s\+$//e]])
