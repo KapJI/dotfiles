@@ -4,7 +4,11 @@
 # .tmux.conf hash: {{ joinPath .chezmoi.homeDir ".tmux.conf" | include | sha256sum }}
 
 if command -v tmux &> /dev/null; then
-    tmux source-file $HOME/.tmux.conf
+    # Source only into a running server — with none, the config loads at
+    # the next server start and source-file would just error.
+    if tmux has-session 2> /dev/null; then
+        tmux source-file $HOME/.tmux.conf
+    fi
     ~/.tmux/plugins/tpm/scripts/install_plugins.sh
 fi
 {{ end -}}
