@@ -1,1 +1,5 @@
-* text eol=lf
+* text=auto eol=lf
+# Never eol-normalize binary assets (an unconditional `text` attribute
+# would corrupt any binary that happens to contain CRLF byte pairs).
+*.icns -text
+*.age -text
