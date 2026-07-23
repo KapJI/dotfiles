@@ -8,9 +8,18 @@ fpath=("$ZDOTDIR/custom_completion" $fpath)
 [ -d /nix/var/nix/profiles/default/share/zsh/site-functions ] && \
     fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
 
-# Enable Homebrew completions
+# Enable Homebrew completions. Check the two canonical prefixes
+# (arm64 / Intel) directly — `$(brew --prefix)` forks brew, the single
+# biggest measured cost of shell startup (~30ms). Fall back to asking
+# brew only on a non-standard install.
 if [ "$MACOS" = true ]; then
-    fpath+=("$(brew --prefix)/share/zsh/site-functions")
+    if [ -d /opt/homebrew/share/zsh/site-functions ]; then
+        fpath+=(/opt/homebrew/share/zsh/site-functions)
+    elif [ -d /usr/local/share/zsh/site-functions ]; then
+        fpath+=(/usr/local/share/zsh/site-functions)
+    elif command -v brew >/dev/null; then
+        fpath+=("$(brew --prefix)/share/zsh/site-functions")
+    fi
 fi
 
 # Smart case completion. Case sensitive if upper case letters are used.

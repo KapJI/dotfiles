@@ -30,3 +30,10 @@ ZSH_AUTOSUGGEST_CLEAR_WIDGETS=(
 )
 
 # ZSH_AUTOSUGGEST_USE_ASYNC="true" # causes errors
+
+# Bind autosuggest's widget wrappers ONCE at the first precmd instead of
+# on every precmd (upstream's default exists to stay outermost if other
+# plugins rewrap widgets at runtime — nothing here does; fsh/fzf-tab all
+# wire up during zshrc, before the first prompt). Measured cost of the
+# default re-bind: ~9ms per prompt.
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
