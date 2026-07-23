@@ -5,6 +5,10 @@ set -euo pipefail
 KEYRING=/etc/apt/keyrings/dropbox-archive-keyring.gpg
 SOURCES=/etc/apt/sources.list.d/dropbox.sources
 CODENAME="{{ .chezmoi.osRelease.versionCodename }}"
+# Dropbox runs separate apt repos per distro, each with the distro's own
+# codenames as suites (ubuntu/dists/<debian codename>/ is a 404 and vice
+# versa), so the path component must match the host distro.
+DISTRO="{{ if eq .osid "linux-debian" }}debian{{ else }}ubuntu{{ end }}"
 
 if [ -f "$KEYRING" ] && [ -f "$SOURCES" ]; then
     exit 0
@@ -16,7 +20,7 @@ curl -fsSL https://linux.dropbox.com/fedora/rpm-public-key.asc \
 
 sudo tee "$SOURCES" >/dev/null <<EOF
 Types: deb
-URIs: http://linux.dropbox.com/ubuntu
+URIs: https://linux.dropbox.com/${DISTRO}
 Suites: ${CODENAME}
 Components: main
 Architectures: amd64
