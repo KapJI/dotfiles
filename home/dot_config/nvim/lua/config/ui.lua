@@ -1,9 +1,18 @@
 -- UI tweaks that depend on the colorscheme and lualine being loaded.
--- Loaded last in init.lua.
+-- Loaded last in init.lua. Overrides re-apply on ColorScheme — a
+-- colorscheme (re)load resets every highlight group, which would
+-- otherwise wipe them until restart (snacks.lua guards its underline
+-- override the same way).
 
 local active_bg = "#1e1e2e"
 local inactive_bg = "#24243a"
 local inactive_lualine_bg = "#1e1e31"
+
+local augroup = vim.api.nvim_create_augroup("user_ui_overrides", { clear = true })
+
+-- Track terminal focus so the ColorScheme re-apply restores the right
+-- variant (an unfocused pane shouldn't pop back to the active bg).
+local focused = true
 
 -- Change only the bg of a highlight group, preserving fg and attributes
 -- (nvim_set_hl replaces the whole group definition — a bare { bg = ... }
@@ -15,8 +24,16 @@ local function set_bg(group, bg)
 end
 
 -- Match tmux active/inactive pane background colors
-set_bg("Normal", active_bg)
-set_bg("NormalNC", inactive_bg)
+local function apply_normal_bg()
+  set_bg("Normal", focused and active_bg or inactive_bg)
+  set_bg("NormalNC", inactive_bg)
+end
+
+apply_normal_bg()
+vim.api.nvim_create_autocmd("ColorScheme", {
+  group = augroup,
+  callback = apply_normal_bg,
+})
 
 -- Dim all nvim windows when tmux pane loses focus.
 -- We use the original lualine_c bg (set by the catppuccin-mocha lualine theme)
@@ -47,14 +64,30 @@ local function set_lualine_c_bg(bg_int)
 end
 
 vim.api.nvim_create_autocmd("FocusLost", {
+  group = augroup,
   callback = function()
-    set_bg("Normal", inactive_bg)
+    focused = false
+    apply_normal_bg()
     set_lualine_c_bg(inactive_lualine_bg_int)
   end,
 })
 vim.api.nvim_create_autocmd("FocusGained", {
+  group = augroup,
   callback = function()
-    set_bg("Normal", active_bg)
+    focused = true
+    apply_normal_bg()
     set_lualine_c_bg(original_c_bg_int)
+  end,
+})
+
+-- Re-dim lualine after a colorscheme reload while unfocused. Deferred:
+-- lualine refreshes its own highlight groups on ColorScheme, and the
+-- dim pass must run after that refresh to see the recreated groups.
+vim.api.nvim_create_autocmd("ColorScheme", {
+  group = augroup,
+  callback = function()
+    vim.schedule(function()
+      if not focused then set_lualine_c_bg(inactive_lualine_bg_int) end
+    end)
   end,
 })
