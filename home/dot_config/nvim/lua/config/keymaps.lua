@@ -15,7 +15,7 @@ end, { desc = "Toggle verbose listchars" })
 
 -- Clipboard (OSC52)
 keyset({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank to clipboard" })
-keyset("n", "<leader>p", '"+p', { desc = "Paste from clipboard" })
+keyset({ "n", "v" }, "<leader>p", '"+p', { desc = "Paste from clipboard" })
 
 -- Toggle comments
 keyset("n", "<leader>/", "gcc", { remap = true, desc = "Toggle comment" })
