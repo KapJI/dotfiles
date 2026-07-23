@@ -3,14 +3,13 @@
 
 local keyset = vim.keymap.set
 
--- Toggle verbose listchars
-local full_listchars    = { eol = "¬", tab = ">·", trail = "~", extends = ">", precedes = "<", space = "␣" }
-local minimal_listchars = { extends = ">", precedes = "<", tab = "  ", trail = "~" }
+-- Toggle verbose listchars (presets single-sourced in config/options.lua)
+local listchars = require("config.options").listchars
 keyset("n", "<C-l>", function()
   if vim.opt.listchars:get().eol then
-    vim.opt.listchars = minimal_listchars
+    vim.opt.listchars = listchars.minimal
   else
-    vim.opt.listchars = full_listchars
+    vim.opt.listchars = listchars.full
   end
 end, { desc = "Toggle verbose listchars" })
 

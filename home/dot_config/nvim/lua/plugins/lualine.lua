@@ -4,7 +4,7 @@ return {
   dependencies = { "nvim-tree/nvim-web-devicons", "catppuccin/nvim" },
   event = "VeryLazy",
   config = function()
-    local inactive_lualine_bg = "#1e1e31"
+    local inactive_lualine_bg = require("config.colors").inactive_lualine_bg
     local lualine_theme = require("lualine.themes.catppuccin-mocha")
     lualine_theme.inactive.c.bg = inactive_lualine_bg
 

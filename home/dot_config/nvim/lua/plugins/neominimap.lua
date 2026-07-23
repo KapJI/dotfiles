@@ -83,8 +83,8 @@ return {
         -- Per-window sidescrolloff: keep cursor 1 col left of the minimap
         -- overlay (16 cols on the right) so it never disappears under it
         -- on long lines. Set window-local — windows without a minimap
-        -- attached keep the global sidescrolloff = 1 (see options.lua).
-        local DEFAULT_SSO = 1   -- matches vim.opt.sidescrolloff
+        -- attached fall back to the global sidescrolloff (options.lua),
+        -- read live so the two never drift.
         local MINIMAP_SSO = 17  -- minimap_width (16) + 1 col gap
 
         local function refresh_window(winid)
@@ -96,7 +96,7 @@ return {
             local mwinid = window_map.get_minimap_winid(winid)
             local has = mwinid ~= nil and vim.api.nvim_win_is_valid(mwinid)
             vim.api.nvim_set_option_value("sidescrolloff",
-                has and MINIMAP_SSO or DEFAULT_SSO,
+                has and MINIMAP_SSO or vim.go.sidescrolloff,
                 { scope = "local", win = winid })
         end
 

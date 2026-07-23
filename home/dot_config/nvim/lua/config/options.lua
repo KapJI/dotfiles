@@ -37,8 +37,15 @@ vim.opt.confirm = true              -- save/discard/cancel dialog instead of E37
 
 vim.opt.termguicolors = true        -- 24-bit color support
 
+-- Two listchars presets, single-sourced here; keymaps.lua's <C-l>
+-- toggle switches between them.
+local listchars = {
+  minimal = { extends = ">", precedes = "<", tab = "  ", trail = "~" },
+  full    = { eol = "¬", tab = ">·", trail = "~", extends = ">", precedes = "<", space = "␣" },
+}
+
 vim.opt.list = true
-vim.opt.listchars = { extends = ">", precedes = "<", tab = "  ", trail = "~" }
+vim.opt.listchars = listchars.minimal
 
 -- Treesitter-based folding. Start fully unfolded (foldlevel 99) so the
 -- fold column shows markers only on lines that are currently folded.
@@ -49,3 +56,6 @@ vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
 vim.opt.foldcolumn = "auto:1"          -- show only when something foldable is in view
 vim.opt.fillchars:append({ fold = " " })
+
+-- Values shared with other config modules (via require("config.options")).
+return { listchars = listchars }

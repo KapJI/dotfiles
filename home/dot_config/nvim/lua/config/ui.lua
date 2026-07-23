@@ -4,9 +4,10 @@
 -- otherwise wipe them until restart (snacks.lua guards its underline
 -- override the same way).
 
-local active_bg = "#1e1e2e"
-local inactive_bg = "#24243a"
-local inactive_lualine_bg = "#1e1e31"
+local colors = require("config.colors")
+local active_bg = colors.active_bg
+local inactive_bg = colors.inactive_bg
+local inactive_lualine_bg = colors.inactive_lualine_bg
 
 local augroup = vim.api.nvim_create_augroup("user_ui_overrides", { clear = true })
 
