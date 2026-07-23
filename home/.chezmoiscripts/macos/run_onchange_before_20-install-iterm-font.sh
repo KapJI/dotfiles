@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 function iterm_get() {
   /usr/libexec/PlistBuddy -c "Print :$1" ~/Library/Preferences/com.googlecode.iterm2.plist
@@ -9,16 +10,19 @@ function install_iterm_font() {
     if [ "$TERM_PROGRAM" != "iTerm.app" ]; then
         return 0
     fi
-    [ -x "/usr/libexec/PlistBuddy" ]
-    [ -x "/usr/bin/plutil" ]
-    [ -x "/usr/bin/defaults" ]
-    [ -f "$HOME/Library/Preferences/com.googlecode.iterm2.plist" ]
-    [ -r "$HOME/Library/Preferences/com.googlecode.iterm2.plist" ]
-    [ -w "$HOME/Library/Preferences/com.googlecode.iterm2.plist" ]
+    # Preconditions — skip quietly (don't fail the apply) when iTerm's
+    # prefs aren't in a state we can safely edit.
+    [ -x "/usr/libexec/PlistBuddy" ] || return 0
+    [ -x "/usr/bin/plutil" ] || return 0
+    [ -x "/usr/bin/defaults" ] || return 0
+    [ -f "$HOME/Library/Preferences/com.googlecode.iterm2.plist" ] || return 0
+    [ -r "$HOME/Library/Preferences/com.googlecode.iterm2.plist" ] || return 0
+    [ -w "$HOME/Library/Preferences/com.googlecode.iterm2.plist" ] || return 0
     local guid1="$(iterm_get '"Default Bookmark Guid"' 2>/dev/null)"
     local guid2="$(iterm_get '"New Bookmarks":0:"Guid"' 2>/dev/null)"
     local font="$(iterm_get '"New Bookmarks":0:"Normal Font"' 2>/dev/null)"
-    [ "$guid1" = "$guid2" ]
+    # Only touch bookmark 0 while it is the default profile.
+    [ "$guid1" = "$guid2" ] || return 0
     [[ $font != "MesloLGS-NF-Regular "* ]] || return 0
     # Download fonts
     command mkdir -p "$HOME/Library/Fonts"

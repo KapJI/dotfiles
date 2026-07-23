@@ -5,7 +5,8 @@
 
 # Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 # Delete profile generations older than 30 days (keeps recent rollback window),
-# then GC unreferenced store paths.
-command -v nix-collect-garbage >/dev/null && \
-    nix-collect-garbage --delete-older-than 30d
+# then GC unreferenced store paths. Skip — don't fail the apply — on
+# hosts where nix isn't available.
+command -v nix-collect-garbage >/dev/null 2>&1 || exit 0
+nix-collect-garbage --delete-older-than 30d
 {{ end -}}

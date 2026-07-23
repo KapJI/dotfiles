@@ -3,6 +3,11 @@
 # host: {{ .chezmoi.hostname }}
 set -euo pipefail
 
+# figlet comes from the nix profile; chezmoi runs each script in a fresh
+# non-interactive shell, so prime PATH like the other nix-consuming
+# scripts do.
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
+
 # Install / update the fastfetch-based motd panel. Layout:
 #
 #   <hostname figlet banner — full width, blue→mauve gradient>

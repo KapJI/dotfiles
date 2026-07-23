@@ -9,5 +9,9 @@ if [ ! -f "$OUTPUT" ]; then
             break
         fi
     done
+    if [ ! -f "$OUTPUT" ]; then
+        echo "Failed to decrypt the age key after 5 attempts; aborting." >&2
+        exit 1
+    fi
     chmod 600 "$OUTPUT"
 fi
