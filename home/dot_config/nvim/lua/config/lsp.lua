@@ -24,7 +24,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- <leader>cr is bound globally by inc-rename.nvim (live-preview rename).
     -- Don't shadow it here with a buffer-local binding to vim.lsp.buf.rename.
     keyset({ "n", "v" }, "<leader>ca", function() require("fzf-lua").lsp_code_actions() end, opts("Code action"))
-    -- <leader>cf is bound globally by conform.nvim (with lsp_fallback for filetypes
+    -- <leader>cf is bound globally by conform.nvim (with LSP fallback for filetypes
     -- without a CLI formatter). Don't shadow it here with a buffer-local LSP-only
     -- binding.
   end,
