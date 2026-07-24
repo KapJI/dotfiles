@@ -50,11 +50,24 @@ if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
         '
     fi
 
-    # Snapshot plugin-cache HEAD refs BEFORE update so we can detect
-    # whether anything actually changed. This script runs weekly but
-    # most weeks no plugin has updates; we want to invalidate the
-    # zsh compdump cache only when at least one plugin's HEAD moved.
-    hash_before=$(find "$antidote_home" -maxdepth 4 -name HEAD -type f -exec cat {} + 2>/dev/null | sha256sum)
+    # Snapshot each plugin's checked-out commit BEFORE update so we can
+    # detect whether anything actually changed. This runs weekly but most
+    # weeks no plugin updates; we only invalidate the zsh compdump cache
+    # when at least one plugin's HEAD commit moved.
+    #
+    # Hash the resolved commit SHA, NOT the .git/HEAD file: every plugin
+    # is checked out on a branch, so HEAD is a symbolic ref
+    # ("ref: refs/heads/master") whose bytes never change as commits
+    # advance — hashing the file would compare equal every week and
+    # silently skip invalidation.
+    _antidote_head_snapshot() {
+        find "$antidote_home" -maxdepth 3 -name .git -type d 2>/dev/null \
+            | sort \
+            | while IFS= read -r gitdir; do
+                git --git-dir="$gitdir" rev-parse HEAD 2>/dev/null
+            done | sha256sum
+    }
+    hash_before=$(_antidote_head_snapshot)
 
     if ! zsh -c 'source ~/.config/zsh/antidote/antidote.zsh; antidote update'; then
         echo "antidote update failed — likely an auth or host-key issue." >&2
@@ -62,7 +75,7 @@ if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
         exit 1
     fi
 
-    hash_after=$(find "$antidote_home" -maxdepth 4 -name HEAD -type f -exec cat {} + 2>/dev/null | sha256sum)
+    hash_after=$(_antidote_head_snapshot)
     if [ "$hash_before" != "$hash_after" ]; then
         # At least one plugin moved. Invalidate compdump in case the
         # update added/removed completion files, and drop the static
