@@ -172,12 +172,18 @@ bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection
 # the same name (zsh/config.d/copy_last_output.zsh). In a vim/nvim pane
 # forward Alt-Y to the app instead, like the M-hjkl bindings above.
 bind -n M-Y if-shell "$is_vim" "send-keys M-Y" {
-    # Both inner branches assume a ❯ prompt exists to anchor the
-    # selection. On a pane with none (a REPL, a raw pager, alternate
-    # prompts) search-backward finds nothing, the cursor stays put, and
-    # the fallback would silently copy the whole visible screen while
-    # still claiming success. Guard on any ❯ being present first.
-    if-shell -b "tmux capture-pane -p -J | grep -q '❯'" {
+    # Both inner branches need a ❯ prompt to anchor the selection, and
+    # copy-mode's own search-backward reaches the full scrollback — so
+    # scan the whole history (-S -), not just the visible screen. That
+    # way a launching prompt that scrolled off during long, multi-screen
+    # output still anchors the copy. A pane with no ❯ anywhere (a REPL, a
+    # raw pager, an alternate-screen app) is still rejected rather than
+    # copying garbage.
+    if-shell -b "tmux capture-pane -p -S - -J | grep -q '❯'" {
+        # A ❯ in the last two visible lines means we are sitting at a
+        # finished prompt: copy the previous command's output. Otherwise
+        # a command is still running: copy from the last prompt (which
+        # may be scrolled off) down to the current output.
         if-shell -b "tmux capture-pane -p -J | tail -n 2 | grep -q '❯'" {
             copy-mode
             send -X search-backward '❯'
