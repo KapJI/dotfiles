@@ -24,12 +24,16 @@ return {
         go = { "gopls", "goimports" }, -- match conform (goimports + gofmt), not gofumpt
         rust = { "rust-analyzer" },
         toml = { "taplo" },
-        dockerfile = { "dockerfile-language-server", "hadolint" },
+        dockerfile = { "dockerfile-language-server" }, -- no hadolint: nvim-lint doesn't run it
         terraform = { "terraform-ls" },
-        typescript = { "typescript-language-server", "prettier", "eslint_d" },
-        javascript = { "typescript-language-server", "prettier", "eslint_d" },
-        html = { "html-lsp", "prettier" },
-        css = { "css-lsp", "prettier" },
+        -- ts/js/html/css: LSP only. No prettier/eslint_d — conform doesn't
+        -- format these filetypes and nvim-lint doesn't run eslint_d, so
+        -- installing them would be dead weight. (prettier stays suggested
+        -- for yaml/json/markdown, which conform does drive.)
+        typescript = { "typescript-language-server" },
+        javascript = { "typescript-language-server" },
+        html = { "html-lsp" },
+        css = { "css-lsp" },
       }
 
       vim.api.nvim_create_user_command("MasonSuggest", function()

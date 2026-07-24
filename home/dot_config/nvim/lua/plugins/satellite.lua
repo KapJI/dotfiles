@@ -10,7 +10,7 @@ return {
     winblend = 50, -- transparency for the bar background
     zindex = 40,
     excluded_filetypes = {
-      "alpha",
+      "snacks_dashboard", -- the dashboard has nothing to scroll; a bar over it is noise
       "fzf",
       "DiffviewFiles",
       "DiffviewFileHistory",

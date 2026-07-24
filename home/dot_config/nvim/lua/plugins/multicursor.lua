@@ -17,7 +17,7 @@ return {
     keyset({ "n", "x" }, "<leader>mn", function()
       mc.matchSkipCursor(1)
     end, { desc = "Multi-cursor: skip + next match" })
-    -- One cursor per line in the visual selection.
+    -- Add a single cursor one line below the main cursor (press to stack more).
     keyset({ "n", "x" }, "<leader>ml", function()
       mc.lineAddCursor(1)
     end, { desc = "Multi-cursor: add cursor below" })
