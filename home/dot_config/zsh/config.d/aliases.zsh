@@ -82,6 +82,11 @@ alias gmv="git mv"
 alias gpl="git pull"
 alias gplra="git pull --rebase --autostash"
 alias gp="git push"
+# Safe force-push default: --force-with-lease refuses to clobber remote
+# commits you haven't fetched; --force-if-includes additionally requires
+# your local ref to include the remote tip. gpf! stays as the raw,
+# no-questions-asked escape hatch.
+alias gpf="git push --force-with-lease --force-if-includes"
 alias gpf!="git push --force"
 alias gr="git remote"
 alias grb="git rebase"
