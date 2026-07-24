@@ -16,13 +16,13 @@ return {
   },
   opts = {
     backends = { "lsp", "treesitter", "markdown", "man" },
-    layout   = { default_direction = "right", min_width = 25 },
-    autojump = true,           -- moving in the outline jumps the source too
+    layout = { default_direction = "right", min_width = 25 },
+    autojump = true, -- moving in the outline jumps the source too
     show_guides = true,
-    highlight_on_jump = 250,   -- briefly highlight the destination line
+    highlight_on_jump = 250, -- briefly highlight the destination line
   },
   keys = {
-    { "<leader>co", "<cmd>AerialToggle!<cr>",   desc = "Code outline (aerial)" },
+    { "<leader>co", "<cmd>AerialToggle!<cr>", desc = "Code outline (aerial)" },
     { "<leader>cO", "<cmd>AerialNavToggle<cr>", desc = "Code outline picker" },
   },
 }

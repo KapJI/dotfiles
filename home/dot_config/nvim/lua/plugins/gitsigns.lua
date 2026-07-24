@@ -8,7 +8,9 @@ return {
       on_attach = function(bufnr)
         -- snacks.bigfile remaps oversized buffers to filetype "bigfile";
         -- skip gitsigns there to avoid running diff on huge buffers.
-        if vim.bo[bufnr].filetype == "bigfile" then return false end
+        if vim.bo[bufnr].filetype == "bigfile" then
+          return false
+        end
 
         local gs = require("gitsigns")
         -- In diff windows keep the built-in ]c/[c (jump to diff change);

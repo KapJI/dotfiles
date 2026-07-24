@@ -12,11 +12,11 @@ return {
   ft = { "markdown" },
   opts = {
     file_types = { "markdown" },
-    code     = { sign = false, width = "block", min_width = 60 },
-    heading  = { sign = false, position = "inline" },
+    code = { sign = false, width = "block", min_width = 60 },
+    heading = { sign = false, position = "inline" },
     checkbox = {
       unchecked = { icon = "󰄱 " },
-      checked   = { icon = "󰱒 " },
+      checked = { icon = "󰱒 " },
     },
   },
   keys = {

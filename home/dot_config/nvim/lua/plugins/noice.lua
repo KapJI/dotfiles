@@ -18,22 +18,34 @@ return {
   keys = {
     {
       "<C-f>",
-      function() if not require("noice.lsp").scroll(4)  then return "<C-f>" end end,
-      mode = { "n", "i", "s" }, expr = true, silent = true,
+      function()
+        if not require("noice.lsp").scroll(4) then
+          return "<C-f>"
+        end
+      end,
+      mode = { "n", "i", "s" },
+      expr = true,
+      silent = true,
       desc = "Scroll forward (noice hover or buffer)",
     },
     {
       "<C-b>",
-      function() if not require("noice.lsp").scroll(-4) then return "<C-b>" end end,
-      mode = { "n", "i", "s" }, expr = true, silent = true,
+      function()
+        if not require("noice.lsp").scroll(-4) then
+          return "<C-b>"
+        end
+      end,
+      mode = { "n", "i", "s" },
+      expr = true,
+      silent = true,
       desc = "Scroll back (noice hover or buffer)",
     },
   },
   opts = {
     cmdline = {
       enabled = true,
-      view    = "cmdline", -- classic bottom row, syntax-highlighted by noice
-      format  = {
+      view = "cmdline", -- classic bottom row, syntax-highlighted by noice
+      format = {
         -- Override the `input` format from "cmdline_input" (popup with
         -- prompt as title) to the bottom-row "cmdline" view. Otherwise
         -- vim's residual "Press ENTER" prompts and similar render as
@@ -42,13 +54,13 @@ return {
         input = { view = "cmdline", icon = "󰥻 " },
       },
     },
-    messages   = { enabled = true },                  -- :echo / :echom / E-errors → nvim-notify toasts
-    popupmenu  = { enabled = true },                  -- styled wildmenu for `:edit <Tab>`
-    notify     = { enabled = true, view = "notify" }, -- vim.notify → nvim-notify
+    messages = { enabled = true }, -- :echo / :echom / E-errors → nvim-notify toasts
+    popupmenu = { enabled = true }, -- styled wildmenu for `:edit <Tab>`
+    notify = { enabled = true, view = "notify" }, -- vim.notify → nvim-notify
     lsp = {
-      progress  = { enabled = true },  -- LSP indexing/loading toasts (lua_ls workspace, rust-analyzer, etc.); pyright filtered out below — its progress events have no message/percentage
-      hover     = { enabled = true },  -- routed through noice view; <C-f>/<C-b> scroll without focus
-      signature = { enabled = true },  -- auto-popup as you type inside ( )
+      progress = { enabled = true }, -- LSP indexing/loading toasts (lua_ls workspace, rust-analyzer, etc.); pyright filtered out below — its progress events have no message/percentage
+      hover = { enabled = true }, -- routed through noice view; <C-f>/<C-b> scroll without focus
+      signature = { enabled = true }, -- auto-popup as you type inside ( )
       -- NOTE: lsp.override (markdown utils + cmp) intentionally NOT
       -- enabled. render-markdown.nvim already handles styling in the
       -- hover popup buffers (filetype=markdown), so flipping the
@@ -56,7 +68,7 @@ return {
       -- a :checkhealth noice warning. Not worth the config bloat.
     },
     presets = {
-      lsp_doc_border        = true, -- rounded border + offset for the hover popup
+      lsp_doc_border = true, -- rounded border + offset for the hover popup
       long_message_to_split = true, -- multi-line output (E-stacks, :messages dump) → split, not toast
     },
     -- Override the `:Noice` / NoiceFzf history filter to exclude
@@ -74,13 +86,14 @@ return {
             { warning = true },
             {
               event = "msg_show",
-              kind  = { "", "echo", "echomsg", "lua_print", "list_cmd", "bufwrite", "shell_out" },
-              cond  = function(msg)
+              kind = { "", "echo", "echomsg", "lua_print", "list_cmd", "bufwrite", "shell_out" },
+              cond = function(msg)
                 local text = msg.content and msg:content() or ""
                 return not (
                   text:match("^%d+ lines? [<>]ed")
                   or text:match("^%d+ lines? yanked")
-                  or text:match("^%d+ %a+ lines?$"))
+                  or text:match("^%d+ %a+ lines?$")
+                )
               end,
             },
             { event = "lsp", kind = "message" },
@@ -97,8 +110,8 @@ return {
       {
         filter = {
           event = "lsp",
-          kind  = "progress",
-          cond  = function(msg)
+          kind = "progress",
+          cond = function(msg)
             return msg.opts.progress and msg.opts.progress.client == "pyright"
           end,
         },
@@ -118,8 +131,8 @@ return {
       {
         view = "notify",
         filter = {
-          event      = "msg_show",
-          kind       = { "", "echo", "echomsg", "lua_print", "list_cmd", "bufwrite", "shell_out" },
+          event = "msg_show",
+          kind = { "", "echo", "echomsg", "lua_print", "list_cmd", "bufwrite", "shell_out" },
           max_height = 19,
         },
         opts = { replace = true, merge = true, title = "Messages" },
@@ -138,8 +151,8 @@ return {
         filter = { error = true, max_height = 19 },
         opts = {
           replace = true,
-          merge   = true,
-          title   = "Error",
+          merge = true,
+          title = "Error",
         },
       },
     },

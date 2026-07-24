@@ -8,7 +8,7 @@ local ok, palettes = pcall(require, "catppuccin.palettes")
 local base = ok and palettes.get_palette("mocha").base or "#1e1e2e"
 
 return {
-  active_bg           = base,       -- catppuccin-mocha base (#1e1e2e)
-  inactive_bg         = "#24243a",  -- Normal bg when the tmux pane is unfocused
-  inactive_lualine_bg = "#1e1e31",  -- dimmed lualine_c bg (inactive splits / unfocused)
+  active_bg = base, -- catppuccin-mocha base (#1e1e2e)
+  inactive_bg = "#24243a", -- Normal bg when the tmux pane is unfocused
+  inactive_lualine_bg = "#1e1e31", -- dimmed lualine_c bg (inactive splits / unfocused)
 }

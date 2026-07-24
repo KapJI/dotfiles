@@ -24,7 +24,9 @@ return {
     -- `create_hl` / `format_hl` / `get_default_hl` API.
     local lualine_utils = require("lualine.utils.utils")
     local function format(self, text, hl_group, opts)
-      if not hl_group or hl_group == "" then return text end
+      if not hl_group or hl_group == "" then
+        return text
+      end
       opts = opts or {}
       local cache_key = "_pp_" .. hl_group .. (opts.fg_only and "_fg" or "")
       self.hl_cache = self.hl_cache or {}
@@ -32,12 +34,18 @@ return {
         local gui
         if not opts.fg_only then
           local parts = {}
-          if lualine_utils.extract_highlight_colors(hl_group, "bold")   then parts[#parts + 1] = "bold"   end
-          if lualine_utils.extract_highlight_colors(hl_group, "italic") then parts[#parts + 1] = "italic" end
-          if #parts > 0 then gui = table.concat(parts, ",") end
+          if lualine_utils.extract_highlight_colors(hl_group, "bold") then
+            parts[#parts + 1] = "bold"
+          end
+          if lualine_utils.extract_highlight_colors(hl_group, "italic") then
+            parts[#parts + 1] = "italic"
+          end
+          if #parts > 0 then
+            gui = table.concat(parts, ",")
+          end
         end
         self.hl_cache[cache_key] = self:create_hl({
-          fg  = lualine_utils.extract_highlight_colors(hl_group, "fg"),
+          fg = lualine_utils.extract_highlight_colors(hl_group, "fg"),
           gui = gui,
         }, cache_key)
       end
@@ -46,17 +54,23 @@ return {
 
     local function pretty_path(self)
       local abs = vim.fn.expand("%:p")
-      if abs == "" then return "[No Name]" end
+      if abs == "" then
+        return "[No Name]"
+      end
       local display = abs
       local cwd = vim.fn.getcwd()
-      if abs:sub(1, #cwd + 1) == cwd .. "/" then display = abs:sub(#cwd + 2) end
+      if abs:sub(1, #cwd + 1) == cwd .. "/" then
+        display = abs:sub(#cwd + 2)
+      end
       local parts = vim.split(display, "/")
       if #parts > 3 then
         parts = { parts[1], "…", unpack(parts, #parts - 1, #parts) }
       end
 
       local filename = parts[#parts]
-      if vim.bo.modified then filename = filename .. " ✎" end
+      if vim.bo.modified then
+        filename = filename .. " ✎"
+      end
       -- "New file" — buffer has a name but the underlying file doesn't
       -- exist on disk yet (e.g. `:e new.txt` before first :w). Skip for
       -- non-file buftypes (terminal, nofile, help, etc).
@@ -72,7 +86,9 @@ return {
       end
 
       local out = dir .. filename
-      if vim.bo.readonly then out = "🔒 " .. out end
+      if vim.bo.readonly then
+        out = "🔒 " .. out
+      end
       return out
     end
 
@@ -89,7 +105,9 @@ return {
         lualine_y = {
           function()
             local size = vim.fn.getfsize(vim.fn.expand("%"))
-            if size < 0 then return "" end
+            if size < 0 then
+              return ""
+            end
             local suffixes = { "B", "KB", "MB", "GB" }
             local i = 1
             local fsize = size
@@ -97,7 +115,9 @@ return {
               fsize = fsize / 1024
               i = i + 1
             end
-            if i == 1 then return string.format("%d %s", fsize, suffixes[i]) end
+            if i == 1 then
+              return string.format("%d %s", fsize, suffixes[i])
+            end
             return string.format("%.1f %s", fsize, suffixes[i])
           end,
         },

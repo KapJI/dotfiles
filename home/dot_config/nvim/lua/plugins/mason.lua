@@ -9,8 +9,8 @@
 return {
   {
     "mason-org/mason.nvim",
-    lazy = false,                       -- load early so PATH is set before lspconfig event fires
-    priority = 200,                     -- before mason-lspconfig (default priority 100)
+    lazy = false, -- load early so PATH is set before lspconfig event fires
+    priority = 200, -- before mason-lspconfig (default priority 100)
     build = ":MasonUpdate",
     keys = { { "<leader>cm", "<Cmd>Mason<CR>", desc = "Mason: LSP/tools manager" } },
     opts = {
@@ -26,14 +26,14 @@ return {
   },
   {
     "mason-org/mason-lspconfig.nvim",
-    lazy = false,                       -- automatic_enable needs to fire at startup
+    lazy = false, -- automatic_enable needs to fire at startup
     dependencies = {
       "mason-org/mason.nvim",
       "neovim/nvim-lspconfig",
     },
     opts = {
-      ensure_installed = {},             -- don't force-install anything; user picks via :Mason
-      automatic_enable = true,           -- auto vim.lsp.enable() any mason-installed server
+      ensure_installed = {}, -- don't force-install anything; user picks via :Mason
+      automatic_enable = true, -- auto vim.lsp.enable() any mason-installed server
     },
   },
 }

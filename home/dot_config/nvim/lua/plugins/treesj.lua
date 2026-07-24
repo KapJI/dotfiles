@@ -11,8 +11,8 @@ return {
     dependencies = { "nvim-treesitter/nvim-treesitter" },
     opts = {
       use_default_keymaps = false, -- we set our own above
-      max_join_length     = 200,    -- don't join into absurdly long lines
-      cursor_behavior     = "hold", -- keep cursor on the same node after toggle
+      max_join_length = 200, -- don't join into absurdly long lines
+      cursor_behavior = "hold", -- keep cursor on the same node after toggle
     },
   },
 }

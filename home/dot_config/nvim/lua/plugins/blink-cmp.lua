@@ -1,7 +1,7 @@
 -- Completion engine
 return {
   "saghen/blink.cmp",
-  version = "*",                -- use prebuilt rust binary from latest release
+  version = "*", -- use prebuilt rust binary from latest release
   event = { "InsertEnter", "CmdlineEnter" },
   dependencies = { "L3MON4D3/LuaSnip" },
   opts = {
@@ -16,7 +16,9 @@ return {
       --   col 0 or after whitespace → real tab (so indentation works)
       ["<Tab>"] = {
         function(cmp)
-          if cmp.is_visible() then return cmp.select_next() end
+          if cmp.is_visible() then
+            return cmp.select_next()
+          end
           local col = vim.fn.col(".") - 1
           if col > 0 and not vim.fn.getline("."):sub(col, col):match("%s") then
             return cmp.show()

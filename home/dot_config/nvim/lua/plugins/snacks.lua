@@ -5,7 +5,7 @@
 return {
   "folke/snacks.nvim",
   priority = 1000,
-  lazy     = false,
+  lazy = false,
   -- Override LSP reference highlight groups to use underline instead of
   -- the colorscheme's default background-fill. snacks.words drives these
   -- groups via vim.lsp.buf.document_highlight(); the underline style
@@ -22,7 +22,7 @@ return {
     end
     apply_underline()
     vim.api.nvim_create_autocmd("ColorScheme", {
-      group    = vim.api.nvim_create_augroup("snacks_words_underline", { clear = true }),
+      group = vim.api.nvim_create_augroup("snacks_words_underline", { clear = true }),
       callback = apply_underline,
     })
 
@@ -31,13 +31,15 @@ return {
     -- meaningful (LSP-attached buffers). ]] / [[ stay as ftplugin's
     -- section-motion (next/prev def/class) on Python, Lua, etc.
     vim.api.nvim_create_autocmd("LspAttach", {
-      group    = vim.api.nvim_create_augroup("snacks_words_keys", { clear = true }),
+      group = vim.api.nvim_create_augroup("snacks_words_keys", { clear = true }),
       callback = function(args)
         local buf = args.buf
-        vim.keymap.set({ "n", "x" }, "]r", function() Snacks.words.jump(1, true) end,
-          { buffer = buf, desc = "Next reference" })
-        vim.keymap.set({ "n", "x" }, "[r", function() Snacks.words.jump(-1, true) end,
-          { buffer = buf, desc = "Previous reference" })
+        vim.keymap.set({ "n", "x" }, "]r", function()
+          Snacks.words.jump(1, true)
+        end, { buffer = buf, desc = "Next reference" })
+        vim.keymap.set({ "n", "x" }, "[r", function()
+          Snacks.words.jump(-1, true)
+        end, { buffer = buf, desc = "Previous reference" })
       end,
     })
   end,
@@ -56,15 +58,15 @@ return {
           "                                                ",
         }, "\n"),
         keys = {
-          { icon = "󰈞", key = "f", desc = "Find file",       action = ":FzfLua files" },
-          { icon = "󰋚", key = "r", desc = "Recent files",    action = ":FzfLua oldfiles" },
+          { icon = "󰈞", key = "f", desc = "Find file", action = ":FzfLua files" },
+          { icon = "󰋚", key = "r", desc = "Recent files", action = ":FzfLua oldfiles" },
           { icon = "󰦛", key = "s", desc = "Restore session", section = "session" },
-          { icon = "󰍉", key = "g", desc = "Live grep",       action = ":FzfLua live_grep" },
-          { icon = "󰈙", key = "e", desc = "New file",        action = ":enew" },
-          { icon = "󰉋", key = ".", desc = "Yazi",            action = ":Yazi cwd" },
-          { icon = "󰒲", key = "l", desc = "Lazy",            action = ":Lazy" },
-          { icon = "󰏖", key = "m", desc = "Mason",           action = ":Mason" },
-          { icon = "󰗼", key = "q", desc = "Quit",            action = ":qa" },
+          { icon = "󰍉", key = "g", desc = "Live grep", action = ":FzfLua live_grep" },
+          { icon = "󰈙", key = "e", desc = "New file", action = ":enew" },
+          { icon = "󰉋", key = ".", desc = "Yazi", action = ":Yazi cwd" },
+          { icon = "󰒲", key = "l", desc = "Lazy", action = ":Lazy" },
+          { icon = "󰏖", key = "m", desc = "Mason", action = ":Mason" },
+          { icon = "󰗼", key = "q", desc = "Quit", action = ":qa" },
         },
       },
       -- Two-pane layout: left = banner + buttons + startup line,
@@ -78,7 +80,7 @@ return {
         -- is 8 lines tall; tweak this if alignment drifts.
         { pane = 2, text = "\n\n\n\n\n\n\n\n\n" },
         { pane = 2, title = "󰋚 Recent Files", section = "recent_files", indent = 2, padding = 1 },
-        { pane = 2, title = "󰉋 Projects",     section = "projects",     indent = 2, padding = 1 },
+        { pane = 2, title = "󰉋 Projects", section = "projects", indent = 2, padding = 1 },
         function()
           local body = require("config.dashboard-tips").pick(3)[1] -- single Text item with \n
           return {
@@ -98,53 +100,53 @@ return {
     -- Disable expensive features (treesitter, LSP, syntax, folds, undofile)
     -- when a buffer's file is above ~1.5MB. Saves nvim from stalls on
     -- large logs, JSON dumps, or minified bundles.
-    bigfile      = { enabled = true },
+    bigfile = { enabled = true },
 
     -- Notifications are owned by noice.nvim → nvim-notify (see noice.lua).
     -- snacks.notifier is left here only as a documented off-switch so its
     -- prior config is recoverable in git history if we want to flip back.
-    notifier     = { enabled = false },
+    notifier = { enabled = false },
 
     -- Smooth scroll animation. Disabled because the per-frame work
     -- (redraws + virt-text bookkeeping) caused noticeable input lag on
     -- large buffers and during rapid <C-d>/<C-u>. The configured
     -- timings are preserved in git history if we want to revisit.
-    scroll       = { enabled = false },
+    scroll = { enabled = false },
 
     -- Other snacks modules — disabled until we explicitly want them.
-    quickfile    = { enabled = false },
-    scope        = { enabled = false },
+    quickfile = { enabled = false },
+    scope = { enabled = false },
     statuscolumn = { enabled = false },
 
     -- Highlights all occurrences of the word under the cursor after a
     -- short idle. Like vim-illuminate but in-ecosystem.
-    words        = { enabled = true },
+    words = { enabled = true },
 
     -- Replaces lukas-reineke/indent-blankline. Same indent guides plus
     -- animated current-scope highlight (the unique-vs-ibl bit).
     -- Chunk mode (┌──└── bracket around current scope) left off — try
     -- toggling if you want it more visible.
-    indent       = {
-      enabled  = true,
-      animate  = { enabled = true },
-      scope    = { enabled = true },
-      chunk    = { enabled = false },
+    indent = {
+      enabled = true,
+      animate = { enabled = true },
+      scope = { enabled = true },
+      chunk = { enabled = false },
     },
 
     -- Replace vim.ui.input (cmdline prompt) with a floating window.
     -- Most input prompts already go through inc-rename / fzf-lua;
     -- this catches the remaining vim.ui.input calls for visual consistency.
-    input        = { enabled = true },
+    input = { enabled = true },
     -- snacks.picker is enabled only as the engine snacks.explorer rides
     -- on — fzf-lua stays the finder for <leader>f*. `ui_select = false`
     -- so it doesn't take over vim.ui.select. The explorer is a picker
     -- source, so its file-tree tweaks live under `sources.explorer`:
     -- `hidden` shows dotfiles; gitignored files stay out (snacks defaults
     -- both `hidden` and `ignored` to false).
-    picker       = {
-      enabled   = true,
+    picker = {
+      enabled = true,
       ui_select = false,
-      sources   = {
+      sources = {
         explorer = {
           hidden = true,
           -- snacks tags every hidden entry — file *and* directory —
@@ -172,14 +174,14 @@ return {
     -- netrw and hijacks `nvim <dir>`, and two directory-buffer handlers
     -- would race. Defaults give a left sidebar that follows the current
     -- file with git_status + diagnostics on. Toggle: <leader>e.
-    explorer     = { enabled = true, replace_netrw = false },
+    explorer = { enabled = true, replace_netrw = false },
 
     -- Hotkey-toggle floating shell. Real terminal work still belongs in
     -- wezterm / tmux panes (persistent scrollback, fingers, full copy-mode);
     -- this is just a quick scratch shell for one-off commands without
     -- leaving nvim's window focus. Toggle with <leader>tt; <Esc><Esc>
     -- exits terminal mode (snacks default).
-    terminal     = { enabled = true },
+    terminal = { enabled = true },
   },
   keys = {
     {
@@ -201,12 +203,12 @@ return {
       function()
         Snacks.terminal.toggle(nil, {
           win = {
-            position    = "float",
-            border      = "rounded",
-            title       = " Terminal ",
-            title_pos   = "center",
-            width       = 0.8,    -- 80% of editor width
-            height      = 0.8,    -- 80% of editor height
+            position = "float",
+            border = "rounded",
+            title = " Terminal ",
+            title_pos = "center",
+            width = 0.8, -- 80% of editor width
+            height = 0.8, -- 80% of editor height
           },
         })
       end,
@@ -234,22 +236,22 @@ return {
         Snacks.lazygit({
           win = {
             wo = {
-              statuscolumn   = "",
-              number         = false,
+              statuscolumn = "",
+              number = false,
               relativenumber = false,
-              foldcolumn     = "0",
-              list           = false,
+              foldcolumn = "0",
+              list = false,
             },
           },
           start_insert = false,
-          auto_insert  = false,
-          interactive  = false, -- avoids the gocui+startinsert render race
-          auto_close   = true,  -- override the `interactive=false` cascade so the float still closes when lazygit exits (otherwise we'd be stuck on "[Process exited 0]" needing a second q)
+          auto_insert = false,
+          interactive = false, -- avoids the gocui+startinsert render race
+          auto_close = true, -- override the `interactive=false` cascade so the float still closes when lazygit exits (otherwise we'd be stuck on "[Process exited 0]" needing a second q)
           -- Theme + editor preset come from the chezmoi-managed
           -- ~/.config/lazygit/config.yml (catppuccin mocha). Left enabled,
           -- `configure` appends snacks's auto-derived theme last in
           -- LG_CONFIG_FILE and overrides it — so opt out entirely.
-          configure    = false,
+          configure = false,
         })
 
         -- Wait for lazygit's first paint to STABILIZE before entering
@@ -259,31 +261,37 @@ return {
         --   1. Buffer reaches window height (lazygit renders full-screen).
         --   2. Line count stops changing for two consecutive polls.
         -- Whichever fires first wins. Hard cap of 2 s as a safety belt.
-        local buf   = vim.api.nvim_get_current_buf()
-        local win   = vim.api.nvim_get_current_win()
+        local buf = vim.api.nvim_get_current_buf()
+        local win = vim.api.nvim_get_current_win()
         local timer = vim.uv.new_timer()
         local last_count = -1
         local stable_for = 0
-        local elapsed    = 0
-        timer:start(50, 50, vim.schedule_wrap(function()
-          elapsed = elapsed + 50
-          if not vim.api.nvim_buf_is_valid(buf) or not vim.api.nvim_win_is_valid(win) then
-            timer:stop(); timer:close()
-            return
-          end
-          local count    = vim.api.nvim_buf_line_count(buf)
-          local target   = vim.api.nvim_win_get_height(win)
-          stable_for     = (count == last_count) and (stable_for + 1) or 0
-          last_count     = count
-
-          local done = count >= target or stable_for >= 2 or elapsed >= 2000
-          if done then
-            timer:stop(); timer:close()
-            if vim.api.nvim_get_current_win() == win then
-              vim.cmd("startinsert")
+        local elapsed = 0
+        timer:start(
+          50,
+          50,
+          vim.schedule_wrap(function()
+            elapsed = elapsed + 50
+            if not vim.api.nvim_buf_is_valid(buf) or not vim.api.nvim_win_is_valid(win) then
+              timer:stop()
+              timer:close()
+              return
             end
-          end
-        end))
+            local count = vim.api.nvim_buf_line_count(buf)
+            local target = vim.api.nvim_win_get_height(win)
+            stable_for = (count == last_count) and (stable_for + 1) or 0
+            last_count = count
+
+            local done = count >= target or stable_for >= 2 or elapsed >= 2000
+            if done then
+              timer:stop()
+              timer:close()
+              if vim.api.nvim_get_current_win() == win then
+                vim.cmd("startinsert")
+              end
+            end
+          end)
+        )
       end,
       desc = "Lazygit (floating)",
     },
@@ -302,11 +310,13 @@ return {
       function()
         if Snacks.profiler.running() then
           Snacks.profiler.stop()
-          local ok_traces, traces = pcall(Snacks.profiler.find,
-            { structure = false, sort = "time", group = false })
+          local ok_traces, traces = pcall(Snacks.profiler.find, { structure = false, sort = "time", group = false })
           if not ok_traces then
-            vim.notify("Profiler stopped, but failed to read traces: " .. tostring(traces),
-              vim.log.levels.ERROR, { title = "Profiler" })
+            vim.notify(
+              "Profiler stopped, but failed to read traces: " .. tostring(traces),
+              vim.log.levels.ERROR,
+              { title = "Profiler" }
+            )
             return
           end
           local out = vim.tbl_map(function(t)
@@ -314,8 +324,11 @@ return {
           end, traces)
           local ok_json, json = pcall(vim.json.encode, out)
           if not ok_json then
-            vim.notify("Profiler stopped, but failed to encode JSON: " .. tostring(json),
-              vim.log.levels.ERROR, { title = "Profiler" })
+            vim.notify(
+              "Profiler stopped, but failed to encode JSON: " .. tostring(json),
+              vim.log.levels.ERROR,
+              { title = "Profiler" }
+            )
             return
           end
           local dir = vim.fn.stdpath("state") .. "/profiler"
@@ -323,17 +336,22 @@ return {
           local file = dir .. "/profile-" .. os.date("%Y%m%d-%H%M%S") .. ".json"
           local ok_write, err = pcall(vim.fn.writefile, { json }, file)
           if not ok_write then
-            vim.notify("Failed to write profile: " .. tostring(err),
-              vim.log.levels.ERROR, { title = "Profiler" })
+            vim.notify("Failed to write profile: " .. tostring(err), vim.log.levels.ERROR, { title = "Profiler" })
             return
           end
           local size_kb = math.floor(vim.fn.getfsize(file) / 1024)
-          vim.notify(string.format("Profiler stopped (%d traces, %d KB)\n%s", #out, size_kb, file),
-            vim.log.levels.INFO, { title = "Profiler" })
+          vim.notify(
+            string.format("Profiler stopped (%d traces, %d KB)\n%s", #out, size_kb, file),
+            vim.log.levels.INFO,
+            { title = "Profiler" }
+          )
         else
           Snacks.profiler.start()
-          vim.notify("Profiler started. Reproduce lag, then press <leader>P again to stop.",
-            vim.log.levels.INFO, { title = "Profiler" })
+          vim.notify(
+            "Profiler started. Reproduce lag, then press <leader>P again to stop.",
+            vim.log.levels.INFO,
+            { title = "Profiler" }
+          )
         end
       end,
       desc = "Toggle profiler & save trace",

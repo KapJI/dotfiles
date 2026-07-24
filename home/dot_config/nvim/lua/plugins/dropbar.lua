@@ -3,10 +3,16 @@
 -- <leader>; to open an interactive picker.
 return {
   "Bekaboo/dropbar.nvim",
-  event        = "VeryLazy",
+  event = "VeryLazy",
   dependencies = { "nvim-tree/nvim-web-devicons" },
   keys = {
-    { "<leader>;", function() require("dropbar.api").pick() end, desc = "Pick from breadcrumbs (dropbar)" },
+    {
+      "<leader>;",
+      function()
+        require("dropbar.api").pick()
+      end,
+      desc = "Pick from breadcrumbs (dropbar)",
+    },
   },
   opts = {
     icons = {
@@ -26,16 +32,24 @@ return {
       -- breadcrumb only renders on real source buffers.
       enable = function(buf, win, _)
         local ft = vim.bo[buf].filetype
-        if vim.tbl_contains({
-          "snacks_terminal", "snacks_dashboard", "neominimap",
-          "TelescopePrompt", "lazy", "mason",
-          "trouble", "qf", "help", "Outline", "aerial",
-        }, ft) then
+        if
+          vim.tbl_contains({
+            "snacks_terminal",
+            "snacks_dashboard",
+            "neominimap",
+            "TelescopePrompt",
+            "lazy",
+            "mason",
+            "trouble",
+            "qf",
+            "help",
+            "Outline",
+            "aerial",
+          }, ft)
+        then
           return false
         end
-        return vim.bo[buf].buftype == ""
-            and vim.api.nvim_buf_get_name(buf) ~= ""
-            and not vim.wo[win].diff
+        return vim.bo[buf].buftype == "" and vim.api.nvim_buf_get_name(buf) ~= "" and not vim.wo[win].diff
       end,
     },
   },

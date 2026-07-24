@@ -3,24 +3,24 @@
 -- (]c/[c), todo-comments (]t/[t), and treesitter-textobjects (]f/[f);
 -- collisions are disabled below by setting suffix = ''.
 return {
-    "echasnovski/mini.bracketed",
-    event = { "BufReadPost", "BufNewFile" },
-    opts = {
-        buffer     = { suffix = "b", options = {} },  -- ]b/[b: cycle buffers
-        conflict   = { suffix = "x", options = {} },  -- ]x/[x: git merge-conflict markers
-        diagnostic = { suffix = "d", options = {} },  -- ]d/[d: replaces our old ]g/[g
-        indent     = { suffix = "i", options = {} },  -- ]i/[i: same-indent line
-        oldfile    = { suffix = "o", options = {} },  -- ]o/[o: recent files
-        quickfix   = { suffix = "q", options = {} },  -- ]q/[q: quickfix entries
-        yank       = { suffix = "y", options = {} },  -- ]y/[y: walk yank history
+  "echasnovski/mini.bracketed",
+  event = { "BufReadPost", "BufNewFile" },
+  opts = {
+    buffer = { suffix = "b", options = {} }, -- ]b/[b: cycle buffers
+    conflict = { suffix = "x", options = {} }, -- ]x/[x: git merge-conflict markers
+    diagnostic = { suffix = "d", options = {} }, -- ]d/[d: replaces our old ]g/[g
+    indent = { suffix = "i", options = {} }, -- ]i/[i: same-indent line
+    oldfile = { suffix = "o", options = {} }, -- ]o/[o: recent files
+    quickfix = { suffix = "q", options = {} }, -- ]q/[q: quickfix entries
+    yank = { suffix = "y", options = {} }, -- ]y/[y: walk yank history
 
-        -- Disabled (collisions or duplicates of existing keymaps):
-        comment    = { suffix = "" },  -- gitsigns owns ]c/[c
-        file       = { suffix = "" },  -- treesitter-textobjects owns ]f/[f
-        treesitter = { suffix = "" },  -- todo-comments owns ]t/[t
-        jump       = { suffix = "" },  -- vim's <C-o>/<C-i> already covers
-        undo       = { suffix = "" },  -- undotree (<leader>u) replaces this
-        location   = { suffix = "" },  -- not used in our workflow
-        window     = { suffix = "" },  -- smart-splits <M-hjkl> covers
-    },
+    -- Disabled (collisions or duplicates of existing keymaps):
+    comment = { suffix = "" }, -- gitsigns owns ]c/[c
+    file = { suffix = "" }, -- treesitter-textobjects owns ]f/[f
+    treesitter = { suffix = "" }, -- todo-comments owns ]t/[t
+    jump = { suffix = "" }, -- vim's <C-o>/<C-i> already covers
+    undo = { suffix = "" }, -- undotree (<leader>u) replaces this
+    location = { suffix = "" }, -- not used in our workflow
+    window = { suffix = "" }, -- smart-splits <M-hjkl> covers
+  },
 }

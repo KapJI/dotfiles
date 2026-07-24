@@ -5,29 +5,29 @@
 local M = {}
 
 local tips = {
-  { "ciw",       "change inner word"                          },
-  { "da{",       "delete braces with their content"           },
-  { "yi\"",      "yank everything inside quotes"              },
-  { "=ip",       "auto-indent / reformat paragraph"           },
-  { "ysiw)",     "wrap word in ( ) — nvim-surround"           },
-  { "ds\"",      "delete the surrounding \" — nvim-surround"  },
-  { "cs\"'",     "change \" → ' around — nvim-surround"       },
-  { ".",         "repeat last change — cornerstone"           },
-  { "*cgn .",    "change first match · then . repeats"        },
-  { "gn / gN",   "visual-select next/prev search match"       },
-  { "qa … q",    "record macro into register a"               },
-  { "@a / @@",   "play macro / replay last"                   },
-  { ":%s//x/g",  "substitute, reusing last search pattern"    },
-  { ":cdo …",    "run a command on every quickfix entry"      },
-  { "ma  'a",    "set buffer-mark a · jump back to it"        },
-  { "''",        "jump to position before the last jump"      },
-  { "'.",        "jump to last edit"                          },
-  { "\"0p",      "paste last yank (survives d/c)"             },
-  { "\"+y",      "yank to system clipboard"                   },
-  { "<C-r>=",    "expression register: live math in insert"   },
-  { "[X",        "jump up one treesitter scope (this config)" },
-  { "<leader>j", "toggle split/join — treesj"                 },
-  { "<C-a>",     "increment number / bool / date / semver"    },
+  { "ciw", "change inner word" },
+  { "da{", "delete braces with their content" },
+  { 'yi"', "yank everything inside quotes" },
+  { "=ip", "auto-indent / reformat paragraph" },
+  { "ysiw)", "wrap word in ( ) — nvim-surround" },
+  { 'ds"', 'delete the surrounding " — nvim-surround' },
+  { "cs\"'", "change \" → ' around — nvim-surround" },
+  { ".", "repeat last change — cornerstone" },
+  { "*cgn .", "change first match · then . repeats" },
+  { "gn / gN", "visual-select next/prev search match" },
+  { "qa … q", "record macro into register a" },
+  { "@a / @@", "play macro / replay last" },
+  { ":%s//x/g", "substitute, reusing last search pattern" },
+  { ":cdo …", "run a command on every quickfix entry" },
+  { "ma  'a", "set buffer-mark a · jump back to it" },
+  { "''", "jump to position before the last jump" },
+  { "'.", "jump to last edit" },
+  { '"0p', "paste last yank (survives d/c)" },
+  { '"+y', "yank to system clipboard" },
+  { "<C-r>=", "expression register: live math in insert" },
+  { "[X", "jump up one treesitter scope (this config)" },
+  { "<leader>j", "toggle split/join — treesj" },
+  { "<C-a>", "increment number / bool / date / semver" },
 }
 
 -- Pick `n` random tips and return them as a list of strings ready
@@ -35,7 +35,9 @@ local tips = {
 function M.pick(n)
   math.randomseed(os.time())
   local copy = {}
-  for i, t in ipairs(tips) do copy[i] = t end
+  for i, t in ipairs(tips) do
+    copy[i] = t
+  end
   -- Fisher-Yates partial shuffle
   for i = #copy, #copy - n + 1, -1 do
     local j = math.random(i)

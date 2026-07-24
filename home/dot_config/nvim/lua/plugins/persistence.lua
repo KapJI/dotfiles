@@ -31,11 +31,9 @@ return {
       pattern = "PersistenceSavePre",
       callback = function()
         local function is_real_file(buf)
-          local name    = vim.api.nvim_buf_get_name(buf)
+          local name = vim.api.nvim_buf_get_name(buf)
           local buftype = vim.bo[buf].buftype
-          return buftype == ""
-            and name ~= ""
-            and vim.fn.filereadable(name) == 1
+          return buftype == "" and name ~= "" and vim.fn.filereadable(name) == 1
         end
 
         for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -56,9 +54,33 @@ return {
     })
   end,
   keys = {
-    { "<leader>ss", function() require("persistence").load() end,                desc = "Session: restore (cwd)" },
-    { "<leader>sl", function() require("persistence").load({ last = true }) end, desc = "Session: restore last used" },
-    { "<leader>sp", function() require("persistence").select() end,              desc = "Session: pick" },
-    { "<leader>sd", function() require("persistence").stop() end,                desc = "Session: don't save on exit" },
+    {
+      "<leader>ss",
+      function()
+        require("persistence").load()
+      end,
+      desc = "Session: restore (cwd)",
+    },
+    {
+      "<leader>sl",
+      function()
+        require("persistence").load({ last = true })
+      end,
+      desc = "Session: restore last used",
+    },
+    {
+      "<leader>sp",
+      function()
+        require("persistence").select()
+      end,
+      desc = "Session: pick",
+    },
+    {
+      "<leader>sd",
+      function()
+        require("persistence").stop()
+      end,
+      desc = "Session: don't save on exit",
+    },
   },
 }

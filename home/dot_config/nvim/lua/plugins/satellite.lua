@@ -6,23 +6,23 @@ return {
   "lewis6991/satellite.nvim",
   event = "VeryLazy",
   opts = {
-    current_only = false,           -- show on every window, not just the active one
-    winblend     = 50,              -- transparency for the bar background
-    zindex       = 40,
+    current_only = false, -- show on every window, not just the active one
+    winblend = 50, -- transparency for the bar background
+    zindex = 40,
     excluded_filetypes = {
       "alpha",
       "fzf",
       "DiffviewFiles",
       "DiffviewFileHistory",
-      "bigfile",  -- snacks.bigfile remaps oversized buffers; skip the scrollbar
+      "bigfile", -- snacks.bigfile remaps oversized buffers; skip the scrollbar
     },
     handlers = {
-      cursor      = { enable = true, symbols = { "⎺", "⎻", "⎼", "⎽" } },
-      search      = { enable = true },
-      diagnostic  = { enable = true, signs = { "-", "=", "≡" }, min_severity = vim.diagnostic.severity.HINT },
-      gitsigns    = { enable = true, signs = { add = "│", change = "│", delete = "-" } },
-      marks       = { enable = true, show_builtins = false },  -- only user marks (a-z, A-Z)
-      quickfix    = { signs = { "-", "=", "≡" } },
+      cursor = { enable = true, symbols = { "⎺", "⎻", "⎼", "⎽" } },
+      search = { enable = true },
+      diagnostic = { enable = true, signs = { "-", "=", "≡" }, min_severity = vim.diagnostic.severity.HINT },
+      gitsigns = { enable = true, signs = { add = "│", change = "│", delete = "-" } },
+      marks = { enable = true, show_builtins = false }, -- only user marks (a-z, A-Z)
+      quickfix = { signs = { "-", "=", "≡" } },
     },
   },
   config = function(_, opts)
@@ -30,7 +30,9 @@ return {
     -- marks.nvim has no User events; refresh on idle so dm{x}/dm-/dm<space>
     -- propagate to the bar without manual :SatelliteRefresh.
     vim.api.nvim_create_autocmd("CursorHold", {
-      callback = function() pcall(vim.cmd, "SatelliteRefresh") end,
+      callback = function()
+        pcall(vim.cmd, "SatelliteRefresh")
+      end,
     })
   end,
 }

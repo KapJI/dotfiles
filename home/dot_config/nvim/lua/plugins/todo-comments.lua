@@ -10,9 +10,21 @@ return {
     cmd = { "TodoFzfLua", "TodoQuickFix", "TodoLocList" },
     dependencies = { "nvim-lua/plenary.nvim" },
     keys = {
-      { "<leader>ct", "<Cmd>TodoFzfLua<CR>",                            desc = "List TODOs (project)" },
-      { "]t",         function() require("todo-comments").jump_next() end, desc = "Next TODO comment" },
-      { "[t",         function() require("todo-comments").jump_prev() end, desc = "Previous TODO comment" },
+      { "<leader>ct", "<Cmd>TodoFzfLua<CR>", desc = "List TODOs (project)" },
+      {
+        "]t",
+        function()
+          require("todo-comments").jump_next()
+        end,
+        desc = "Next TODO comment",
+      },
+      {
+        "[t",
+        function()
+          require("todo-comments").jump_prev()
+        end,
+        desc = "Previous TODO comment",
+      },
     },
     opts = {
       signs = true, -- gutter sign for each TODO line

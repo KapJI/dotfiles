@@ -4,21 +4,27 @@ return {
   {
     "kylechui/nvim-surround",
     event = "VeryLazy",
-    config = function() require("nvim-surround").setup() end,
+    config = function()
+      require("nvim-surround").setup()
+    end,
   },
 
   -- Auto-close brackets and quotes
   {
     "windwp/nvim-autopairs",
     event = "InsertEnter",
-    config = function() require("nvim-autopairs").setup() end,
+    config = function()
+      require("nvim-autopairs").setup()
+    end,
   },
 
   -- Auto-detect indentation style from file content
   {
     "NMAC427/guess-indent.nvim",
     event = "BufReadPost",
-    config = function() require("guess-indent").setup() end,
+    config = function()
+      require("guess-indent").setup()
+    end,
   },
 
   -- Visual marks in sign column. Bracket nav remapped to ]m/[m for

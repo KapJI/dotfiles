@@ -8,7 +8,9 @@ return {
     keys = {
       {
         "<leader>cr",
-        function() return ":IncRename " .. vim.fn.expand("<cword>") end,
+        function()
+          return ":IncRename " .. vim.fn.expand("<cword>")
+        end,
         expr = true, -- the keymap returns the command string with cword pre-filled
         desc = "Rename symbol (LSP, with preview)",
       },

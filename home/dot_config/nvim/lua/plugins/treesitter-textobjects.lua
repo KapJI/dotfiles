@@ -11,39 +11,67 @@
 --   <leader>xa / <leader>xA   eXchange Argument with next / prev neighbor
 --                              (group: <leader>x for swap/exchange ops)
 return {
-    "nvim-treesitter/nvim-treesitter-textobjects",
-    branch = "main",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
-    event = { "BufReadPost", "BufNewFile" },
-    config = function()
-        local sel  = require("nvim-treesitter-textobjects.select")
-        local move = require("nvim-treesitter-textobjects.move")
-        local swap = require("nvim-treesitter-textobjects.swap")
-        local k    = vim.keymap.set
-        local xo   = { "x", "o" }
-        local nxo  = { "n", "x", "o" }
+  "nvim-treesitter/nvim-treesitter-textobjects",
+  branch = "main",
+  dependencies = { "nvim-treesitter/nvim-treesitter" },
+  event = { "BufReadPost", "BufNewFile" },
+  config = function()
+    local sel = require("nvim-treesitter-textobjects.select")
+    local move = require("nvim-treesitter-textobjects.move")
+    local swap = require("nvim-treesitter-textobjects.swap")
+    local k = vim.keymap.set
+    local xo = { "x", "o" }
+    local nxo = { "n", "x", "o" }
 
-        -- Text objects
-        k(xo, "af", function() sel.select_textobject("@function.outer",  "textobjects") end, { desc = "around function" })
-        k(xo, "if", function() sel.select_textobject("@function.inner",  "textobjects") end, { desc = "inner function"  })
-        k(xo, "ac", function() sel.select_textobject("@class.outer",     "textobjects") end, { desc = "around class"    })
-        k(xo, "ic", function() sel.select_textobject("@class.inner",     "textobjects") end, { desc = "inner class"     })
-        k(xo, "aa", function() sel.select_textobject("@parameter.outer", "textobjects") end, { desc = "around argument" })
-        k(xo, "ia", function() sel.select_textobject("@parameter.inner", "textobjects") end, { desc = "inner argument"  })
-        k(xo, "ab", function() sel.select_textobject("@block.outer",     "textobjects") end, { desc = "around block"    })
-        k(xo, "ib", function() sel.select_textobject("@block.inner",     "textobjects") end, { desc = "inner block"     })
+    -- Text objects
+    k(xo, "af", function()
+      sel.select_textobject("@function.outer", "textobjects")
+    end, { desc = "around function" })
+    k(xo, "if", function()
+      sel.select_textobject("@function.inner", "textobjects")
+    end, { desc = "inner function" })
+    k(xo, "ac", function()
+      sel.select_textobject("@class.outer", "textobjects")
+    end, { desc = "around class" })
+    k(xo, "ic", function()
+      sel.select_textobject("@class.inner", "textobjects")
+    end, { desc = "inner class" })
+    k(xo, "aa", function()
+      sel.select_textobject("@parameter.outer", "textobjects")
+    end, { desc = "around argument" })
+    k(xo, "ia", function()
+      sel.select_textobject("@parameter.inner", "textobjects")
+    end, { desc = "inner argument" })
+    k(xo, "ab", function()
+      sel.select_textobject("@block.outer", "textobjects")
+    end, { desc = "around block" })
+    k(xo, "ib", function()
+      sel.select_textobject("@block.inner", "textobjects")
+    end, { desc = "inner block" })
 
-        -- Function-start movement. [f from inside a function jumps to its
-        -- declaration (enclosing-scope replacement for [x).
-        k(nxo, "]f", function() move.goto_next_start("@function.outer",     "textobjects") end, { desc = "next function start" })
-        k(nxo, "[f", function() move.goto_previous_start("@function.outer", "textobjects") end, { desc = "prev function start" })
+    -- Function-start movement. [f from inside a function jumps to its
+    -- declaration (enclosing-scope replacement for [x).
+    k(nxo, "]f", function()
+      move.goto_next_start("@function.outer", "textobjects")
+    end, { desc = "next function start" })
+    k(nxo, "[f", function()
+      move.goto_previous_start("@function.outer", "textobjects")
+    end, { desc = "prev function start" })
 
-        -- Class-start movement. Capital C avoids collision with gitsigns ]c/[c.
-        k(nxo, "]C", function() move.goto_next_start("@class.outer",     "textobjects") end, { desc = "next class start" })
-        k(nxo, "[C", function() move.goto_previous_start("@class.outer", "textobjects") end, { desc = "prev class start" })
+    -- Class-start movement. Capital C avoids collision with gitsigns ]c/[c.
+    k(nxo, "]C", function()
+      move.goto_next_start("@class.outer", "textobjects")
+    end, { desc = "next class start" })
+    k(nxo, "[C", function()
+      move.goto_previous_start("@class.outer", "textobjects")
+    end, { desc = "prev class start" })
 
-        -- Argument swap
-        k("n", "<leader>xa", function() swap.swap_next("@parameter.inner")     end, { desc = "swap argument with next" })
-        k("n", "<leader>xA", function() swap.swap_previous("@parameter.inner") end, { desc = "swap argument with prev" })
-    end,
+    -- Argument swap
+    k("n", "<leader>xa", function()
+      swap.swap_next("@parameter.inner")
+    end, { desc = "swap argument with next" })
+    k("n", "<leader>xA", function()
+      swap.swap_previous("@parameter.inner")
+    end, { desc = "swap argument with prev" })
+  end,
 }

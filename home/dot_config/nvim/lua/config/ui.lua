@@ -51,7 +51,9 @@ if ok then
 
   local function set_lualine_c_bg(bg_int)
     for _, group in ipairs(vim.fn.getcompletion("lualine_", "highlight")) do
-      if group:match("_inactive") then goto continue end
+      if group:match("_inactive") then
+        goto continue
+      end
       local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
       local changed = false
       if hl.bg == original_c_bg_int or hl.bg == inactive_lualine_bg_int then
@@ -62,7 +64,9 @@ if ok then
         hl.fg = bg_int
         changed = true
       end
-      if changed then vim.api.nvim_set_hl(0, group, hl) end
+      if changed then
+        vim.api.nvim_set_hl(0, group, hl)
+      end
       ::continue::
     end
   end
@@ -96,7 +100,9 @@ vim.api.nvim_create_autocmd("ColorScheme", {
   group = augroup,
   callback = function()
     vim.schedule(function()
-      if not focused then dim_lualine(true) end
+      if not focused then
+        dim_lualine(true)
+      end
     end)
   end,
 })

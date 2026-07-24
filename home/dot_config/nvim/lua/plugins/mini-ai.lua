@@ -23,16 +23,16 @@
 --   dil"   delete inside the previous ""
 --   van]   visual around the next []
 return {
-    "echasnovski/mini.ai",
-    event = { "BufReadPost", "BufNewFile" },
-    opts = {
-        n_lines = 500, -- limit search range so massive files don't stall
-        custom_textobjects = {
-            f = false, -- defer to treesitter-textobjects' @function (definition, not call)
-            a = false, -- defer to treesitter-textobjects' @parameter
-            b = false, -- defer to treesitter-textobjects' @block
-            q = false, -- vim's built-in i'/i"/i` already covers quotes
-        },
-        -- l/n (last/next) modifiers are enabled by default; no setting needed.
+  "echasnovski/mini.ai",
+  event = { "BufReadPost", "BufNewFile" },
+  opts = {
+    n_lines = 500, -- limit search range so massive files don't stall
+    custom_textobjects = {
+      f = false, -- defer to treesitter-textobjects' @function (definition, not call)
+      a = false, -- defer to treesitter-textobjects' @parameter
+      b = false, -- defer to treesitter-textobjects' @block
+      q = false, -- vim's built-in i'/i"/i` already covers quotes
     },
+    -- l/n (last/next) modifiers are enabled by default; no setting needed.
+  },
 }

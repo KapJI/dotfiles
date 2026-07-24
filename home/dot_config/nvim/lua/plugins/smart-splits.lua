@@ -18,21 +18,93 @@ return {
   },
   keys = {
     -- Navigation — same keys as the old vim-tmux-navigator setup.
-    { "<M-h>", function() require("smart-splits").move_cursor_left()  end, desc = "Pane: left" },
-    { "<M-j>", function() require("smart-splits").move_cursor_down()  end, desc = "Pane: down" },
-    { "<M-k>", function() require("smart-splits").move_cursor_up()    end, desc = "Pane: up" },
-    { "<M-l>", function() require("smart-splits").move_cursor_right() end, desc = "Pane: right" },
+    {
+      "<M-h>",
+      function()
+        require("smart-splits").move_cursor_left()
+      end,
+      desc = "Pane: left",
+    },
+    {
+      "<M-j>",
+      function()
+        require("smart-splits").move_cursor_down()
+      end,
+      desc = "Pane: down",
+    },
+    {
+      "<M-k>",
+      function()
+        require("smart-splits").move_cursor_up()
+      end,
+      desc = "Pane: up",
+    },
+    {
+      "<M-l>",
+      function()
+        require("smart-splits").move_cursor_right()
+      end,
+      desc = "Pane: right",
+    },
 
     -- Resize — Alt+Shift+HJKL, 3 cells per press.
-    { "<M-S-h>", function() require("smart-splits").resize_left()  end, desc = "Resize ←" },
-    { "<M-S-j>", function() require("smart-splits").resize_down()  end, desc = "Resize ↓" },
-    { "<M-S-k>", function() require("smart-splits").resize_up()    end, desc = "Resize ↑" },
-    { "<M-S-l>", function() require("smart-splits").resize_right() end, desc = "Resize →" },
+    {
+      "<M-S-h>",
+      function()
+        require("smart-splits").resize_left()
+      end,
+      desc = "Resize ←",
+    },
+    {
+      "<M-S-j>",
+      function()
+        require("smart-splits").resize_down()
+      end,
+      desc = "Resize ↓",
+    },
+    {
+      "<M-S-k>",
+      function()
+        require("smart-splits").resize_up()
+      end,
+      desc = "Resize ↑",
+    },
+    {
+      "<M-S-l>",
+      function()
+        require("smart-splits").resize_right()
+      end,
+      desc = "Resize →",
+    },
 
     -- Swap nvim split contents (no equivalent in tmux/wezterm).
-    { "<leader>wH", function() require("smart-splits").swap_buf_left()  end, desc = "Swap pane ←" },
-    { "<leader>wJ", function() require("smart-splits").swap_buf_down()  end, desc = "Swap pane ↓" },
-    { "<leader>wK", function() require("smart-splits").swap_buf_up()    end, desc = "Swap pane ↑" },
-    { "<leader>wL", function() require("smart-splits").swap_buf_right() end, desc = "Swap pane →" },
+    {
+      "<leader>wH",
+      function()
+        require("smart-splits").swap_buf_left()
+      end,
+      desc = "Swap pane ←",
+    },
+    {
+      "<leader>wJ",
+      function()
+        require("smart-splits").swap_buf_down()
+      end,
+      desc = "Swap pane ↓",
+    },
+    {
+      "<leader>wK",
+      function()
+        require("smart-splits").swap_buf_up()
+      end,
+      desc = "Swap pane ↑",
+    },
+    {
+      "<leader>wL",
+      function()
+        require("smart-splits").swap_buf_right()
+      end,
+      desc = "Swap pane →",
+    },
   },
 }

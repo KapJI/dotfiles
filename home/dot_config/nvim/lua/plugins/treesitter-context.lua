@@ -5,10 +5,10 @@ return {
     event = { "BufReadPost", "BufNewFile" },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
     opts = {
-      max_lines = 3,        -- cap header height
+      max_lines = 3, -- cap header height
       multiline_threshold = 1,
-      mode = "cursor",      -- show context based on cursor position (vs window top)
-      separator = nil,      -- thin underline; set to "─" or similar to make it visible
+      mode = "cursor", -- show context based on cursor position (vs window top)
+      separator = nil, -- thin underline; set to "─" or similar to make it visible
       zindex = 20,
     },
     keys = {
@@ -19,7 +19,9 @@ return {
       -- no ]X because context is always above the cursor.
       {
         "[X",
-        function() require("treesitter-context").go_to_context(vim.v.count1) end,
+        function()
+          require("treesitter-context").go_to_context(vim.v.count1)
+        end,
         desc = "Jump to surrounding context",
       },
     },
