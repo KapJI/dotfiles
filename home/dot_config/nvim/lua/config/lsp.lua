@@ -11,19 +11,28 @@ vim.diagnostic.config({
   float = { source = true },
 })
 
--- LSP keymaps (set when a language server attaches to a buffer)
+-- LSP keymaps (set when a language server attaches to a buffer).
+-- Named augroup (cleared on re-source) so re-running this file doesn't
+-- register the LspAttach handler twice.
 vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("user_lsp_attach", { clear = true }),
   callback = function(ev)
     local keyset = vim.keymap.set
-    local opts = function(desc) return { buffer = ev.buf, silent = true, desc = desc } end
+    local opts = function(desc)
+      return { buffer = ev.buf, silent = true, desc = desc }
+    end
     keyset("n", "gd", vim.lsp.buf.definition, opts("Go to definition"))
     keyset("n", "gy", vim.lsp.buf.type_definition, opts("Go to type definition"))
     keyset("n", "gi", vim.lsp.buf.implementation, opts("Go to implementation"))
-    keyset("n", "gr", function() require("fzf-lua").lsp_references() end, opts("Go to references"))
+    keyset("n", "gr", function()
+      require("fzf-lua").lsp_references()
+    end, opts("Go to references"))
     keyset("n", "K", vim.lsp.buf.hover, opts("Show documentation"))
     -- <leader>cr is bound globally by inc-rename.nvim (live-preview rename).
     -- Don't shadow it here with a buffer-local binding to vim.lsp.buf.rename.
-    keyset({ "n", "v" }, "<leader>ca", function() require("fzf-lua").lsp_code_actions() end, opts("Code action"))
+    keyset({ "n", "v" }, "<leader>ca", function()
+      require("fzf-lua").lsp_code_actions()
+    end, opts("Code action"))
     -- <leader>cf is bound globally by conform.nvim (with LSP fallback for filetypes
     -- without a CLI formatter). Don't shadow it here with a buffer-local LSP-only
     -- binding.
@@ -31,14 +40,16 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 local keyset = vim.keymap.set
-keyset("n", "<leader>cd", function() require("fzf-lua").diagnostics_document() end, { desc = "Document diagnostics" })
+keyset("n", "<leader>cd", function()
+  require("fzf-lua").diagnostics_document()
+end, { desc = "Document diagnostics" })
 
 -- LSP server configurations
 vim.lsp.config("nil_ls", {})
 
 vim.lsp.config("pyright", {
   settings = {
-    pyright = { disableOrganizeImports = true },  -- let ruff handle imports
+    pyright = { disableOrganizeImports = true }, -- let ruff handle imports
   },
 })
 
@@ -63,10 +74,22 @@ vim.lsp.config("lua_ls", {
 
 -- Servers whose binaries come from outside mason (uv-tool / nix / system).
 -- mason-installed servers auto-enable via mason-lspconfig's automatic_enable.
-local function executable(name) return vim.fn.executable(name) == 1 end
+local function executable(name)
+  return vim.fn.executable(name) == 1
+end
 local servers = {}
-if executable("nil") then table.insert(servers, "nil_ls") end
-if executable("pyright-langserver") or executable("pyright") then table.insert(servers, "pyright") end
-if executable("ruff") then table.insert(servers, "ruff") end
-if executable("rust-analyzer") then table.insert(servers, "rust_analyzer") end
-if #servers > 0 then vim.lsp.enable(servers) end
+if executable("nil") then
+  table.insert(servers, "nil_ls")
+end
+if executable("pyright-langserver") or executable("pyright") then
+  table.insert(servers, "pyright")
+end
+if executable("ruff") then
+  table.insert(servers, "ruff")
+end
+if executable("rust-analyzer") then
+  table.insert(servers, "rust_analyzer")
+end
+if #servers > 0 then
+  vim.lsp.enable(servers)
+end
