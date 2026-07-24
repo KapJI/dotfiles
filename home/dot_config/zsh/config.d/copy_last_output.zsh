@@ -50,12 +50,18 @@ _copy_last_output() {
     return
   fi
 
-  # Prompt lines are the ones carrying the `❯` glyph.
+  # Prompt lines are the ones that START with the `❯` glyph. Our p10k
+  # prompt_char is the first segment with no prefix/whitespace (and
+  # TRANSIENT_PROMPT is off), so every prompt renders `❯ ` at column 0.
+  # Anchor to line start rather than matching `❯` anywhere: command
+  # output can itself contain `❯` (e.g. cat-ing a file that has it),
+  # which a mid-line match would misread as a prompt and mis-slice the
+  # captured span.
   local -a lines marks
   local i
   lines=("${(@f)dump}")
   for i in {1..$#lines}; do
-    [[ ${lines[i]} == *'❯'* ]] && marks+=$i
+    [[ ${lines[i]} == '❯'* ]] && marks+=$i
   done
   if (( $#marks < 2 )); then
     zle -M "Alt-Y: no previous command output found"
