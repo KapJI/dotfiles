@@ -70,8 +70,16 @@ _atit_short_pwd() {
     fi
 }
 
+# Memoized across precmd calls: _atit_short_pwd walks .git ancestors and
+# globs sibling names, but $PWD is unchanged for every command you run
+# without cd'ing (the common case), so recompute only when it moves.
+typeset -g _atit_cached_pwd='' _atit_cached_short=''
 _set_term_title_precmd() {
-    local short=$(_atit_short_pwd)
+    if [[ $PWD != $_atit_cached_pwd ]]; then
+        _atit_cached_pwd=$PWD
+        _atit_cached_short=$(_atit_short_pwd)
+    fi
+    local short=$_atit_cached_short
     local full=${PWD/#$HOME/\~}
     # Folder glyph prefix marks "a shell sitting at a prompt in this
     # directory" — visually distinct from running-program titles,
