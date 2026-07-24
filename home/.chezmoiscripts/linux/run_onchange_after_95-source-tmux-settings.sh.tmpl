@@ -3,25 +3,13 @@
 
 # .tmux.conf hash: {{ joinPath .chezmoi.homeDir ".tmux.conf" | include | sha256sum }}
 
-if command -v tmux &> /dev/null; then
-    # Install/clone plugins BEFORE sourcing. tpm's own loader only sources
-    # plugins already on disk — it never clones — so sourcing first would
-    # leave a live session missing any newly added plugin until the next
-    # manual reload. install_plugins reads the @plugin list by parsing the
-    # config file directly, so it needs no running server and is safe here.
-    #
-    # tpm is fetched via .chezmoiexternal.toml before this after-script
-    # runs, so it is normally present; guard anyway so a partial bootstrap
-    # skips plugin install cleanly instead of erroring on a missing path.
-    tpm_install=~/.tmux/plugins/tpm/scripts/install_plugins.sh
-    if [ -x "$tpm_install" ]; then
-        "$tpm_install"
-    fi
-    # Reload into a running server so it picks up the just-installed
-    # plugins. With no server, the config loads at the next start and
-    # source-file would just error, so gate on an existing session.
-    if tmux has-session 2> /dev/null; then
-        tmux source-file $HOME/.tmux.conf
-    fi
+# Reload the config into a running server so a live session picks up the
+# change on apply. Plugins are fetched and pinned via .chezmoiexternal.toml
+# (no tpm install step), so there is nothing to install here — the
+# run-shell loads in .tmux.conf re-source the plugin files. With no server
+# running, the config loads at the next tmux start and source-file would
+# just error, so gate on an existing session.
+if command -v tmux &> /dev/null && tmux has-session 2> /dev/null; then
+    tmux source-file $HOME/.tmux.conf
 fi
 {{ end -}}

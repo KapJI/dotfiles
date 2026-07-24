@@ -65,9 +65,36 @@
 {{ end }}
 
 {{ if and (eq .chezmoi.os "linux") (not .is_desktop) }}
-[".tmux/plugins/tpm"]
-    type = "git-repo"
-    url = "https://github.com/tmux-plugins/tpm"
+# tmux plugins, pinned to release tags. The tag is baked into the tarball
+# URL, so the URL is the pin (an immutable artifact, mirroring flake.lock
+# for nix tools) — no plugin manager and no @plugin list needed. .tmux.conf
+# loads each one directly via run-shell; they resolve their own dir
+# self-relatively and make no runtime git calls, so a plain archive works.
+[".tmux/plugins/catppuccin"]
+    type = "archive"
+    url = "https://github.com/catppuccin/tmux/archive/refs/tags/v2.1.3.tar.gz"
+    stripComponents = 1
+    refreshPeriod = {{ $default_refresh }}
+
+[".tmux/plugins/tmux-resurrect"]
+    type = "archive"
+    url = "https://github.com/tmux-plugins/tmux-resurrect/archive/refs/tags/v4.0.0.tar.gz"
+    stripComponents = 1
+    refreshPeriod = {{ $default_refresh }}
+
+[".tmux/plugins/tmux-continuum"]
+    type = "archive"
+    url = "https://github.com/tmux-plugins/tmux-continuum/archive/refs/tags/v3.1.0.tar.gz"
+    stripComponents = 1
+    refreshPeriod = {{ $default_refresh }}
+
+# mode-indicator publishes no tags (dormant since 2021), so it pins to a
+# commit SHA instead — GitHub serves an archive tarball for any commit, so
+# taglessness is no obstacle. Pure shell; previously came from nixpkgs.
+[".tmux/plugins/mode-indicator"]
+    type = "archive"
+    url = "https://github.com/MunifTanjim/tmux-mode-indicator/archive/7027903adca37c54cb8f5fa99fc113b11c23c2c4.tar.gz"
+    stripComponents = 1
     refreshPeriod = {{ $default_refresh }}
 {{ end }}
 

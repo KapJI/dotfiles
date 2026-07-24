@@ -50,3 +50,13 @@ AppData/Local/nvim-data/site/autoload/plug.vim
 # vi-mode plugin config; source file was deleted in b0352b9 but the
 # orphaned target lingered.
 .config/zsh/config.d/plugins/vi_mode.zsh
+
+{{ if and (eq .chezmoi.os "linux") (not .is_desktop) -}}
+# tpm removed: tmux plugins are now fetched + pinned via .chezmoiexternal.toml
+# and loaded with explicit run-shell in .tmux.conf. Delete tpm's own clone
+# and the catppuccin dir it created (tpm's basename rule cloned catppuccin/tmux
+# to plugins/tmux; it now lives at plugins/catppuccin). resurrect/continuum
+# keep the same paths, now owned by chezmoi, so they are NOT listed here.
+.tmux/plugins/tpm
+.tmux/plugins/tmux
+{{- end }}

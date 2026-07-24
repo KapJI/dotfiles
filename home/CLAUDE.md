@@ -131,7 +131,7 @@ Use `{{ if eq .chezmoi.os "darwin" }}` for OS-specific blocks. Use `{{ if .is_de
 
 ### External Dependencies
 
-`.chezmoiexternal.toml` declares external files/archives to download (eza/yazi themes, fonts, binary completions, the tree-sitter CLI, git repos like antidote and tpm). These are fetched automatically during `chezmoi apply`.
+`.chezmoiexternal.toml` declares external files/archives to download (eza/yazi themes, fonts, binary completions, the tree-sitter CLI, git repos like antidote, tag-pinned tmux plugins). These are fetched automatically during `chezmoi apply`.
 
 ### Zsh Configuration
 

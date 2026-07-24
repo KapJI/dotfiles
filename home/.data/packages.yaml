@@ -242,14 +242,15 @@
 
 - nix-server: tmux
 
-# Tagless upstream — tpm can only pin tags, so flake.lock pins it and
-# .tmux.conf loads it from the nix profile via run-shell.
+# Needs python3 + fzf at runtime; the nixpkgs build wires those up (pinned
+# via flake.lock) and .tmux.conf loads it from the nix profile via run-shell.
 - nix-server: tmuxPlugins.extrakto
 
-- nix-server: tmuxPlugins.fingers   # nixpkgs ships the pre-built binary + wrapper
-
-# Tagless upstream, same flake.lock pinning as extrakto.
-- nix-server: tmuxPlugins.mode-indicator
+# Compiled Crystal binary; nixpkgs pre-builds it per-arch. Upstream ships no
+# linux-aarch64 release binary, so nix is the only cross-arch source — it
+# stays here rather than moving to a chezmoiexternal fetch. (mode-indicator,
+# being pure shell, did move: see .chezmoiexternal.toml.)
+- nix-server: tmuxPlugins.fingers
 
 - nix: tealdeer
   winget: dbrgn.tealdeer

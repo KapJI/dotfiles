@@ -250,19 +250,22 @@ set -g @mode_indicator_copy_prompt " COPY "
 set -g @mode_indicator_sync_prompt " SYNC "
 set -g @mode_indicator_empty_prompt " TMUX "
 
-# Upstream publishes no tags (dormant since 2021), so tpm can't pin it;
-# the nixpkgs build rides flake.lock instead, loaded like tmux-fingers.
+# Dormant upstream (last release 2021), pure shell — fetched and pinned to
+# a commit via .chezmoiexternal.toml (it publishes no tags) and loaded from
+# ~/.tmux/plugins like catppuccin/resurrect/continuum. fingers and extrakto
+# stay on the nix profile above because they need a compiled binary / a
+# python+fzf runtime that nixpkgs builds; this one is just shell.
 # Must run after status-left is set (it substitutes the
 # #{tmux_mode_indicator} placeholder) and after the prompts above.
 #
 # Guarded on the file existing: a plain missing run-shell is silent at
 # server start but errors `returned 127` on every source-file reload, so
-# an incomplete nix profile degrades to a quiet warning instead. The
-# if-shell is transparent when the plugin is present (verified the
-# placeholder still substitutes identically to an unguarded load).
-if-shell "test -r ~/.nix-profile/share/tmux-plugins/mode-indicator/mode_indicator.tmux" \
-  "run-shell ~/.nix-profile/share/tmux-plugins/mode-indicator/mode_indicator.tmux" \
-  "display-message 'tmux: mode-indicator not found in nix profile'"
+# a missing archive degrades to a quiet warning instead. The if-shell is
+# transparent when the plugin is present (verified the placeholder still
+# substitutes identically to an unguarded load).
+if-shell "test -r ~/.tmux/plugins/mode-indicator/mode_indicator.tmux" \
+  "run-shell ~/.tmux/plugins/mode-indicator/mode_indicator.tmux" \
+  "display-message 'tmux: mode-indicator not found'"
 
 
 ##### Extrakto #####
@@ -271,9 +274,10 @@ set -g @extrakto_clip_tool_run "tmux_osc52"
 set -g @extrakto_filter_order "path word line all"
 set -g @extrakto_grab_area "recent"
 
-# Tagless upstream, same story as mode-indicator: pinned via flake.lock,
-# loaded from the nix profile instead of tpm. Guarded so a missing file
-# warns quietly rather than erroring on every source-file reload.
+# Needs python3 + fzf at runtime, which the nixpkgs build wires up; loaded
+# from the nix profile and pinned via flake.lock, like tmux-fingers.
+# Guarded so a missing file warns quietly rather than erroring on every
+# source-file reload.
 if-shell "test -r ~/.nix-profile/share/tmux-plugins/extrakto/extrakto.tmux" \
   "run-shell ~/.nix-profile/share/tmux-plugins/extrakto/extrakto.tmux" \
   "display-message 'tmux: extrakto not found in nix profile'"
@@ -309,21 +313,28 @@ set -g @continuum-save-interval '10'
 
 ##### Plugins #####
 
-# All tpm plugins are pinned to a tag. Plugins whose upstream has no
-# tags (extrakto, mode-indicator) load from the nix profile above and
-# pin via flake.lock instead, as does fingers (nixpkgs pre-builds it).
-set -g @plugin 'tmux-plugins/tpm'
-set -g @plugin 'catppuccin/tmux#v2.1.3'
-set -g @plugin 'tmux-plugins/tmux-resurrect#v4.0.0'
-set -g @plugin 'tmux-plugins/tmux-continuum#v3.1.0'
-
-# Guarded like the nix plugin loads above: a bare `run` errors 127 on
-# every source-file reload when tpm is missing (a partial/offline apply),
-# so degrade to a quiet warning. Normally present — tpm is fetched via
-# .chezmoiexternal.toml before the after-script runs.
-if-shell "test -r ~/.tmux/plugins/tpm/tpm" \
-  "run '~/.tmux/plugins/tpm/tpm'" \
-  "display-message 'tmux: tpm not found — plugins not loaded'"
+# Catppuccin, resurrect and continuum are fetched and pinned via
+# .chezmoiexternal.toml (to release tags; mode-indicator above pins to a
+# commit), then loaded here with the same guarded run-shell pattern. tpm is
+# not used: its only jobs were cloning (chezmoi does that now) and sourcing
+# these .tmux files, which each resolve their own directory self-relatively.
+# The split with the nix-profile plugins is by build needs, not tags: every
+# plugin that is just shell/config files lives in chezmoi, while fingers (a
+# compiled binary) and extrakto (needs a python+fzf runtime) stay on nix,
+# which builds and pins them via flake.lock.
+#
+# Load resurrect before continuum: resurrect.tmux publishes the
+# @resurrect-{save,restore}-script-path options that continuum reads to
+# drive its auto-save, and continuum needs no tpm/env to find it.
+if-shell "test -r ~/.tmux/plugins/tmux-resurrect/resurrect.tmux" \
+  "run-shell ~/.tmux/plugins/tmux-resurrect/resurrect.tmux" \
+  "display-message 'tmux: tmux-resurrect not found'"
+if-shell "test -r ~/.tmux/plugins/tmux-continuum/continuum.tmux" \
+  "run-shell ~/.tmux/plugins/tmux-continuum/continuum.tmux" \
+  "display-message 'tmux: tmux-continuum not found'"
+if-shell "test -r ~/.tmux/plugins/catppuccin/catppuccin.tmux" \
+  "run-shell ~/.tmux/plugins/catppuccin/catppuccin.tmux" \
+  "display-message 'tmux: catppuccin not found'"
 
 # Override Catppuccin style for selected text
 set -g mode-style "fg=#cdd6f4,bg=#585b70"
