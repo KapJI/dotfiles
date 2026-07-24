@@ -1,5 +1,9 @@
-# Detect if we are inside vscode task:
-if [[ $- == *c* ]]; then
+# Detect whether this interactive shell was launched to run a command
+# string (`zsh -ic '…'`), e.g. a VS Code task — in which case we must not
+# hijack it with tmux. zsh, unlike bash, does NOT put `c` in $- for -c, so
+# the old `[[ $- == *c* ]]` test never fired; ZSH_EXECUTION_STRING holds the
+# command for -c/-ic and is unset for a plain interactive shell.
+if [[ -n ${ZSH_EXECUTION_STRING:-} ]]; then
   VSCODE_TASK=true
 else
   VSCODE_TASK=false
