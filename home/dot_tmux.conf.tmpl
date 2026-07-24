@@ -69,14 +69,13 @@ set -g set-titles on
 # bar inside the pane rather than being repeated in the outer tab.
 set -g set-titles-string ' #{host_short}'
 
-# Match window size to current client (vs largest attached)
+# aggressive-resize: size each window to the session actively viewing it
+# (the one where it is the current window), not the largest session it is
+# merely attached to. Suits full-screen apps that handle SIGWINCH.
 setw -g aggressive-resize on
 
 
 ##### Interaction & keys #####
-
-# Enable xterm-style keys (e.g. Shift+Arrow)
-setw -g xterm-keys on
 
 # Send terminal focus in/out events
 set -s focus-events on
