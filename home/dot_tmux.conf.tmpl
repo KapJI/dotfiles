@@ -39,8 +39,9 @@ set -g renumber-windows on
 #                         update in a background split doesn't
 #                         clobber the window name.
 #
-# Falls back to #{pane_current_command} for panes whose program hasn't
-# emitted a title yet.
+# A pane's pane_title defaults to the hostname (non-empty), so a title
+# equal to #{host} means the program hasn't set one — treat that (and a
+# genuinely empty title) as "unset" and fall back to #{pane_current_command}.
 #
 # automatic-rename is left off because its internal re-evaluation is
 # multi-second and doesn't fire on pane_title or focus changes — using
@@ -50,11 +51,11 @@ set -g allow-rename off
 setw -g automatic-rename off
 
 set-hook -g pane-focus-in {
-  rename-window "#{?pane_title,#{pane_title},#{pane_current_command}}"
+  rename-window "#{?pane_title,#{?#{==:#{pane_title},#{host}},#{pane_current_command},#{pane_title}},#{pane_current_command}}"
 }
 set-hook -g pane-title-changed {
   if-shell -F "#{pane_active}" {
-    rename-window "#{?pane_title,#{pane_title},#{pane_current_command}}"
+    rename-window "#{?pane_title,#{?#{==:#{pane_title},#{host}},#{pane_current_command},#{pane_title}},#{pane_current_command}}"
   }
 }
 
