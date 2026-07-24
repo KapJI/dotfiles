@@ -13,8 +13,11 @@ set -g history-limit 50000
 # Use tmux-256color for proper terminfo support
 set -g default-terminal "tmux-256color"
 
-# Enable TrueColor support for vim
-set -ga terminal-overrides ",*-256color*:RGB"
+# Advertise 24-bit colour to the outer terminal (truecolor in vim/nvim).
+# terminal-features is tmux's modern interface for this, replacing the
+# lower-level terminal-overrides. Recent terminfo already advertises RGB
+# for *-256color, but this pins it regardless of the server's ncurses.
+set -as terminal-features ",*-256color*:RGB"
 
 # Index windows/panes from 1
 set -g base-index 1
