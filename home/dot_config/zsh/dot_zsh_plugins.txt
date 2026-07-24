@@ -20,7 +20,9 @@
 #  - zsh-autosuggestions must be LAST: it wraps the final ZLE widget
 #    set, including fsh's already-wrapped versions.
 
-romkatv/powerlevel10k
+# path: the theme file directly — a bare entry makes antidote also source
+# powerlevel9k.zsh-theme (a compat shim that just re-sources this file).
+romkatv/powerlevel10k path:powerlevel10k.zsh-theme
 
 zsh-users/zsh-completions path:src kind:fpath
 MichaelAquilina/zsh-you-should-use
@@ -42,7 +44,10 @@ ohmyzsh/ohmyzsh path:plugins/colored-man-pages
 ohmyzsh/ohmyzsh path:plugins/dirhistory
 ohmyzsh/ohmyzsh path:plugins/extract
 ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z
-ohmyzsh/ohmyzsh path:plugins/safe-paste
+# safe-paste intentionally omitted: on zsh >=5.1 it only re-binds
+# bracketed-paste-magic (already done by lib/misc.zsh above) and runs a
+# buggy `set zle_bracketed_paste` that clobbers $@ instead of setting an
+# option. Nothing left for it to add.
 
 # fsh wraps widgets at source time; must come AFTER OMZ + fzf-tab so
 # the bindings (self-insert → url-quote-magic, fzf-tab-complete, etc.)
