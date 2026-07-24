@@ -99,10 +99,11 @@ add-zsh-hook preexec _atit_preexec_glyph
 # to always emit OSC 2. OMZ uses the screen DCS escape `\ek...\e\\`
 # under TERM=tmux*, which sets the WINDOW name directly (or is
 # blocked entirely by `allow-rename off`) — neither does what we want.
-# OSC 2 instead updates the PANE's title, which tmux's
-# `automatic-rename-format = '#{pane_title}'` turns into the window
-# name. Net effect: each split tracks its own title and the window
-# name follows the focused split.
+# OSC 2 instead updates the PANE's title, which .tmux.conf's
+# `pane-focus-in` / `pane-title-changed` hooks turn into the window
+# name via rename-window (automatic-rename is off). Net effect: each
+# split tracks its own title and the window name follows the focused
+# split.
 #
 # The override is gated on $TMUX so non-tmux contexts — local wezterm
 # / ghostty / kitty etc. — keep OMZ's original behaviour, which is
