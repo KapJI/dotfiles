@@ -9,6 +9,14 @@ zstyle ':antidote:bundle' use-friendly-names 'yes'
 # compdump cache when fpath actually changes.
 zstyle ':zephyr:plugin:completion' use-cache 'yes'
 
+# Silence Oh My Zsh's own updater. getantidote/use-omz sources OMZ's
+# tools/check_for_upgrade.sh, whose `mode` defaults to `prompt`: every
+# UPDATE_ZSH_DAYS (13) it asks to update and, on accept, `git pull`s the
+# antidote-owned ohmyzsh clone — a second update path that fights the
+# weekly `antidote update` in run_onchange_after_80. Must be set before
+# the bundle `source` below, since use-omz runs during that source.
+zstyle ':omz:update' mode disabled
+
 # Static-load mode (antidote's recommended fast path, ~30ms saving vs
 # `antidote load`):
 #   1. Regenerate the static bundle (.zsh_plugins.zsh) only when the
