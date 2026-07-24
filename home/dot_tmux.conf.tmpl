@@ -171,25 +171,34 @@ bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection
 # the same name (zsh/config.d/copy_last_output.zsh). In a vim/nvim pane
 # forward Alt-Y to the app instead, like the M-hjkl bindings above.
 bind -n M-Y if-shell "$is_vim" "send-keys M-Y" {
-    if-shell -b "tmux capture-pane -p -J | tail -n 2 | grep -q '❯'" {
-        copy-mode
-        send -X search-backward '❯'
-        send -X search-backward '❯'
-        send -X begin-selection
-        send -X search-forward '❯'
-        send -X cursor-up
-        send -X cursor-up
-        send -X end-of-line
-        send -X copy-pipe-and-cancel "tmux load-buffer -w -b lastcmd -"
-        display-message 'Copied last command output'
+    # Both inner branches assume a ❯ prompt exists to anchor the
+    # selection. On a pane with none (a REPL, a raw pager, alternate
+    # prompts) search-backward finds nothing, the cursor stays put, and
+    # the fallback would silently copy the whole visible screen while
+    # still claiming success. Guard on any ❯ being present first.
+    if-shell -b "tmux capture-pane -p -J | grep -q '❯'" {
+        if-shell -b "tmux capture-pane -p -J | tail -n 2 | grep -q '❯'" {
+            copy-mode
+            send -X search-backward '❯'
+            send -X search-backward '❯'
+            send -X begin-selection
+            send -X search-forward '❯'
+            send -X cursor-up
+            send -X cursor-up
+            send -X end-of-line
+            send -X copy-pipe-and-cancel "tmux load-buffer -w -b lastcmd -"
+            display-message 'Copied last command output'
+        } {
+            copy-mode
+            send -X search-backward '❯'
+            send -X begin-selection
+            send -X bottom-line
+            send -X end-of-line
+            send -X copy-pipe-and-cancel "tmux load-buffer -w -b lastcmd -"
+            display-message 'Copied last command output'
+        }
     } {
-        copy-mode
-        send -X search-backward '❯'
-        send -X begin-selection
-        send -X bottom-line
-        send -X end-of-line
-        send -X copy-pipe-and-cancel "tmux load-buffer -w -b lastcmd -"
-        display-message 'Copied last command output'
+        display-message 'No prompt marker found — nothing to copy'
     }
 }
 
