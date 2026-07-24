@@ -8,17 +8,26 @@
 reload() {
     local -a preserve=(
         HOME USER SHELL TERM LANG LC_ALL
-        XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME
+        XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_RUNTIME_DIR
         COLORTERM TERM_PROGRAM TERM_PROGRAM_VERSION
         SSH_AUTH_SOCK SSH_CONNECTION SSH_CLIENT SSH_TTY
         TMUX TMUX_PANE
         DISPLAY WAYLAND_DISPLAY
+        # Session-identity vars that rc files don't repopulate: the
+        # session bus (GUI/notify tools), and wezterm's control socket +
+        # pane id (so `wezterm cli` keeps working after a reload).
+        DBUS_SESSION_BUS_ADDRESS
+        WEZTERM_UNIX_SOCKET WEZTERM_PANE
     )
     local -a env_args=() v
     for v in $preserve; do
         [[ -n ${(P)v} ]] && env_args+=("$v=${(P)v}")
     done
-    exec env -i "${env_args[@]}" zsh -l
+    # Exec $SHELL by absolute path, not bare `zsh`: with PATH stripped,
+    # `env` would resolve `zsh` against its built-in default path
+    # (/usr/bin:/bin), which on NixOS holds no zsh. $SHELL is preserved
+    # above and is already absolute.
+    exec env -i "${env_args[@]}" "$SHELL" -l
 }
 
 # Aliases
