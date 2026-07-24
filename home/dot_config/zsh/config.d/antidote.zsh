@@ -24,13 +24,25 @@ zsh_plugins=$ZDOTDIR/.zsh_plugins.zsh
 zsh_plugins_txt=$ZDOTDIR/.zsh_plugins.txt
 
 if [[ ! -e $zsh_plugins || $zsh_plugins_txt -nt $zsh_plugins ]]; then
-    antidote bundle <$zsh_plugins_txt >| $zsh_plugins
-    # Plugin set changed (added/removed/reordered) — the cached
-    # compdump may reference completion functions from plugins that
-    # are no longer loaded. Drop it so zephyr's run_compinit does a
-    # full rebuild against the new fpath. (N) glob qualifier =
-    # expand to nothing if no match, instead of zsh's default error.
-    rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*(N)
+    # Generate into a temp file and rename atomically. Writing the live
+    # bundle in place means an interrupted `antidote bundle` (or two
+    # shells racing this branch) can leave it truncated — and because the
+    # truncated file is then newer than the .txt, this guard skips regen
+    # and `source`s the broken bundle on every subsequent startup. The
+    # per-PID temp keeps racing shells from clobbering each other; mv
+    # picks one winner atomically. Keep the previous bundle on failure.
+    if antidote bundle <"$zsh_plugins_txt" >| "$zsh_plugins.tmp.$$"; then
+        mv -f -- "$zsh_plugins.tmp.$$" "$zsh_plugins"
+        # Plugin set changed (added/removed/reordered) — the cached
+        # compdump may reference completion functions from plugins that
+        # are no longer loaded. Drop it so zephyr's run_compinit does a
+        # full rebuild against the new fpath. (N) glob qualifier =
+        # expand to nothing if no match, instead of zsh's default error.
+        rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*(N)
+    else
+        rm -f -- "$zsh_plugins.tmp.$$"
+        print -u2 "antidote: bundle regen failed; keeping previous $zsh_plugins"
+    fi
 fi
 
 if [[ ! -e $zsh_plugins.zwc || $zsh_plugins -nt $zsh_plugins.zwc ]]; then
