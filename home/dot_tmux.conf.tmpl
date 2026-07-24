@@ -183,11 +183,15 @@ bind -n M-Y if-shell "$is_vim" "send-keys M-Y" {
     # raw pager, an alternate-screen app) is still rejected rather than
     # copying garbage.
     if-shell -b "tmux capture-pane -p -S - -J | grep -q '❯'" {
-        # A ❯ in the last two visible lines means we are sitting at a
-        # finished prompt: copy the previous command's output. Otherwise
-        # a command is still running: copy from the last prompt (which
-        # may be scrolled off) down to the current output.
-        if-shell -b "tmux capture-pane -p -J | tail -n 2 | grep -q '❯'" {
+        # A ❯ on the CURSOR's line means we are sitting at a finished
+        # prompt: copy the previous command's output. (Checking the last
+        # two visible rows instead would misfire whenever the idle prompt
+        # isn't near the bottom — after clear/Ctrl-L or in a fresh pane —
+        # because capture-pane pads the visible region out to the full
+        # pane height with blank rows.) Otherwise a command is still
+        # running: copy from the last prompt (which may be scrolled off)
+        # down to the current output.
+        if-shell -b "tmux capture-pane -p -J -S '#{cursor_y}' -E '#{cursor_y}' | grep -q '❯'" {
             copy-mode
             send -X search-backward '❯'
             send -X search-backward '❯'
