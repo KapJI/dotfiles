@@ -144,7 +144,7 @@ unbind -T root MouseDrag1Pane
 set-hook -g client-attached 'run-shell -b "printf \"\\033]1337;SetUserVar=IS_TMUX=dHJ1ZQ==\\007\" > #{client_tty}"'
 
 # Use Alt-hjkl to switch panes (compatible with smart-splits.nvim)
-is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf)(diff)?$'"
+is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+/)?g?(view|l?n?vim?x?|fzf)(diff)?$'"
 bind -n M-h if-shell "$is_vim" "send-keys M-h" "select-pane -L"
 bind -n M-j if-shell "$is_vim" "send-keys M-j" "select-pane -D"
 bind -n M-k if-shell "$is_vim" "send-keys M-k" "select-pane -U"
