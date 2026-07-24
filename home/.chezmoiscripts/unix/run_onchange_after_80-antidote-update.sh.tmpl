@@ -89,4 +89,29 @@ s = s.replace(r"$'\x1b[22m'", r"$'\x1b[22;27m'")
 p.write_text(s)
 PY
     fi
+
+    # you-should-use forks `tput` five times at source (once per shell) to
+    # populate its NONE/BOLD/RED/YELLOW/PURPLE colour variables (~18ms
+    # total here). We override YSU_MESSAGE_FORMAT (config.d/plugins/ysu.zsh)
+    # so those variables are never used — swap the tput command
+    # substitutions for the equivalent literal SGR escapes. Idempotent: the
+    # grep guard short-circuits once `tput` is gone, and the patch is
+    # re-applied automatically whenever antidote refetches the plugin.
+    ysu_lib="$antidote_home/MichaelAquilina/zsh-you-should-use/you-should-use.plugin.zsh"
+    if [ -f "$ysu_lib" ] && grep -qF 'tput sgr0' "$ysu_lib"; then
+        python3 - "$ysu_lib" <<'PY'
+import pathlib, sys
+p = pathlib.Path(sys.argv[1])
+s = p.read_text()
+for name, tput, esc in (
+    ("NONE",   "sgr0",     r"\e[0m"),
+    ("BOLD",   "bold",     r"\e[1m"),
+    ("RED",    "setaf 1",  r"\e[31m"),
+    ("YELLOW", "setaf 3",  r"\e[33m"),
+    ("PURPLE", "setaf 5",  r"\e[35m"),
+):
+    s = s.replace('%s="$(tput %s)"' % (name, tput), "%s=$'%s'" % (name, esc))
+p.write_text(s)
+PY
+    fi
 fi
