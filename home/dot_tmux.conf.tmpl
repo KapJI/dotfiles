@@ -119,8 +119,9 @@ bind f resize-pane -Z
 # Convert pane into a window
 bind F break-pane \; display-message "Pane moved to a separate window"
 
-# Toggle synchronize-panes
-bind S setw synchronize-panes \; display-message "Toggled synchronize-panes"
+# Toggle synchronize-panes — the format expands after the toggle, so it
+# reports the resulting state rather than just "toggled".
+bind S setw synchronize-panes \; display-message "synchronize-panes #{?synchronize-panes,on,off}"
 
 # Copy mode
 bind v copy-mode
