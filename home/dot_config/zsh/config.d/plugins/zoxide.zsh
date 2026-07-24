@@ -1,5 +1,7 @@
-# Enable zoxide
-eval "$(zoxide init zsh)"
+# Enable zoxide. Cached to avoid forking zoxide (~5ms) on every startup;
+# _zsh_cache_eval regenerates the cache whenever the zoxide binary changes
+# (see init_tools.zsh).
+_zsh_cache_eval zoxide-init.zsh zoxide zoxide init zsh
 export _ZO_FZF_OPTS="--no-sort \
 --bind=ctrl-z:ignore,btab:up,tab:down \
 --cycle \

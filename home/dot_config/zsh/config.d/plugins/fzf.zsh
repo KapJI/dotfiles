@@ -1,5 +1,7 @@
-# Initialize fzf shell integration (Ctrl+R, Ctrl+T, Alt+C)
-eval "$(fzf --zsh)"
+# Initialize fzf shell integration (Ctrl+R, Ctrl+T, Alt+C). Cached to
+# avoid forking fzf (~6ms) on every startup; _zsh_cache_eval regenerates
+# the cache whenever the fzf binary changes (see init_tools.zsh).
+_zsh_cache_eval fzf-init.zsh fzf fzf --zsh
 
 # fzf 0.48+ rebinds Tab to its own `fzf-completion` widget here, which
 # overrides fzf-tab's binding from antidote. Without `**` trigger,
