@@ -231,7 +231,15 @@ set -g @mode_indicator_empty_prompt " TMUX "
 # the nixpkgs build rides flake.lock instead, loaded like tmux-fingers.
 # Must run after status-left is set (it substitutes the
 # #{tmux_mode_indicator} placeholder) and after the prompts above.
-run-shell ~/.nix-profile/share/tmux-plugins/mode-indicator/mode_indicator.tmux
+#
+# Guarded on the file existing: a plain missing run-shell is silent at
+# server start but errors `returned 127` on every source-file reload, so
+# an incomplete nix profile degrades to a quiet warning instead. The
+# if-shell is transparent when the plugin is present (verified the
+# placeholder still substitutes identically to an unguarded load).
+if-shell "test -r ~/.nix-profile/share/tmux-plugins/mode-indicator/mode_indicator.tmux" \
+  "run-shell ~/.nix-profile/share/tmux-plugins/mode-indicator/mode_indicator.tmux" \
+  "display-message 'tmux: mode-indicator not found in nix profile'"
 
 
 ##### Extrakto #####
@@ -241,8 +249,11 @@ set -g @extrakto_filter_order "path word line all"
 set -g @extrakto_grab_area "recent"
 
 # Tagless upstream, same story as mode-indicator: pinned via flake.lock,
-# loaded from the nix profile instead of tpm.
-run-shell ~/.nix-profile/share/tmux-plugins/extrakto/extrakto.tmux
+# loaded from the nix profile instead of tpm. Guarded so a missing file
+# warns quietly rather than erroring on every source-file reload.
+if-shell "test -r ~/.nix-profile/share/tmux-plugins/extrakto/extrakto.tmux" \
+  "run-shell ~/.nix-profile/share/tmux-plugins/extrakto/extrakto.tmux" \
+  "display-message 'tmux: extrakto not found in nix profile'"
 
 
 ##### Fingers #####
@@ -254,7 +265,10 @@ bind -n M-y run -b "#{@fingers-cli} start #{pane_id} --mode jump"
 
 # Load tmux-fingers from the nix-server profile (nixpkgs ships a pre-built
 # binary + wrapper — no Crystal toolchain or RPATH gymnastics needed).
-run-shell ~/.nix-profile/share/tmux-plugins/tmux-fingers/tmux-fingers.tmux
+# Guarded like the other nix-loaded plugins above.
+if-shell "test -r ~/.nix-profile/share/tmux-plugins/tmux-fingers/tmux-fingers.tmux" \
+  "run-shell ~/.nix-profile/share/tmux-plugins/tmux-fingers/tmux-fingers.tmux" \
+  "display-message 'tmux: tmux-fingers not found in nix profile'"
 
 
 ##### Resurrect & Continuum #####

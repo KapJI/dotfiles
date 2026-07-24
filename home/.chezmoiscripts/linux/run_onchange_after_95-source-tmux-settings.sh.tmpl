@@ -9,6 +9,12 @@ if command -v tmux &> /dev/null; then
     if tmux has-session 2> /dev/null; then
         tmux source-file $HOME/.tmux.conf
     fi
-    ~/.tmux/plugins/tpm/scripts/install_plugins.sh
+    # tpm is fetched via .chezmoiexternal.toml before this after-script
+    # runs, so it is normally present; guard anyway so a partial bootstrap
+    # skips plugin install cleanly instead of erroring on a missing path.
+    tpm_install=~/.tmux/plugins/tpm/scripts/install_plugins.sh
+    if [ -x "$tpm_install" ]; then
+        "$tpm_install"
+    fi
 fi
 {{ end -}}
