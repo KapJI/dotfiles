@@ -84,7 +84,10 @@ _set_term_title_precmd() {
     # Folder glyph prefix marks "a shell sitting at a prompt in this
     # directory" — visually distinct from running-program titles,
     # which the preexec hook below prefixes with a gear glyph.
-    title " $short" "$full"
+    # Escape `%` -> `%%` so a dir named e.g. `%n` isn't expanded by the
+    # `title` function's `print -P` (kept for OMZ's own idle templates);
+    # matches the preexec path and the nvim titlestring escaping.
+    title " ${short:gs/%/%%}" "${full:gs/%/%%}"
 }
 
 add-zsh-hook precmd _set_term_title_precmd
