@@ -3,6 +3,23 @@
 -- editing config — replaces the handlers instead of stacking duplicates.
 local augroup = vim.api.nvim_create_augroup("user_autocmds", { clear = true })
 
+-- Never persist undo history for sensitive files. Persistent undo
+-- (undofile, options.lua) otherwise leaves a decrypted copy of secrets
+-- on disk indefinitely — most sharply the plaintext temp files chezmoi
+-- writes when you `chezmoi edit` an age-encrypted source, which silently
+-- defeats encryption-at-rest. Match SSH files (~/.ssh/*) and chezmoi's
+-- decrypted temps (…/chezmoi-encrypted<rand>/…). Buffer-local, set on
+-- read/create before the undofile is ever written.
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
+  group = augroup,
+  callback = function(ev)
+    local name = ev.file or ""
+    if name:match("/%.ssh/") or name:match("chezmoi%-encrypted") then
+      vim.opt_local.undofile = false
+    end
+  end,
+})
+
 -- Jump to last known cursor position when opening a file
 vim.api.nvim_create_autocmd("BufReadPost", {
   group = augroup,
