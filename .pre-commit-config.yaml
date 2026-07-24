@@ -6,3 +6,22 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
+
+  # Lua tooling for the Neovim config. system hooks reuse the nix-installed
+  # binaries (from .data/packages.yaml) so pre-commit and the editor share
+  # one version. stylua reads home/dot_config/nvim/stylua.toml; luacheck
+  # reads the repo-root .luacheckrc.
+  - repo: local
+    hooks:
+      - id: stylua
+        name: stylua (check)
+        entry: stylua --check
+        language: system
+        types: [lua]
+        files: ^home/dot_config/nvim/.*\.lua$
+      - id: luacheck
+        name: luacheck
+        entry: luacheck
+        language: system
+        types: [lua]
+        files: ^home/dot_config/nvim/.*\.lua$

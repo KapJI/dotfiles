@@ -275,6 +275,17 @@
 - nix: ruff
   uv-tool: ruff
 
+# Neovim formatters & linters — installed fleet-wide so conform.nvim
+# (format-on-save) and nvim-lint find them on PATH. Consumers:
+# home/dot_config/nvim/lua/plugins/{conform,nvim-lint}.lua.
+# (python→ruff, nix→nixfmt, rust→rustfmt live under their own entries.)
+- nix: stylua                   # lua formatter
+- nix: luajitPackages.luacheck  # lua linter (LuaJIT dialect, matches nvim)
+- nix: shfmt                    # sh / bash formatter
+- nix: prettier                 # yaml / json / markdown formatter
+- nix: taplo                    # toml formatter
+- nix: gotools                  # provides goimports (go import organizer)
+
 - brew-cask: visual-studio-code
   deb-desktop: code
   winget: Microsoft.VisualStudioCode

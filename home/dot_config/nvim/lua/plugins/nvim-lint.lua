@@ -2,8 +2,9 @@
 -- Complement to conform.nvim (which formats); this catches style/quality
 -- issues that LSPs don't.
 --
--- Install the linter binaries via :MasonInstall <name>:
---   :MasonInstall yamllint markdownlint-cli2
+-- Linter binaries: luacheck ships from packages.yaml (nix, fleet-wide);
+-- yamllint / markdownlint-cli2 come from mason (:MasonInstall yamllint
+-- markdownlint-cli2). luacheck reads .luacheckrc at the repo root.
 -- (optional: shellcheck — bashls auto-uses it for .sh/.bash; only listed
 --  here for .zsh files which bashls doesn't attach to)
 return {
@@ -14,7 +15,8 @@ return {
       local lint = require("lint")
 
       lint.linters_by_ft = {
-        yaml     = { "yamllint" },
+        lua = { "luacheck" },
+        yaml = { "yamllint" },
         markdown = { "markdownlint-cli2" },
         -- Uncomment when you want shellcheck on zsh files (sh/bash already
         -- covered by bashls). shellcheck doesn't fully grok zsh syntax;
@@ -27,18 +29,23 @@ return {
       -- keystroke).
       vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost", "InsertLeave" }, {
         group = vim.api.nvim_create_augroup("nvim-lint", { clear = true }),
-        callback = function() lint.try_lint() end,
+        callback = function()
+          lint.try_lint()
+        end,
       })
 
       -- The autocmd can't cover the buffer whose BufReadPost triggered
       -- this very load: lazy re-fires the event after setup, but before
       -- filetype detection has settled, so try_lint finds no linter for
       -- it. Lint the initial buffer with one direct, scheduled pass.
-      vim.schedule(function() lint.try_lint() end)
+      vim.schedule(function()
+        lint.try_lint()
+      end)
 
       -- Manual trigger
-      vim.keymap.set("n", "<leader>cl", function() lint.try_lint() end,
-        { desc = "Lint current buffer" })
+      vim.keymap.set("n", "<leader>cl", function()
+        lint.try_lint()
+      end, { desc = "Lint current buffer" })
     end,
   },
 }
