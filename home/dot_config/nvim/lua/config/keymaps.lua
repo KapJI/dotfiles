@@ -13,7 +13,10 @@ keyset("n", "<C-l>", function()
   end
 end, { desc = "Toggle verbose listchars" })
 
--- Clipboard (OSC52)
+-- System clipboard. vim.g.clipboard is left unset, so Neovim picks a
+-- provider by environment: pbcopy on macOS; otherwise inside tmux it hands
+-- off to tmux's buffer (`tmux load-buffer -w`, which relays to the local
+-- terminal over OSC 52); bare SSH without tmux uses Neovim's own OSC 52.
 keyset({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank to clipboard" })
 keyset({ "n", "v" }, "<leader>p", '"+p', { desc = "Paste from clipboard" })
 
@@ -60,7 +63,12 @@ vim.api.nvim_create_user_command("Arrows", function(opts)
   else
     vim.notify("Usage: :Arrows on|off", vim.log.levels.WARN)
   end
-end, { nargs = 1, complete = function() return { "on", "off" } end })
+end, {
+  nargs = 1,
+  complete = function()
+    return { "on", "off" }
+  end,
+})
 
 -- Keep cursor centered when scrolling
 keyset("n", "<C-d>", "<C-d>zz", { desc = "Scroll down half page" })
@@ -75,12 +83,12 @@ keyset("n", "<leader>ce", vim.diagnostic.open_float, { desc = "Diagnostic float"
 -- complete-all-matches) and <C-k> kill-to-end (no vim equivalent).
 keyset("c", "<C-a>", "<Home>", { desc = "Cmdline: beginning of line (emacs)" })
 keyset("c", "<C-k>", function()
-  local pos  = vim.fn.getcmdpos()
+  local pos = vim.fn.getcmdpos()
   local line = vim.fn.getcmdline()
   vim.fn.setcmdline(line:sub(1, pos - 1))
 end, { desc = "Cmdline: kill to end" })
 
 -- Notification history (noice routes vim.notify → nvim-notify).
-keyset("n", "<leader>Nh", "<Cmd>NoiceFzf<CR>",     { desc = "Notifications: history (fzf)" })
-keyset("n", "<leader>Nl", "<Cmd>NoiceLast<CR>",    { desc = "Notifications: last popup" })
+keyset("n", "<leader>Nh", "<Cmd>NoiceFzf<CR>", { desc = "Notifications: history (fzf)" })
+keyset("n", "<leader>Nl", "<Cmd>NoiceLast<CR>", { desc = "Notifications: last popup" })
 keyset("n", "<leader>Nd", "<Cmd>NoiceDismiss<CR>", { desc = "Notifications: dismiss visible" })
