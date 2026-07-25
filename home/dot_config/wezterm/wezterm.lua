@@ -132,14 +132,22 @@ local function split_nav(action, key)
     }
 end
 
--- ── Alt-Y: copy the previous command's output ────────────────────────────
--- At a bare wezterm prompt (no tmux) copy the last command's output to the
--- clipboard. This uses OSC 133 *semantic zones* — the iterm2 shell-integration
--- plugin (zsh/config.d/plugins/…) emits 133;A/B/C/D marking prompt and output
--- boundaries, and wezterm records them as zones. Grabbing the last "Output"
--- zone is exact: no ❯-glyph guessing and no scrollback-line cap, so output
--- that itself contains a ❯ can't mis-anchor the selection — the failure mode
--- of the old `wezterm cli get-text` zsh widget this replaces.
+-- ── Alt-Y: copy the previous command AND its output ──────────────────────
+-- At a bare wezterm prompt (no tmux) copy the last command line plus its
+-- output to the clipboard. This uses OSC 133 *semantic zones* — the iterm2
+-- shell-integration plugin (zsh/config.d/plugins/…) emits 133;A/B/C/D marking
+-- prompt (A/B), command input (B/C) and output (C/D) boundaries, and wezterm
+-- records them as zones. Grabbing the last "Output" zone is exact: no ❯-glyph
+-- guessing and no scrollback-line cap, so output that itself contains a ❯
+-- can't mis-anchor the selection — the failure mode of the old
+-- `wezterm cli get-text` zsh widget this replaces.
+--
+-- The command line comes from the "Input" zone that produced this output:
+-- the last Input zone at or above the output's start row (matched by row, not
+-- by list position, so a last command that printed nothing doesn't pair the
+-- wrong Input with an older Output). Copying command+output keeps this
+-- consistent with the in-tmux M-Y binding, which selects from the ❯ prompt
+-- line down.
 --
 -- Inside tmux/nvim, forward Alt-Y to the inner app exactly like the M-hjkl
 -- keys above (same is_inner_app test): tmux's own `bind -n M-Y` does the
@@ -151,19 +159,39 @@ local function copy_last_output(win, pane)
         win:perform_action({ SendKey = { key = 'y', mods = 'ALT|SHIFT' } }, pane)
         return
     end
-    local zones = pane:get_semantic_zones('Output')
-    if #zones == 0 then
+    local outputs = pane:get_semantic_zones('Output')
+    if #outputs == 0 then
         return
     end
-    local text = pane:get_text_from_semantic_zone(zones[#zones])
+    local out = outputs[#outputs]
+
+    -- The command that produced this output: the last Input zone starting on
+    -- or before the output's first row.
+    local cmd_zone
+    for _, z in ipairs(pane:get_semantic_zones('Input')) do
+        if z.start_y <= out.start_y then
+            cmd_zone = z
+        end
+    end
+
+    local parts = {}
+    if cmd_zone then
+        local cmd = (pane:get_text_from_semantic_zone(cmd_zone) or ''):gsub('%s+$', '')
+        if cmd ~= '' then
+            parts[#parts + 1] = cmd
+        end
+    end
     -- Trim trailing whitespace/blank lines (the p10k prompt-gap newline and
     -- anything the command left dangling) so the clipboard ends at the last
     -- real line of output.
-    text = (text or ''):gsub('%s+$', '')
-    if text == '' then
+    local outtext = (pane:get_text_from_semantic_zone(out) or ''):gsub('%s+$', '')
+    if outtext ~= '' then
+        parts[#parts + 1] = outtext
+    end
+    if #parts == 0 then
         return
     end
-    win:copy_to_clipboard(text)
+    win:copy_to_clipboard(table.concat(parts, '\n'))
 end
 
 config.keys = {
