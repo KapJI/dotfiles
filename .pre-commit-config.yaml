@@ -25,3 +25,9 @@ repos:
         language: system
         types: [lua]
         files: ^home/dot_config/nvim/.*\.lua$
+      - id: nvim-tests
+        name: nvim config tests
+        entry: tests/nvim/run.sh
+        language: system
+        pass_filenames: false
+        files: ^(home/dot_config/nvim/.*\.lua|tests/nvim/.*)$
