@@ -9,6 +9,7 @@
 return {
   "rcarriga/nvim-notify",
   main = "notify",
+  lazy = true, -- loaded on demand by noice (its notify backend), not at startup
   opts = {
     merge_duplicates = false,
   },

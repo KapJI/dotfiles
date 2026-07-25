@@ -35,7 +35,7 @@ return {
         jsonc = { "prettier" },
         markdown = { "prettier" },
         nix = { "nixfmt" },
-        go = { "goimports", "gofmt" },
+        go = { "goimports" }, -- goimports already applies gofmt formatting; a second gofmt pass is redundant
         rust = { "rustfmt" },
         terraform = { "terraform_fmt" },
         ["terraform-vars"] = { "terraform_fmt" },
