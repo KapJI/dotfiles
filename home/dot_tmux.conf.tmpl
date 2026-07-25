@@ -351,18 +351,23 @@ set -g @continuum-save-interval '10'
 # compiled binary) and extrakto (needs a python+fzf runtime) stay on nix,
 # which builds and pins them via flake.lock.
 #
-# Load resurrect before continuum: resurrect.tmux publishes the
-# @resurrect-{save,restore}-script-path options that continuum reads to
-# drive its auto-save, and continuum needs no tpm/env to find it.
+# Load order matters: resurrect -> catppuccin -> continuum.
+#  - resurrect before continuum: resurrect.tmux publishes the
+#    @resurrect-{save,restore}-script-path options that continuum reads to
+#    drive its auto-save, and continuum needs no tpm/env to find it.
+#  - continuum LAST: continuum.tmux prepends its save hook,
+#    #(continuum_save.sh), to status-right at load. Any plugin that rewrites
+#    status-right afterwards drops that hook and silently stops the 10-minute
+#    autosave — so it must run after catppuccin, which owns the status line.
 if-shell "test -r ~/.tmux/plugins/tmux-resurrect/resurrect.tmux" \
   "run-shell ~/.tmux/plugins/tmux-resurrect/resurrect.tmux" \
   "display-message 'tmux: tmux-resurrect not found'"
-if-shell "test -r ~/.tmux/plugins/tmux-continuum/continuum.tmux" \
-  "run-shell ~/.tmux/plugins/tmux-continuum/continuum.tmux" \
-  "display-message 'tmux: tmux-continuum not found'"
 if-shell "test -r ~/.tmux/plugins/catppuccin/catppuccin.tmux" \
   "run-shell ~/.tmux/plugins/catppuccin/catppuccin.tmux" \
   "display-message 'tmux: catppuccin not found'"
+if-shell "test -r ~/.tmux/plugins/tmux-continuum/continuum.tmux" \
+  "run-shell ~/.tmux/plugins/tmux-continuum/continuum.tmux" \
+  "display-message 'tmux: tmux-continuum not found'"
 
 # Override Catppuccin style for selected text
 set -g mode-style "fg=#cdd6f4,bg=#585b70"
