@@ -296,9 +296,11 @@ return {
       desc = "Lazygit (floating)",
     },
 
-    -- ]] / [[ for snacks.words navigation are bound buffer-local on
-    -- LspAttach (see init above) — global keymaps lose to ftplugin's
-    -- buffer-local section-motion mappings on Python, Lua, JS, etc.
+    -- snacks.words reference navigation (]r / [r) is bound buffer-local
+    -- on LspAttach (see init above), not here — and deliberately not on
+    -- ]] / [[, which stay as ftplugin's section-motion (a global mapping
+    -- there would anyway lose to the buffer-local ftplugin ones on
+    -- Python, Lua, JS, etc.).
 
     -- Toggle profiler + save a flattened trace as JSON. Press once to
     -- start, reproduce the lag, press again to stop — writes a

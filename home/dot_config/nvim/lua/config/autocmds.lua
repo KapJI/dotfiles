@@ -19,12 +19,21 @@ local augroup = vim.api.nvim_create_augroup("user_autocmds", { clear = true })
 --     into .ssh (`:edit alias` → …/.ssh/config) — the name alone misses
 --     it, since Neovim keeps the unresolved name at BufReadPre.
 -- fs_realpath is nil for a not-yet-existing BufNewFile, so fall back to
--- the name. Set the option on ev.buf explicitly (not vim.opt_local) so
--- protection lands on the file being read even if it isn't current.
+-- the name. Normalize \ to / first so Windows paths (C:\Users\…\.ssh\)
+-- match too — the nvim config runs on Windows in this fleet. Set the
+-- option on ev.buf explicitly (not vim.opt_local) so protection lands on
+-- the file being read even if it isn't the current buffer.
+--
+-- Watch renames and writes, not just reads: :saveas / :file move an
+-- existing (already undofile=true) buffer into ~/.ssh without firing
+-- BufReadPre/BufNewFile, which would otherwise write a real undo file for
+-- the new sensitive path. BufFilePost catches the rename; BufWritePre is
+-- the belt-and-suspenders pass right before any write reaches disk.
 local function undo_sensitive(path)
+  path = path:gsub("\\", "/")
   return path:match("/%.ssh/") or path:match("chezmoi%-encrypted")
 end
-vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile", "BufFilePost", "BufWritePre" }, {
   group = augroup,
   callback = function(ev)
     local name = vim.api.nvim_buf_get_name(ev.buf)
@@ -57,7 +66,10 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     -- BufWritePre aborts the whole write — so a protected buffer
     -- couldn't be saved at all. The buftype guard also covers exporting
     -- a scratch/help buffer with `:w file` (e.g. :checkhealth output).
-    if vim.bo.buftype ~= "" or not vim.bo.modifiable then
+    -- Skip 'binary' buffers too (nvim -b, hex/blob edits): trailing bytes
+    -- there are data, not whitespace to trim, and stripping them corrupts
+    -- the file.
+    if vim.bo.buftype ~= "" or not vim.bo.modifiable or vim.bo.binary then
       return
     end
     if strip_whitespace_excluded[vim.bo.filetype] then
