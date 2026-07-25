@@ -33,7 +33,6 @@ return {
         "fzf",
         "TelescopePrompt",
         "lazy",
-        "mason",
         "undotree",
         "diff",
         "bigfile",

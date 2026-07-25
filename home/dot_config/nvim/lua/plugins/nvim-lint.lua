@@ -2,9 +2,9 @@
 -- Complement to conform.nvim (which formats); this catches style/quality
 -- issues that LSPs don't.
 --
--- Linter binaries: luacheck ships from packages.yaml (nix, fleet-wide);
--- yamllint / markdownlint-cli2 come from mason (:MasonInstall yamllint
--- markdownlint-cli2). luacheck reads .luacheckrc at the repo root.
+-- Linter binaries all ship from packages.yaml, fleet-wide: luacheck,
+-- yamllint, and markdownlint-cli2 (nix on macOS/Linux; winget/npm/uv on
+-- Windows). luacheck reads .luacheckrc at the repo root.
 -- (optional: shellcheck — bashls auto-uses it for .sh/.bash; only listed
 --  here for .zsh files which bashls doesn't attach to)
 return {

@@ -76,8 +76,16 @@ vim.lsp.config("lua_ls", {
   },
 })
 
--- Servers whose binaries come from outside mason (uv-tool / nix / system).
--- mason-installed servers auto-enable via mason-lspconfig's automatic_enable.
+-- bashls / yamlls run on nvim-lspconfig's defaults (cmd, root markers,
+-- filetypes); lua_ls's settings are configured above.
+vim.lsp.config("bashls", {})
+vim.lsp.config("yamlls", {})
+
+-- Enable each server only when its binary is on PATH, so a host missing
+-- one degrades gracefully (the server just doesn't attach) rather than
+-- erroring. Binaries come from nix on macOS/Linux and winget/npm/uv on
+-- Windows (see .data/packages.yaml). This replaces mason + mason-lspconfig
+-- automatic_enable — every server, mason-provided or not, enables here.
 local function executable(name)
   return vim.fn.executable(name) == 1
 end
@@ -93,6 +101,15 @@ if executable("ruff") then
 end
 if executable("rust-analyzer") then
   table.insert(servers, "rust_analyzer")
+end
+if executable("lua-language-server") then
+  table.insert(servers, "lua_ls")
+end
+if executable("bash-language-server") then
+  table.insert(servers, "bashls")
+end
+if executable("yaml-language-server") then
+  table.insert(servers, "yamlls")
 end
 if #servers > 0 then
   vim.lsp.enable(servers)

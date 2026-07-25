@@ -1,8 +1,8 @@
 -- LSP defaults (keymaps + server config live in lua/config/lsp.lua,
 -- which is loaded by init.lua after lazy setup completes).
--- No lazy-load event: mason-lspconfig (lazy = false) lists this plugin
--- as a dependency, so it loads at startup regardless — an event here
--- would only suggest a deferral that never happens.
+-- lazy = false, not event-triggered: config.lsp calls vim.lsp.enable()
+-- for every server at startup and needs this plugin's server configs
+-- (cmd, root markers, filetypes) already registered when it runs.
 return {
   "neovim/nvim-lspconfig",
   lazy = false,

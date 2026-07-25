@@ -65,7 +65,6 @@ return {
           { icon = "󰈙", key = "e", desc = "New file", action = ":enew" },
           { icon = "󰉋", key = ".", desc = "Yazi", action = ":Yazi cwd" },
           { icon = "󰒲", key = "l", desc = "Lazy", action = ":Lazy" },
-          { icon = "󰏖", key = "m", desc = "Mason", action = ":Mason" },
           { icon = "󰗼", key = "q", desc = "Quit", action = ":qa" },
         },
       },

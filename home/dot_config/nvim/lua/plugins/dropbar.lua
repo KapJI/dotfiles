@@ -39,7 +39,6 @@ return {
             "neominimap",
             "TelescopePrompt",
             "lazy",
-            "mason",
             "trouble",
             "qf",
             "help",
