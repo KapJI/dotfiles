@@ -17,7 +17,12 @@ set -g default-terminal "tmux-256color"
 # terminal-features is tmux's modern interface for this, replacing the
 # lower-level terminal-overrides. Recent terminfo already advertises RGB
 # for *-256color, but this pins it regardless of the server's ncurses.
-set -as terminal-features ",*-256color*:RGB"
+#
+# Assign a fixed, high array slot rather than `set -as` (append): appending
+# adds another identical entry on every source-file/reload, so the array
+# grows without bound. An index well past the built-in features (there are
+# only a handful) keeps this idempotent — a reload overwrites the same slot.
+set -s 'terminal-features[100]' '*-256color*:RGB'
 
 # Index windows/panes from 1
 set -g base-index 1
