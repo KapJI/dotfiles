@@ -46,40 +46,48 @@ alias czm="chezmoi"
 # Single quotes: defer `chezmoi source-path` to use time instead of
 # spawning chezmoi on every shell startup.
 alias czmcd='cd "$(chezmoi source-path)"'
-# Bump pinned nixpkgs + claude-code-nix in the flake, then re-add the lock to chezmoi source.
-# After running, review/commit: chezmoi cd && git diff home/dot_config/nix-profile/flake.lock
-alias nix-bump-lock='nix flake update --flake ~/.config/nix-profile && chezmoi re-add ~/.config/nix-profile/flake.lock'
-
-# Deliberate antidote plugin update — the analogue of nix-bump-lock. Rewrites
-# every pin:<sha> in .zsh_plugins.txt to its repo's upstream default-branch
-# HEAD, then re-adds the file to the chezmoi source. Resolves one SHA per repo
-# (cached) so ohmyzsh's several lines stay in lockstep on one commit. A failed
-# lookup leaves that pin untouched. After running, review/commit:
-#   chezmoi cd && git diff home/dot_config/zsh/dot_zsh_plugins.txt
-# The new SHAs are checked out at the next shell (antidote regenerates its
-# static bundle and syncs pins), or on other hosts at the next `chezmoi apply`.
-zsh-bump-plugins() {
+# Bump every pinned dependency lock in one shot, then re-add the changed files
+# to the chezmoi source — the merge of the old nix-bump-lock and
+# zsh-bump-plugins. Two locks:
+#   1. the nix flake (flake.lock) — nixpkgs + claude-code-nix.
+#   2. the antidote plugin pins (.zsh_plugins.txt) — each pin:<sha> rewritten
+#      to its repo's upstream default-branch HEAD. One lookup per repo (cached)
+#      so ohmyzsh's several lines stay in lockstep on one commit; a failed
+#      lookup leaves that pin untouched.
+# (antidote itself is pinned in .chezmoiexternal.toml, a chezmoi-config file
+# with no re-add target — bump it there by hand.) After running, review/commit:
+#   chezmoi cd && git diff
+# The new plugin SHAs are checked out at the next shell (antidote regenerates
+# its static bundle and syncs pins), or on other hosts at the next apply.
+bump-locks() {
     emulate -L zsh
     setopt local_options extended_glob
+    print "==> nix flake update"
+    nix flake update --flake ~/.config/nix-profile || return 1
+    print "==> antidote plugin pins -> upstream HEAD"
     local f=$ZDOTDIR/.zsh_plugins.txt
-    [[ -r $f ]] || { print -u2 "zsh-bump-plugins: cannot read $f"; return 1 }
-    local line repo
-    local -A cache
-    local -a out
-    while IFS= read -r line || [[ -n $line ]]; do
-        if [[ $line != '#'* && $line == *pin:* ]]; then
-            repo=${line%%[[:space:]]*}
-            if [[ -z ${cache[$repo]:-} ]]; then
-                cache[$repo]=$(git ls-remote "https://github.com/$repo" HEAD 2>/dev/null | awk 'NR==1{print $1}')
+    if [[ -r $f ]]; then
+        local line repo
+        local -A cache
+        local -a out
+        while IFS= read -r line || [[ -n $line ]]; do
+            if [[ $line != '#'* && $line == *pin:* ]]; then
+                repo=${line%%[[:space:]]*}
+                if [[ -z ${cache[$repo]:-} ]]; then
+                    cache[$repo]=$(git ls-remote "https://github.com/$repo" HEAD 2>/dev/null | awk 'NR==1{print $1}')
+                fi
+                [[ -n ${cache[$repo]:-} ]] && line=${line/pin:[[:xdigit:]]##/pin:${cache[$repo]}}
             fi
-            [[ -n ${cache[$repo]:-} ]] && line=${line/pin:[[:xdigit:]]##/pin:${cache[$repo]}}
-        fi
-        out+=$line
-    done < $f
-    print -rl -- "${out[@]}" > $f
-    chezmoi re-add $f
-    print "zsh-bump-plugins: pins rewritten in $f and re-added to chezmoi."
-    print "Review/commit: chezmoi cd && git diff home/dot_config/zsh/dot_zsh_plugins.txt"
+            out+=$line
+        done < $f
+        print -rl -- "${out[@]}" > $f
+    else
+        print -u2 "bump-locks: skipping plugins ($f not readable)"
+    fi
+    print "==> chezmoi re-add"
+    chezmoi re-add ~/.config/nix-profile/flake.lock $f
+    print "bump-locks: flake.lock + plugin pins updated and re-added to chezmoi."
+    print "Review/commit: chezmoi cd && git diff"
 }
 
 # yazi wrapper: cd shell to whatever directory yazi was in when you quit.

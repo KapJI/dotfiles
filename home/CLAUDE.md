@@ -100,11 +100,11 @@ A flake at `~/.config/nix-profile/flake.nix` is rendered inline by `home/.chezmo
 
 `flake.lock` is chezmoi-managed at `home/dot_config/nix-profile/flake.lock` for cross-host reproducibility. The before_03 script reads it from `chezmoi sourceDir` directly (because chezmoi target-state writes happen *after* `before_*` scripts) and chezmoi's later target-write phase is a no-op when content matches.
 
-Bump versions on a primary host:
+Bump versions on a primary host with `bump-locks` (see Zsh Configuration — it bumps the flake **and** the antidote plugin pins in one shot):
 ```bash
-nix-bump-lock        # alias: nix flake update + chezmoi re-add flake.lock
-chezmoi cd && git diff home/dot_config/nix-profile/flake.lock
-git commit -am "nix: bump flake.lock"
+bump-locks           # nix flake update + antidote plugin pins, then chezmoi re-add
+chezmoi cd && git diff
+git commit -am "deps: bump flake.lock + plugin pins"
 git push
 ```
 Other hosts: `chezmoi update` → before_03 reruns (lock hash changed) → `nix profile remove` + `nix profile add` rebuilds the profile entry atomically.
@@ -143,15 +143,15 @@ The zsh config is modular under `dot_config/zsh/config.d/`:
 
 The plugin manager is **antidote** (configured in `dot_config/zsh/dot_zsh_plugins.txt`). Plugins are loaded at shell startup via a static bundle (`config.d/antidote.zsh`).
 
-Every plugin is **pinned to a commit SHA** (`pin:<sha>` in `dot_zsh_plugins.txt`) for cross-host reproducibility, mirroring `flake.lock` and the tag-pinned tmux plugins. `antidote update` (weekly, `run_onchange_after_80`) skips pinned bundles, so shells don't roll forward on their own. Bump deliberately:
+Every plugin is **pinned to a commit SHA** (`pin:<sha>` in `dot_zsh_plugins.txt`) for cross-host reproducibility, mirroring `flake.lock` and the tag-pinned tmux plugins. antidote itself is pinned too (an archive at a SHA in `.chezmoiexternal.toml`, which also disables its self-update). `antidote update` (weekly, `run_onchange_after_80`) skips pinned bundles, so shells don't roll forward on their own. Bump deliberately with `bump-locks` (also bumps the nix flake):
 
 ```bash
-zsh-bump-plugins   # rewrites every pin: to upstream HEAD, then chezmoi re-add
+bump-locks         # rewrites every pin: to upstream HEAD + nix flake, then chezmoi re-add
 # then review/commit:
-chezmoi cd && git diff home/dot_config/zsh/dot_zsh_plugins.txt
+chezmoi cd && git diff
 ```
 
-To bump one plugin, edit its SHA by hand and `chezmoi apply`. `ohmyzsh` spans several lines but is one clone — all its lines must share the same SHA (antidote errors on a pin conflict within a bundle).
+To bump one plugin, edit its SHA by hand and `chezmoi apply`. `ohmyzsh` spans several lines but is one clone — all its lines must share the same SHA (antidote errors on a pin conflict within a bundle). antidote itself bumps by editing the SHA in `.chezmoiexternal.toml`.
 
 ### Encryption
 

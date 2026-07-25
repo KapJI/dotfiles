@@ -6,11 +6,12 @@
 
 # Update antidote plugins.
 #
-# Every bundle in .zsh_plugins.txt is pinned to a commit SHA, and antidote
-# skips pinned bundles during `antidote update` — so this weekly run no longer
-# rolls plugins forward on its own. What it still does: self-update antidote
-# itself, purge stale bundles, and re-apply the fzf-tab / you-should-use
-# patches below. Plugin version bumps are deliberate: run `zsh-bump-plugins`
+# Both antidote itself and every bundle in .zsh_plugins.txt are pinned (the
+# tool via an archive in .chezmoiexternal.toml, the bundles via pin:<sha>), and
+# antidote skips pinned bundles during `antidote update` — so this run no
+# longer rolls anything forward on its own (the self-update also no-ops with no
+# .git). What it still does: purge stale bundles and re-apply the fzf-tab /
+# you-should-use patches below. Version bumps are deliberate: run `bump-locks`
 # (aliases.zsh), then commit; the new SHAs are checked out at the next shell
 # (bundle regen) or on other hosts at the next apply.
 #

@@ -42,9 +42,19 @@
 
 
 {{ if ne .osid "windows" }}
+# antidote (the plugin manager) pinned to a commit SHA for reproducibility,
+# like the tmux plugins below and the pin:<sha> on every bundle in
+# .zsh_plugins.txt. Fetched as an archive rather than a git clone: with no
+# .git, antidote's own `antidote update` self-update no-ops ("self updating is
+# disabled in this build"), so the tool version is frozen too and bumps stay
+# deliberate. HEAD is 21 commits past the newest tag (v2.1.0) with nothing
+# newer published, so this pins the SHA (as mode-indicator does) rather than
+# downgrade to the tag. Bump by replacing the SHA with the current tip:
+#   git ls-remote https://github.com/mattmc3/antidote HEAD
 [".config/zsh/antidote"]
-    type = "git-repo"
-    url = "https://github.com/mattmc3/antidote.git"
+    type = "archive"
+    url = "https://github.com/mattmc3/antidote/archive/67120be33ce52dfbf64278c07bc03f7c10e7eb9d.tar.gz"
+    stripComponents = 1
     refreshPeriod = {{ $default_refresh }}
 {{ end }}
 

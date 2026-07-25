@@ -24,10 +24,10 @@
 # the same freeze that flake.lock (nix) and the tag-pinned tmux plugins
 # (.chezmoiexternal.toml) give the rest of the fleet. antidote skips pinned
 # bundles during `antidote update` (run_onchange_after_80), so shells no
-# longer roll forward on their own. Update deliberately with `zsh-bump-plugins`
-# (aliases.zsh): it rewrites these SHAs to each repo's upstream HEAD and
-# re-adds this file to the chezmoi source; then review `chezmoi cd && git diff`
-# and commit — the analogue of `nix-bump-lock` for the flake. To bump a single
+# longer roll forward on their own. Update deliberately with `bump-locks`
+# (aliases.zsh): it rewrites these SHAs to each repo's upstream HEAD (and bumps
+# the nix flake) and re-adds the changed files to the chezmoi source; then
+# review `chezmoi cd && git diff` and commit. To bump a single
 # plugin, edit its SHA by hand and `chezmoi apply`. To see what a SHA is:
 # `git -C "$(antidote path <owner>/<repo>)" describe --tags --always`.
 # NOTE: ohmyzsh appears on several lines but is ONE clone, so all its lines
