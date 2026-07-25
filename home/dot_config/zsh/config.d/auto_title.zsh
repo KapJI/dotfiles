@@ -130,8 +130,17 @@ if [[ -n $TMUX ]]; then
         # window name is concise; OMZ's convention of putting the long
         # version in OSC 2 makes sense for non-tmux terminals but
         # produces a full-path window name in tmux.
-        print -Pn "\e]2;${1:q}\a"
-        print -Pn "\e]1;${1:q}\a"
+        # Render literally — NOT print -P — so a directory name containing
+        # control bytes can't inject a terminal escape. ${(V)} makes ESC/BEL/
+        # newline visible (^[, ^G, \n); print -rn emits them verbatim instead
+        # of re-interpreting backslash escapes back into raw bytes, which
+        # print-without-r (and the old ${1:q} + print -P) did — a crafted dir
+        # name could otherwise close the OSC and inject e.g. OSC 52. Callers
+        # double `%`->`%%` for OMZ's print -P title (non-tmux); undo that here.
+        local t=${(V)1}
+        t=${t//'%%'/%}
+        print -rn -- $'\e]2;'"$t"$'\a'
+        print -rn -- $'\e]1;'"$t"$'\a'
     }
 fi
 
