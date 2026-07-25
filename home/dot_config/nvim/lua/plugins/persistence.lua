@@ -11,8 +11,10 @@ return {
     -- session contents are controlled by 'sessionoptions'. Trim
     -- runtimepath out of the saved session (it doesn't change between
     -- launches and bloats the file); keep buffers, layout, cwd,
-    -- tabpages, help windows, and globals.
-    vim.o.sessionoptions = "buffers,curdir,tabpages,winsize,help,globals,skiprtp"
+    -- tabpages, and globals. No `help`: the PersistenceSavePre cleanup
+    -- below strips help windows as transient (same as minimap/undotree),
+    -- so `help` here was inert — dropped to match the actual behavior.
+    vim.o.sessionoptions = "buffers,curdir,tabpages,winsize,globals,skiprtp"
 
     require("persistence").setup(opts)
 

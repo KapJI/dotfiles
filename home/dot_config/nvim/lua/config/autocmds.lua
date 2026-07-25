@@ -8,16 +8,29 @@ local augroup = vim.api.nvim_create_augroup("user_autocmds", { clear = true })
 -- on disk indefinitely — most sharply the plaintext temp files chezmoi
 -- writes when you `chezmoi edit` an age-encrypted source, which silently
 -- defeats encryption-at-rest. Match SSH files (~/.ssh/*) and chezmoi's
--- decrypted temps (…/chezmoi-encrypted<rand>/…). Buffer-local, set on
--- read/create before the undofile is ever written. Match the resolved
--- buffer name (always absolute) rather than ev.file, which stays relative
--- for `:edit .ssh/foo` and would slip past the leading-slash pattern.
+-- decrypted temps (…/chezmoi-encrypted<rand>/…). Set on read/create
+-- before the undofile is ever written.
+--
+-- Test BOTH the buffer name (always absolute here) and its symlink-
+-- resolved path:
+--   - the raw name catches a real file under a symlinked ~/.ssh dir,
+--     whose realpath resolves elsewhere and would slip the pattern;
+--   - the realpath catches a symlink whose name is innocuous but points
+--     into .ssh (`:edit alias` → …/.ssh/config) — the name alone misses
+--     it, since Neovim keeps the unresolved name at BufReadPre.
+-- fs_realpath is nil for a not-yet-existing BufNewFile, so fall back to
+-- the name. Set the option on ev.buf explicitly (not vim.opt_local) so
+-- protection lands on the file being read even if it isn't current.
+local function undo_sensitive(path)
+  return path:match("/%.ssh/") or path:match("chezmoi%-encrypted")
+end
 vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
   group = augroup,
   callback = function(ev)
     local name = vim.api.nvim_buf_get_name(ev.buf)
-    if name:match("/%.ssh/") or name:match("chezmoi%-encrypted") then
-      vim.opt_local.undofile = false
+    local resolved = (vim.uv or vim.loop).fs_realpath(name) or name
+    if undo_sensitive(name) or undo_sensitive(resolved) then
+      vim.api.nvim_set_option_value("undofile", false, { buf = ev.buf })
     end
   end,
 })
@@ -95,7 +108,14 @@ do
   local TITLE_PREFIX = " "
 
   local function title_for_buf()
-    local name = vim.fn.expand("%:t")
+    -- Strip control chars from the basename before it flows into
+    -- 'titlestring' and the TermClose OSC-2 write below. A filename may
+    -- legally contain ESC/BEL bytes (any byte but / and NUL); left in,
+    -- they'd be emitted raw in the terminal title sequence — a BEL ends
+    -- the OSC early, so trailing bytes execute as terminal commands
+    -- (escape injection from a maliciously-named file). Strip first so
+    -- the cleaned width, not the raw width, drives truncation below.
+    local name = (vim.fn.expand("%:t"):gsub("%c", ""))
     if name == "" then
       return vim.trim(TITLE_PREFIX)
     end
