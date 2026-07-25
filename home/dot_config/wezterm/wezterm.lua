@@ -81,8 +81,14 @@ config.colors               = {
 -- Forwarding chain when nested (e.g. wezterm split → tmux → nvim):
 --   wezterm sees tmux as foreground → forwards M-h to tmux
 --   tmux's is_vim shell check sees nvim → forwards M-h to nvim
---   nvim's smart-splits handles the key; on edge, sends back through tmux
---   tmux passes to wezterm via the same chain
+--   nvim's smart-splits moves within nvim, or at its edge hands off to
+--     tmux's own select-pane
+--
+-- The key does NOT climb back out to wezterm: tmux's select-pane wraps
+-- (leftmost↔rightmost) instead of hitting an edge, and while IS_TMUX is set
+-- wezterm forwards M-hjkl unconditionally — a key handed back would just
+-- bounce straight in again. So wezterm-level panes respond to Alt-hjkl only
+-- when the foreground app is neither tmux nor nvim.
 --
 -- Detection:
 --   - IS_NVIM user-var (set by smart-splits via OSC) — works through SSH/et
