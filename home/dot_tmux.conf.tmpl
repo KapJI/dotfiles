@@ -129,8 +129,13 @@ bind S setw synchronize-panes \; display-message "synchronize-panes #{?synchroni
 # Copy mode
 bind v copy-mode
 
-# Prevent mouse drag in normal mode from entering copy mode
-unbind -T root MouseDrag1Pane
+# Mouse drag: keep tmux's default forwarding to mouse-aware programs
+# (send-keys -M when the pane is already in copy-mode or the app turned on
+# mouse tracking, #{mouse_any_flag}) but drop the default's copy-mode -M
+# else-branch, so a plain drag at the shell prompt does NOT fall into copy
+# mode. The previous blanket `unbind` removed the forwarding too, so drags
+# never reached mouse apps (nvim mouse, htop, less, fzf).
+bind -T root MouseDrag1Pane if -F '#{||:#{pane_in_mode},#{mouse_any_flag}}' 'send-keys -M'
 
 # Announce tmux to the outer terminal (e.g. wezterm) via OSC user-var so
 # Alt-hjkl gets forwarded to us through SSH/et. Symmetric to smart-splits.nvim's
