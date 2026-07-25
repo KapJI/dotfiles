@@ -4,9 +4,6 @@ setopt NO_BEEP
 # Allow tab completion in the middle of a word
 setopt COMPLETE_IN_WORD
 
-# Match files beginning with a dot without explicitly specifying the dot
-setopt GLOBDOTS
-
 # History options. Some of these are also set by OMZ's lib/history.zsh, but
 # being explicit here decouples behavior from upstream changes and keeps
 # every history-related decision visible in one place.

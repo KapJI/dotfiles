@@ -16,8 +16,11 @@
 #   3. In every case the LAST segment (current dir) is kept full; only
 #      intermediate segments are truncated.
 #   4. Each intermediate segment is shortened to the shortest prefix
-#      that uniquely identifies it among entries in its parent dir
-#      (GLOBDOTS is on, so hidden siblings are considered too).
+#      that uniquely identifies it among entries in its parent dir. The
+#      prefix always carries the segment's own leading char, so a dotfile
+#      segment (prefix starts with `.`) already globs hidden siblings and
+#      a visible segment can only collide with visible ones — the plain
+#      `*(N)` glob below needs neither GLOBDOTS nor a (D) qualifier.
 
 # Shortest unique prefix of $2 within $1.
 _atit_unique_prefix() {
