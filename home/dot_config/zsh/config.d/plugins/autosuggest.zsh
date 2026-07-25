@@ -18,6 +18,8 @@ ZSH_AUTOSUGGEST_CLEAR_WIDGETS=(
   history-search-backward
   history-beginning-search-forward
   history-beginning-search-backward
+  history-beginning-search-forward-end
+  history-beginning-search-backward-end
   history-substring-search-up
   history-substring-search-down
   up-line-or-beginning-search
@@ -29,7 +31,12 @@ ZSH_AUTOSUGGEST_CLEAR_WIDGETS=(
   bracketed-paste
 )
 
-# ZSH_AUTOSUGGEST_USE_ASYNC="true" # causes errors
+# Async is already ON, and not because of any line here: the plugin sets
+# ZSH_AUTOSUGGEST_USE_ASYNC (empty but present) on zsh >= 5.0.8 and keys off
+# the parameter being *set*, not its value — so a commented-out assignment
+# never mattered. The old "causes errors" was the pre-5.0.8 ^C bug (upstream
+# issue #364), now irrelevant on our zsh. To actually disable async you would
+# `unset ZSH_AUTOSUGGEST_USE_ASYNC` after the plugin loads.
 
 # Bind autosuggest's widget wrappers ONCE at the first precmd instead of
 # on every precmd (upstream's default exists to stay outermost if other
