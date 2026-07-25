@@ -6,6 +6,14 @@
 
 # Update antidote plugins.
 #
+# Every bundle in .zsh_plugins.txt is pinned to a commit SHA, and antidote
+# skips pinned bundles during `antidote update` — so this weekly run no longer
+# rolls plugins forward on its own. What it still does: self-update antidote
+# itself, purge stale bundles, and re-apply the fzf-tab / you-should-use
+# patches below. Plugin version bumps are deliberate: run `zsh-bump-plugins`
+# (aliases.zsh), then commit; the new SHAs are checked out at the next shell
+# (bundle regen) or on other hosts at the next apply.
+#
 # Force git/ssh into non-interactive mode. Antidote's git wrappers redirect
 # stderr to /dev/null (antidote.zsh's git_fetch/git_pull), so any
 # interactive prompt (SSH host-key confirmation, credential ask) would

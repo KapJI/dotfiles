@@ -19,31 +19,44 @@
 #    Wraps the final widget set so highlighting fires on key events.
 #  - zsh-autosuggestions must be LAST: it wraps the final ZLE widget
 #    set, including fsh's already-wrapped versions.
+#
+# Every bundle is pinned to a commit SHA (pin:<sha>) for reproducibility —
+# the same freeze that flake.lock (nix) and the tag-pinned tmux plugins
+# (.chezmoiexternal.toml) give the rest of the fleet. antidote skips pinned
+# bundles during `antidote update` (run_onchange_after_80), so shells no
+# longer roll forward on their own. Update deliberately with `zsh-bump-plugins`
+# (aliases.zsh): it rewrites these SHAs to each repo's upstream HEAD and
+# re-adds this file to the chezmoi source; then review `chezmoi cd && git diff`
+# and commit — the analogue of `nix-bump-lock` for the flake. To bump a single
+# plugin, edit its SHA by hand and `chezmoi apply`. To see what a SHA is:
+# `git -C "$(antidote path <owner>/<repo>)" describe --tags --always`.
+# NOTE: ohmyzsh appears on several lines but is ONE clone, so all its lines
+# MUST carry the SAME SHA — antidote errors on a pin conflict within a bundle.
 
 # path: the theme file directly — a bare entry makes antidote also source
 # powerlevel9k.zsh-theme (a compat shim that just re-sources this file).
-romkatv/powerlevel10k path:powerlevel10k.zsh-theme
+romkatv/powerlevel10k path:powerlevel10k.zsh-theme pin:9253fb1c5034410c43a0c681ff8294181c54016c
 
-zsh-users/zsh-completions path:src kind:fpath
-MichaelAquilina/zsh-you-should-use
+zsh-users/zsh-completions path:src kind:fpath pin:4f5416f5fd9b42822de3ff0cebb831843f655d1d
+MichaelAquilina/zsh-you-should-use pin:5f3d129864ee4505043d88c3486224f1d75b692e
 
 # Queues compdef calls; the real compinit runs at the first prompt
 # (post_zshrc), after antidote.zsh's run_compinit patch has landed.
-mattmc3/zephyr path:plugins/completion
+mattmc3/zephyr path:plugins/completion pin:17d75fe22d87a6ea9c6d0194cc1b70c2e502140d
 
 # Hooks _main_complete (autoloaded from fpath at source time), so it
 # tolerates the deferred compinit — see the header note.
-Aloxaf/fzf-tab
+Aloxaf/fzf-tab pin:24105b15714bfec37989ed5c5b6e60f572253019
 
 # OMZ — must come BEFORE fsh. OMZ's lib/misc.zsh binds self-insert
 # to url-quote-magic, which would overwrite fsh's self-insert wrap
 # if fsh loaded first.
-getantidote/use-omz
-ohmyzsh/ohmyzsh path:lib
-ohmyzsh/ohmyzsh path:plugins/colored-man-pages
-ohmyzsh/ohmyzsh path:plugins/dirhistory
-ohmyzsh/ohmyzsh path:plugins/extract
-ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z
+getantidote/use-omz pin:317648f75d2643abcd7cf580062a8999b11473d7
+ohmyzsh/ohmyzsh path:lib pin:b37dd49ca5bfe0d99b35607637152cb8cc8b29d7
+ohmyzsh/ohmyzsh path:plugins/colored-man-pages pin:b37dd49ca5bfe0d99b35607637152cb8cc8b29d7
+ohmyzsh/ohmyzsh path:plugins/dirhistory pin:b37dd49ca5bfe0d99b35607637152cb8cc8b29d7
+ohmyzsh/ohmyzsh path:plugins/extract pin:b37dd49ca5bfe0d99b35607637152cb8cc8b29d7
+ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z pin:b37dd49ca5bfe0d99b35607637152cb8cc8b29d7
 # safe-paste intentionally omitted: on zsh >=5.1 it only re-binds
 # bracketed-paste-magic (already done by lib/misc.zsh above) and runs a
 # buggy `set zle_bracketed_paste` that clobbers $@ instead of setting an
@@ -52,7 +65,7 @@ ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z
 # fsh wraps widgets at source time; must come AFTER OMZ + fzf-tab so
 # the bindings (self-insert → url-quote-magic, fzf-tab-complete, etc.)
 # are already created.
-zdharma-continuum/fast-syntax-highlighting
+zdharma-continuum/fast-syntax-highlighting pin:3d574ccf48804b10dca52625df13da5edae7f553
 
 # Must be last — wraps the final widget set from everything above.
-zsh-users/zsh-autosuggestions
+zsh-users/zsh-autosuggestions pin:85919cd1ffa7d2d5412f6d3fe437ebdbeeec4fc5

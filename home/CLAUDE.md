@@ -141,7 +141,17 @@ The zsh config is modular under `dot_config/zsh/config.d/`:
 - `env.zsh.tmpl` — environment variables (templated)
 - `key_bindings.zsh` — keybindings
 
-The plugin manager is **antidote** (configured in `dot_config/zsh/dot_zsh_plugins.txt`). Plugins are loaded at shell startup.
+The plugin manager is **antidote** (configured in `dot_config/zsh/dot_zsh_plugins.txt`). Plugins are loaded at shell startup via a static bundle (`config.d/antidote.zsh`).
+
+Every plugin is **pinned to a commit SHA** (`pin:<sha>` in `dot_zsh_plugins.txt`) for cross-host reproducibility, mirroring `flake.lock` and the tag-pinned tmux plugins. `antidote update` (weekly, `run_onchange_after_80`) skips pinned bundles, so shells don't roll forward on their own. Bump deliberately:
+
+```bash
+zsh-bump-plugins   # rewrites every pin: to upstream HEAD, then chezmoi re-add
+# then review/commit:
+chezmoi cd && git diff home/dot_config/zsh/dot_zsh_plugins.txt
+```
+
+To bump one plugin, edit its SHA by hand and `chezmoi apply`. `ohmyzsh` spans several lines but is one clone — all its lines must share the same SHA (antidote errors on a pin conflict within a bundle).
 
 ### Encryption
 
