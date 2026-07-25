@@ -30,12 +30,17 @@ _copy_last_output() {
     return
   fi
 
-  # The pane to read is the focused one — Alt-Y was just pressed in it.
-  # ($WEZTERM_PANE would name it directly, but wezterm doesn't export
-  # that var in every setup, so ask the mux for the focused pane id.)
-  local pane
-  pane=$(wezterm cli list-clients --format json 2>/dev/null \
-    | jq -r '.[0].focused_pane_id // empty' 2>/dev/null)
+  # The pane to read is the one this shell runs in — wezterm exports its id
+  # as $WEZTERM_PANE. Prefer that over list-clients' focused pane: with more
+  # than one gui/mux client the "focused" pane can belong to a different
+  # window than the one Alt-Y was pressed in, and list-clients[0] is just the
+  # first client, not necessarily this one. Fall back to the focused pane only
+  # if the var is somehow unset.
+  local pane=${WEZTERM_PANE:-}
+  if [[ -z $pane ]]; then
+    pane=$(wezterm cli list-clients --format json 2>/dev/null \
+      | jq -r '.[0].focused_pane_id // empty' 2>/dev/null)
+  fi
   if [[ -z $pane ]]; then
     zle -M "Alt-Y: couldn't determine the wezterm pane"
     return
