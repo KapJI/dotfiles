@@ -9,11 +9,13 @@ local augroup = vim.api.nvim_create_augroup("user_autocmds", { clear = true })
 -- writes when you `chezmoi edit` an age-encrypted source, which silently
 -- defeats encryption-at-rest. Match SSH files (~/.ssh/*) and chezmoi's
 -- decrypted temps (…/chezmoi-encrypted<rand>/…). Buffer-local, set on
--- read/create before the undofile is ever written.
+-- read/create before the undofile is ever written. Match the resolved
+-- buffer name (always absolute) rather than ev.file, which stays relative
+-- for `:edit .ssh/foo` and would slip past the leading-slash pattern.
 vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
   group = augroup,
   callback = function(ev)
-    local name = ev.file or ""
+    local name = vim.api.nvim_buf_get_name(ev.buf)
     if name:match("/%.ssh/") or name:match("chezmoi%-encrypted") then
       vim.opt_local.undofile = false
     end
