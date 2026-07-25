@@ -8,8 +8,17 @@ here="$(cd "$(dirname "$0")" && pwd)" # tests/nvim
 init="$here/minimal_init.lua"
 spec="$here/spec"
 
+# Isolate from the deployed ~/.config/nvim: point XDG_CONFIG_HOME at an
+# empty temp dir so nvim's default runtimepath does NOT include the applied
+# config. minimal_init.lua then explicitly adds the SOURCE config, making it
+# the only config on the runtimepath — so the suite tests the source of
+# truth, not whatever happens to be deployed. (XDG_DATA_HOME is left alone so
+# the plenary clone under ~/.local/share/nvim is still found.)
+xdg="$(mktemp -d)"
+trap 'rm -rf "$xdg"' EXIT
+
 set +e
-out="$(nvim --headless --noplugin -u "$init" \
+out="$(XDG_CONFIG_HOME="$xdg" nvim --headless --noplugin -u "$init" \
   -c "PlenaryBustedDirectory $spec { minimal_init = '$init', sequential = true }" 2>&1)"
 code=$?
 set -e
