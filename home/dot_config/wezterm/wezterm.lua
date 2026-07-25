@@ -132,6 +132,40 @@ local function split_nav(action, key)
     }
 end
 
+-- ── Alt-Y: copy the previous command's output ────────────────────────────
+-- At a bare wezterm prompt (no tmux) copy the last command's output to the
+-- clipboard. This uses OSC 133 *semantic zones* — the iterm2 shell-integration
+-- plugin (zsh/config.d/plugins/…) emits 133;A/B/C/D marking prompt and output
+-- boundaries, and wezterm records them as zones. Grabbing the last "Output"
+-- zone is exact: no ❯-glyph guessing and no scrollback-line cap, so output
+-- that itself contains a ❯ can't mis-anchor the selection — the failure mode
+-- of the old `wezterm cli get-text` zsh widget this replaces.
+--
+-- Inside tmux/nvim, forward Alt-Y to the inner app exactly like the M-hjkl
+-- keys above (same is_inner_app test): tmux's own `bind -n M-Y` does the
+-- equivalent copy from the marks it records, so this must not intercept it
+-- there. Key is Alt+Shift+y (capital Y), matching tmux's M-Y and the old
+-- widget's `^[Y`; forwarding re-encodes it as ESC-Y, which is what tmux reads.
+local function copy_last_output(win, pane)
+    if is_inner_app(pane) then
+        win:perform_action({ SendKey = { key = 'y', mods = 'ALT|SHIFT' } }, pane)
+        return
+    end
+    local zones = pane:get_semantic_zones('Output')
+    if #zones == 0 then
+        return
+    end
+    local text = pane:get_text_from_semantic_zone(zones[#zones])
+    -- Trim trailing whitespace/blank lines (the p10k prompt-gap newline and
+    -- anything the command left dangling) so the clipboard ends at the last
+    -- real line of output.
+    text = (text or ''):gsub('%s+$', '')
+    if text == '' then
+        return
+    end
+    win:copy_to_clipboard(text)
+end
+
 config.keys = {
     split_nav('move', 'h'),
     split_nav('move', 'j'),
@@ -141,6 +175,7 @@ config.keys = {
     split_nav('resize', 'j'),
     split_nav('resize', 'k'),
     split_nav('resize', 'l'),
+    { key = 'y', mods = 'ALT|SHIFT', action = wezterm.action_callback(copy_last_output) },
 }
 
 return config

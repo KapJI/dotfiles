@@ -55,6 +55,11 @@ AppData/Local/nvim-data/site/autoload/plug.vim
 # orphaned target lingered.
 .config/zsh/config.d/plugins/vi_mode.zsh
 
+# Alt-Y "copy last command output" zsh widget; superseded by the wezterm.lua
+# semantic-zone binding (bare wezterm) + the in-tmux M-Y binding. Source file
+# deleted, so remove the orphaned target.
+.config/zsh/config.d/copy_last_output.zsh
+
 {{ if and (eq .chezmoi.os "linux") (not .is_desktop) -}}
 # tpm removed: tmux plugins are now fetched + pinned via .chezmoiexternal.toml
 # and loaded with explicit run-shell in .tmux.conf. Delete tpm's own clone

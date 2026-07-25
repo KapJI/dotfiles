@@ -181,9 +181,10 @@ bind -T copy-mode-vi End  send -X end-of-line
 bind -T copy-mode-vi y send -X copy-selection
 bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection
 
-# Copy last command output — Alt-Y, the same key as the zsh widget of
-# the same name (zsh/config.d/copy_last_output.zsh). In a vim/nvim pane
-# forward Alt-Y to the app instead, like the M-hjkl bindings above.
+# Copy last command output — Alt-Y. At a bare wezterm prompt (no tmux) the
+# equivalent copy is done in wezterm.lua via OSC 133 semantic zones; this
+# binding is the in-tmux path. In a vim/nvim pane forward Alt-Y to the app
+# instead, like the M-hjkl bindings above.
 #
 # Navigation is by the shell's OSC 133 prompt marks (emitted by the iterm2
 # shell-integration plugin: 133;A prompt start, 133;C output start), which
@@ -206,8 +207,14 @@ bind -n M-Y if-shell "$is_vim" "send-keys M-Y" {
         # inside a running command's output. capture-pane pads the visible
         # region to full pane height with blank rows, so test only the
         # cursor's own row (anchored ^❯ so a mid-line ❯ in output can't
-        # false-match).
-        if-shell -b "tmux capture-pane -p -J -S '#{cursor_y}' -E '#{cursor_y}' | grep -q '^❯'" {
+        # false-match). Also require pane_current_command == zsh: a running
+        # command whose last output line happens to start with ❯ (e.g. a
+        # program printing its own prompt-like glyph) would otherwise be
+        # misread as an idle prompt and copy the PREVIOUS command instead of
+        # the running one. While a command runs, pane_current_command is that
+        # command, not zsh, so the guard rejects it and the running branch
+        # (below) is taken.
+        if-shell -b "[ '#{pane_current_command}' = zsh ] && tmux capture-pane -p -J -S '#{cursor_y}' -E '#{cursor_y}' | grep -q '^❯'" {
             # Idle at a finished prompt: copy the PREVIOUS command's output.
             # Require at least two prompt marks — a fresh or just-cleared
             # pane has only the current one, so there is nothing to copy.
