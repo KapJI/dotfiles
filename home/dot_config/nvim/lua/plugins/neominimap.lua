@@ -79,11 +79,18 @@ return {
     -- overlay. snacks.dashboard fires User SnacksDashboard{Opened,
     -- Closed} which we bracket here.
     local dash_group = vim.api.nvim_create_augroup("user_neominimap_dashboard", { clear = true })
+    -- Remember whether the minimap was on when the dashboard opened, so
+    -- closing it restores that state instead of unconditionally re-enabling.
+    -- Otherwise a manually-disabled minimap (<leader>nm) is forced back on by
+    -- any later dashboard open/close cycle.
+    local minimap_was_enabled = true
     vim.api.nvim_create_autocmd("User", {
       group = dash_group,
       pattern = "SnacksDashboardOpened",
       callback = function()
         vim.schedule(function()
+          local ok, vars = pcall(require, "neominimap.variables")
+          minimap_was_enabled = (not ok) or vars.g.enabled ~= false
           pcall(vim.cmd, "Neominimap Disable")
         end)
       end,
@@ -93,7 +100,9 @@ return {
       pattern = "SnacksDashboardClosed",
       callback = function()
         vim.schedule(function()
-          pcall(vim.cmd, "Neominimap Enable")
+          if minimap_was_enabled then
+            pcall(vim.cmd, "Neominimap Enable")
+          end
         end)
       end,
     })

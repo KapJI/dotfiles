@@ -24,9 +24,13 @@ vim.api.nvim_create_autocmd("LspAttach", {
     keyset("n", "gd", vim.lsp.buf.definition, opts("Go to definition"))
     keyset("n", "gy", vim.lsp.buf.type_definition, opts("Go to type definition"))
     keyset("n", "gi", vim.lsp.buf.implementation, opts("Go to implementation"))
+    -- nowait: gr is a prefix of Neovim's default grr/gra/gri/grn LSP maps,
+    -- so without it, pressing gr stalls for timeoutlen (~1s) to disambiguate.
+    -- Fire immediately — those built-ins are redundant with this scheme
+    -- (references=gr, code action=<leader>ca, implementation=gi, rename=<leader>cr).
     keyset("n", "gr", function()
       require("fzf-lua").lsp_references()
-    end, opts("Go to references"))
+    end, vim.tbl_extend("force", opts("Go to references"), { nowait = true }))
     keyset("n", "K", vim.lsp.buf.hover, opts("Show documentation"))
     -- <leader>cr is bound globally by inc-rename.nvim (live-preview rename).
     -- Don't shadow it here with a buffer-local binding to vim.lsp.buf.rename.

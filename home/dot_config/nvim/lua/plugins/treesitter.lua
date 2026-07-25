@@ -71,7 +71,17 @@ return {
 
       vim.api.nvim_create_autocmd("FileType", {
         callback = function(args)
-          if pcall(vim.treesitter.start, args.buf) then
+          if not pcall(vim.treesitter.start, args.buf) then
+            return
+          end
+          -- Only take over 'indentexpr' when the parser ships an indents
+          -- query. Several installed parsers (make, rst, git_config, vim,
+          -- dtd, jinja.html) have none, and the treesitter indentexpr then
+          -- degrades to a no-op that clobbers the filetype's native indent
+          -- (make's significant tabs, rst list continuations). Leave those.
+          local ft = vim.bo[args.buf].filetype
+          local lang = vim.treesitter.language.get_lang(ft) or ft
+          if vim.treesitter.query.get(lang, "indents") then
             vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
           end
         end,

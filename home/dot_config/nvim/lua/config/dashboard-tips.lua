@@ -30,17 +30,32 @@ local tips = {
   { "<C-a>", "increment number / bool / date / semver" },
 }
 
+-- Self-contained PRNG (Park-Miller MINSTD). Shuffling tips must not depend
+-- on or perturb Lua's global math.random state, and must differ even for two
+-- calls in the same second — os.time() seeding (1s resolution) would repeat.
+-- Seeded once from a nanosecond clock; the sequence advances across calls.
+local function make_rng(seed)
+  local state = seed % 2147483647
+  if state <= 0 then
+    state = state + 2147483646
+  end
+  return function(max)
+    state = (state * 16807) % 2147483647
+    return (state % max) + 1
+  end
+end
+local rng = make_rng((vim.uv or vim.loop).hrtime())
+
 -- Pick `n` random tips and return them as a list of strings ready
 -- for snacks.dashboard's `text` section.
 function M.pick(n)
-  math.randomseed(os.time())
   local copy = {}
   for i, t in ipairs(tips) do
     copy[i] = t
   end
   -- Fisher-Yates partial shuffle
   for i = #copy, #copy - n + 1, -1 do
-    local j = math.random(i)
+    local j = rng(i)
     copy[i], copy[j] = copy[j], copy[i]
   end
 

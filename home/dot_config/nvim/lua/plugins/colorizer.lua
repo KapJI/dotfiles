@@ -15,6 +15,7 @@ return {
       -- user_default_options/user_commands/lazy_load at the top level).
       filetypes = {
         "*",
+        "!bigfile", -- honor snacks.bigfile: don't color-parse oversized buffers (matches satellite/neominimap)
         -- Turn on color names in CSS/theme files where they're useful.
         css = { names = true },
         scss = { names = true },
