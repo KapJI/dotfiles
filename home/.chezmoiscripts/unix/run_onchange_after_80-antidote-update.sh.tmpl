@@ -20,6 +20,15 @@ if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
     export GIT_TERMINAL_PROMPT=0
     export GIT_SSH_COMMAND="ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new"
 
+    # We patch files inside two plugin clones below (fzf-tab, you-should-use),
+    # leaving their working trees dirty. Antidote updates via `git pull
+    # --rebase`, which refuses to run against a dirty tree unless autostash is
+    # on — and antidote only passes --autostash when ANTIDOTE_GIT_AUTOSTASH is
+    # exactly "true". Without this, the weekly update fails the moment either
+    # upstream gets a commit. With it, our patches are stashed across the
+    # rebase and re-applied afterward (and re-patched below anyway).
+    export ANTIDOTE_GIT_AUTOSTASH=true
+
     antidote_home="${ANTIDOTE_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/antidote}"
     [ -d "$antidote_home" ] || antidote_home="$HOME/Library/Caches/antidote"
 
@@ -97,9 +106,18 @@ if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
 import pathlib, sys
 p = pathlib.Path(sys.argv[1])
 s = p.read_text()
-s = s.replace(r"$'\x1b[1m'",  r"$'\x1b[1;7m'")
-s = s.replace(r"$'\x1b[22m'", r"$'\x1b[22;27m'")
-p.write_text(s)
+subs = ((r"$'\x1b[1m'", r"$'\x1b[1;7m'"), (r"$'\x1b[22m'", r"$'\x1b[22;27m'"))
+# Bail (loudly, non-fatally) rather than silently no-op if upstream renamed
+# the SGR escapes: an unverified replace() would leave the active-group
+# highlight quietly unpatched and nobody would notice until it stopped working.
+missing = [old for old, _ in subs if old not in s]
+if missing:
+    print("warning: fzf-tab ftb-switch-group patch is stale — pattern(s) not "
+          "found: %r; active-group highlight NOT applied" % missing, file=sys.stderr)
+else:
+    for old, new in subs:
+        s = s.replace(old, new)
+    p.write_text(s)
 PY
     fi
 
@@ -116,15 +134,25 @@ PY
 import pathlib, sys
 p = pathlib.Path(sys.argv[1])
 s = p.read_text()
-for name, tput, esc in (
-    ("NONE",   "sgr0",     r"\e[0m"),
-    ("BOLD",   "bold",     r"\e[1m"),
-    ("RED",    "setaf 1",  r"\e[31m"),
-    ("YELLOW", "setaf 3",  r"\e[33m"),
-    ("PURPLE", "setaf 5",  r"\e[35m"),
-):
-    s = s.replace('%s="$(tput %s)"' % (name, tput), "%s=$'%s'" % (name, esc))
-p.write_text(s)
+subs = [('%s="$(tput %s)"' % (name, tput), "%s=$'%s'" % (name, esc))
+        for name, tput, esc in (
+            ("NONE",   "sgr0",     r"\e[0m"),
+            ("BOLD",   "bold",     r"\e[1m"),
+            ("RED",    "setaf 1",  r"\e[31m"),
+            ("YELLOW", "setaf 3",  r"\e[33m"),
+            ("PURPLE", "setaf 5",  r"\e[35m"),
+        )]
+# Verify every pattern is present before rewriting; a silent partial patch
+# would leave some tput forks in place (the ~18ms/shell cost we meant to kill)
+# with no error to notice.
+missing = [old for old, _ in subs if old not in s]
+if missing:
+    print("warning: zsh-you-should-use tput patch is stale — %d pattern(s) not "
+          "found; leaving upstream tput forks in place" % len(missing), file=sys.stderr)
+else:
+    for old, new in subs:
+        s = s.replace(old, new)
+    p.write_text(s)
 PY
     fi
 fi
