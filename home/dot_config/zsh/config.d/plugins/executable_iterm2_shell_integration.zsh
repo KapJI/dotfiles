@@ -43,7 +43,16 @@ if [[ -o interactive ]]; then
         _iterm2_hostname=$(hostname -f 2>/dev/null)
       fi
       printf "\033]1337;RemoteHost=%s@%s\007" "$USER" "${_iterm2_hostname-}"
-      printf "\033]1337;CurrentDir=%s\007" "$PWD"
+      # Local modification to the vendored upstream script: sanitize $PWD
+      # before it enters the OSC. A directory name may contain raw ESC/BEL
+      # (any byte but / and NUL); left verbatim it would close this
+      # sequence early and let the rest inject a terminal command (OSC 52
+      # clipboard write is the classic weaponization). ${(V)} renders
+      # control bytes visible (^[, ^G, \n) so nothing survives to break
+      # out — same defense as config.d/auto_title.zsh's title emitter, and
+      # a no-op for ordinary printable paths. printf's %s doesn't
+      # re-interpret the argument, so the visible form is emitted as-is.
+      printf "\033]1337;CurrentDir=%s\007" "${(V)PWD}"
       iterm2_print_user_vars
     }
 
