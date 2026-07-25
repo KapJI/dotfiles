@@ -180,50 +180,62 @@ bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection
 # tmux records — NOT by matching the ❯ glyph. So previous-prompt/-o land on
 # real prompt/output boundaries, and output that itself contains a ❯ (a log
 # line, a cat-ed file) can no longer mis-anchor the selection the way the old
-# search-backward '❯' did. A pane whose shell lacks the integration (a bare
-# shell, some SSH sessions) has no marks, so Alt-Y cleanly reports "nothing
-# to copy" instead of copying garbage.
+# search-backward '❯' did. Whether a pane's shell actually emits those marks
+# can't be read back from a capture-pane snapshot, so the shell advertises it
+# per-pane via @osc133_capable (see zsh/config.d/tmux_osc133.zsh); a pane
+# without it (a bare shell, a login shell without the plugin) is rejected up
+# front, so Alt-Y reports "nothing to copy" instead of copying garbage.
 bind -n M-Y if-shell "$is_vim" "send-keys M-Y" {
-    # Route on whether the cursor sits on a finished ❯ prompt (idle) or
-    # inside a running command's output. capture-pane pads the visible
-    # region to full pane height with blank rows, so test only the cursor's
-    # own row (anchored ^❯ so a mid-line ❯ in output can't false-match).
-    if-shell -b "tmux capture-pane -p -J -S '#{cursor_y}' -E '#{cursor_y}' | grep -q '^❯'" {
-        # Idle at a finished prompt: copy the PREVIOUS command's output.
-        # Require at least two prompt marks — a fresh or just-cleared pane
-        # has only the current one, so there is nothing to copy.
-        if-shell -b "tmux capture-pane -p -S - -J | awk '/^❯/{n++} END{exit !(n>=2)}'" {
-            copy-mode
-            # Step off the current (idle) prompt, then to the previous
-            # command's output start. next-prompt returns to the idle
-            # prompt's mark; two cursor-ups walk back over the blank
-            # ADD_NEWLINE gap to that output's last line (our p10k prompt
-            # occupies two rows with a blank line above it).
-            send -X previous-prompt
-            send -X previous-prompt -o
-            send -X begin-selection
-            send -X next-prompt
-            send -X cursor-up
-            send -X cursor-up
-            send -X end-of-line
-            send -X copy-pipe-and-cancel "tmux load-buffer -w -b lastcmd -"
-            display-message 'Copied last command output'
+    # Only trust OSC 133 prompt-mark navigation when this pane's shell
+    # advertised the capability via @osc133_capable (set per-pane by
+    # zsh/config.d/tmux_osc133.zsh). Without it the ❯ glyphs on screen are
+    # just PS1 text with no marks behind them — previous-prompt would no-op
+    # and the selection would be garbage — so report cleanly instead.
+    if-shell -F "#{@osc133_capable}" {
+        # Route on whether the cursor sits on a finished ❯ prompt (idle) or
+        # inside a running command's output. capture-pane pads the visible
+        # region to full pane height with blank rows, so test only the
+        # cursor's own row (anchored ^❯ so a mid-line ❯ in output can't
+        # false-match).
+        if-shell -b "tmux capture-pane -p -J -S '#{cursor_y}' -E '#{cursor_y}' | grep -q '^❯'" {
+            # Idle at a finished prompt: copy the PREVIOUS command's output.
+            # Require at least two prompt marks — a fresh or just-cleared
+            # pane has only the current one, so there is nothing to copy.
+            if-shell -b "tmux capture-pane -p -S - -J | awk '/^❯/{n++} END{exit !(n>=2)}'" {
+                copy-mode
+                # Step off the current (idle) prompt, then to the previous
+                # command's output start. next-prompt returns to the idle
+                # prompt's mark; two cursor-ups walk back over the blank
+                # ADD_NEWLINE gap to that output's last line (our p10k prompt
+                # occupies two rows with a blank line above it).
+                send -X previous-prompt
+                send -X previous-prompt -o
+                send -X begin-selection
+                send -X next-prompt
+                send -X cursor-up
+                send -X cursor-up
+                send -X end-of-line
+                send -X copy-pipe-and-cancel "tmux load-buffer -w -b lastcmd -"
+                display-message 'Copied last command output'
+            } {
+                display-message 'Nothing to copy — no previous command'
+            }
         } {
-            display-message 'Nothing to copy — no previous command'
+            # A command is running: copy its output so far, from the running
+            # command's output start down to the bottom of the live text.
+            if-shell -b "tmux capture-pane -p -S - -J | grep -q '^❯'" {
+                copy-mode
+                send -X end-of-line
+                send -X begin-selection
+                send -X previous-prompt -o
+                send -X copy-pipe-and-cancel "tmux load-buffer -w -b lastcmd -"
+                display-message 'Copied running command output'
+            } {
+                display-message 'No prompt marker found — nothing to copy'
+            }
         }
     } {
-        # A command is running: copy its output so far, from the running
-        # command's output start down to the bottom of the live text.
-        if-shell -b "tmux capture-pane -p -S - -J | grep -q '^❯'" {
-            copy-mode
-            send -X end-of-line
-            send -X begin-selection
-            send -X previous-prompt -o
-            send -X copy-pipe-and-cancel "tmux load-buffer -w -b lastcmd -"
-            display-message 'Copied running command output'
-        } {
-            display-message 'No prompt marker found — nothing to copy'
-        }
+        display-message 'Alt-Y: no OSC 133 prompt marks in this pane — nothing to copy'
     }
 }
 
