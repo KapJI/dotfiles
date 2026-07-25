@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+{{ if not .is_desktop -}}
+# tmux-resurrect (server-only — fetched in .chezmoiexternal.toml under the
+# `linux && !is_desktop` guard) saves pane scrollback under ~/.tmux/resurrect.
+# Upstream v4.0.0 creates that directory with a plain `mkdir -p` under the
+# ambient umask (022 here → 0755 dir, 0644 files), so on a multi-user host any
+# other account can read the captured scrollback — which routinely holds
+# tokens, command lines and sensitive output. Pre-create the directory 0700 so
+# its contents are unreadable to other users regardless of the individual
+# files' own mode (they can't traverse into a 0700 dir). `install -d -m 700`
+# also resets the mode when the dir already exists, so it heals an
+# already-leaky directory on the next apply.
+install -d -m 700 "$HOME/.tmux/resurrect"
+{{ end -}}
