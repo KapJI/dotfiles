@@ -29,16 +29,13 @@ local augroup = vim.api.nvim_create_augroup("user_autocmds", { clear = true })
 -- BufReadPre/BufNewFile, which would otherwise write a real undo file for
 -- the new sensitive path. BufFilePost catches the rename; BufWritePre is
 -- the belt-and-suspenders pass right before any write reaches disk.
-local function undo_sensitive(path)
-  path = path:gsub("\\", "/")
-  return path:match("/%.ssh/") or path:match("chezmoi%-encrypted")
-end
+local sensitive = require("config.sensitive")
 vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile", "BufFilePost", "BufWritePre" }, {
   group = augroup,
   callback = function(ev)
     local name = vim.api.nvim_buf_get_name(ev.buf)
     local resolved = (vim.uv or vim.loop).fs_realpath(name) or name
-    if undo_sensitive(name) or undo_sensitive(resolved) then
+    if sensitive.is_sensitive_undo_path(name) or sensitive.is_sensitive_undo_path(resolved) then
       vim.api.nvim_set_option_value("undofile", false, { buf = ev.buf })
     end
   end,
