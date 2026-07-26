@@ -10,6 +10,6 @@
 # running, the config loads at the next tmux start and source-file would
 # just error, so gate on an existing session.
 if command -v tmux &> /dev/null && tmux has-session 2> /dev/null; then
-    tmux source-file $HOME/.tmux.conf
+    tmux source-file "$HOME/.tmux.conf"
 fi
 {{ end -}}
