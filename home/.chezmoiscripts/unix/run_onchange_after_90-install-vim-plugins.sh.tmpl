@@ -29,12 +29,16 @@ nvim --headless "+Lazy! sync" +qall
 
 # Second pass: compile parsers and WAIT for them (install()/update() are
 # nvim-treesitter async tasks; :wait() blocks until they finish).
-#   install(<manifest>) — compile every manifest parser not yet present. This
-#     is what makes a fresh `chezmoi apply` finish the parsers HERE instead of
-#     on the first interactive nvim; it no-ops already-installed parsers, so
-#     repeat weekly runs are cheap.
-#   update()            — refresh already-installed parsers to their latest
-#     revision (the weekly-maintenance job; install() alone never updates).
+#   install(<manifest>, {max_jobs=N}) — compile every manifest parser not yet
+#     present, so a fresh `chezmoi apply` finishes the parsers HERE instead of
+#     on the first interactive nvim (it no-ops already-installed parsers, so
+#     repeat weekly runs are cheap). max_jobs caps concurrent downloads: the
+#     default (100 → all ~50 at once) saturates the network and yields
+#     corrupt/truncated tarballs ("Damaged tar archive", rename ENOENT). It
+#     runs twice so a parser whose download flaked the first time is retried —
+#     the second call no-ops everything already installed.
+#   update() — refresh installed parsers to their latest revision (the weekly
+#     job; install() alone never updates).
 # The parser list is the single source of truth in lua/config/ts-parsers.lua,
 # shared with the plugin config (lua/plugins/treesitter.lua).
-nvim --headless "+lua local ts = require('nvim-treesitter'); ts.install(require('config.ts-parsers'), { summary = true }):wait(600000); ts.update({ summary = true }):wait(600000)" +qall
+nvim --headless "+lua local ts = require('nvim-treesitter'); local want = require('config.ts-parsers'); local opts = { summary = true, max_jobs = 4 }; ts.install(want, opts):wait(600000); ts.install(want, opts):wait(600000); ts.update({ summary = true }):wait(600000)" +qall

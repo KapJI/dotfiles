@@ -14,7 +14,11 @@ return {
       -- skip here so a second install() in the same nvim can't race the
       -- script's install():wait() on the same parser.
       if vim.env.TS_PREINSTALL ~= "1" then
-        require("nvim-treesitter").install(require("config.ts-parsers"))
+        -- max_jobs caps concurrent parser downloads. nvim-treesitter's default
+        -- (100 → all at once) saturates the network and yields corrupt tarballs
+        -- ("Damaged tar archive"); a small cap is reliable and, for the handful
+        -- of parsers a startup ever installs, still plenty fast.
+        require("nvim-treesitter").install(require("config.ts-parsers"), { max_jobs = 4 })
       end
 
       vim.api.nvim_create_autocmd("FileType", {
