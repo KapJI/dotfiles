@@ -68,32 +68,54 @@ alias czmcd='cd "$(chezmoi source-path)"'
 bump-locks() {
     emulate -L zsh
     setopt local_options extended_glob
+    local rc=0
     print "==> nix flake update"
     nix flake update --flake ~/.config/nix-profile || return 1
     print "==> antidote plugin pins -> upstream HEAD"
     local f=$ZDOTDIR/.zsh_plugins.txt
     if [[ -r $f ]]; then
-        local line repo
+        local line repo sha
         local -A cache
         local -a out
         while IFS= read -r line || [[ -n $line ]]; do
             if [[ $line != '#'* && $line == *pin:* ]]; then
                 repo=${line%%[[:space:]]*}
+                # Resolve each repo once, caching the OUTCOME — the real SHA or
+                # a FAIL sentinel. Caching the failure too means a dead lookup
+                # is recorded (not retried on every pin line for the same repo,
+                # e.g. ohmyzsh's several lines) and warned about exactly once.
+                # A failed lookup must never masquerade as success: it leaves
+                # the pin untouched and trips rc so the whole command reports
+                # non-zero instead of printing a cheerful "updated".
                 if [[ -z ${cache[$repo]:-} ]]; then
-                    cache[$repo]=$(git ls-remote "https://github.com/$repo" HEAD 2>/dev/null | awk 'NR==1{print $1}')
+                    sha=$(git ls-remote "https://github.com/$repo" HEAD 2>/dev/null | awk 'NR==1{print $1}')
+                    if [[ -n $sha ]]; then
+                        cache[$repo]=$sha
+                    else
+                        cache[$repo]=FAIL
+                        rc=1
+                        print -u2 "bump-locks: WARNING: git ls-remote failed for $repo — pin left unchanged"
+                    fi
                 fi
-                [[ -n ${cache[$repo]:-} ]] && line=${line/pin:[[:xdigit:]]##/pin:${cache[$repo]}}
+                [[ ${cache[$repo]} != FAIL ]] && line=${line/pin:[[:xdigit:]]##/pin:${cache[$repo]}}
             fi
             out+=$line
         done < $f
         print -rl -- "${out[@]}" > $f
     else
         print -u2 "bump-locks: skipping plugins ($f not readable)"
+        rc=1
     fi
     print "==> chezmoi re-add"
     chezmoi re-add ~/.config/nix-profile/flake.lock $f
-    print "bump-locks: flake.lock + plugin pins updated and re-added to chezmoi."
-    print "Review/commit: chezmoi cd && git diff"
+    if (( rc )); then
+        print -u2 "bump-locks: FINISHED WITH ERRORS — some pins were left unchanged (see warnings above)."
+        print -u2 "Review carefully before committing: chezmoi cd && git diff"
+    else
+        print "bump-locks: flake.lock + plugin pins updated and re-added to chezmoi."
+        print "Review/commit: chezmoi cd && git diff"
+    fi
+    return $rc
 }
 
 # yazi wrapper: cd shell to whatever directory yazi was in when you quit.
