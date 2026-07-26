@@ -1,0 +1,41 @@
+# shellcheck shell=bash
+# ~/.bash_profile — bash login-shell profile (headless Linux servers only;
+# gated in .chezmoiignore). This host deliberately keeps bash as the login
+# shell recorded in /etc/passwd: no chsh, so no root/password step and no way
+# to lock the account out of SSH if the shell binary ever disappears. Its real
+# job is to hand interactive logins off to zsh — preferring the pinned nix zsh,
+# the curated interactive shell used across the fleet.
+#
+# Coexistence: machines whose login shell is already zsh (e.g. an apt zsh set
+# via chsh on an older host) never read ~/.bash_profile, so shipping this file
+# there is a harmless no-op — it does not change or fight their login shell.
+
+# Interactive login shells only. Guards:
+#   $- contains i      — never touch scp/rsync/`ssh host cmd`/`bash -lc`; all
+#                        non-interactive, they fall through to ~/.profile below.
+#   no $ZSH_VERSION    — belt-and-suspenders: never recurse if already in zsh.
+#   no $NO_ZSH_HANDOFF — escape hatch: `export NO_ZSH_HANDOFF=1` then re-login
+#                        (or run `NO_ZSH_HANDOFF=1 bash -l`) to stay in bash.
+if [[ $- == *i* && -z ${ZSH_VERSION:-} && -z ${NO_ZSH_HANDOFF:-} ]]; then
+    # Prefer the pinned nix zsh; fall back to a system zsh; if neither exists
+    # (a zsh-less or half-provisioned host) drop through to a normal bash login.
+    for _zsh in "$HOME/.nix-profile/bin/zsh" /usr/bin/zsh /bin/zsh; do
+        if [[ -x $_zsh ]]; then
+            # zsh rebuilds its own environment from ~/.zshenv + config.d (PATH,
+            # nix, …), so there's no need to source ~/.profile first — doing so
+            # would run bash's full interactive init (MOTD, etc.) only to throw
+            # it away at exec.
+            export SHELL="$_zsh"
+            exec "$_zsh" -l
+        fi
+    done
+    unset _zsh
+fi
+
+# Fell through (no zsh, escape hatch set, or a non-interactive login): behave
+# like a stock bash login shell. Creating this file overrode bash's default of
+# reading ~/.profile for login shells, so source it back. On Debian/Ubuntu
+# ~/.profile also pulls in ~/.bashrc for interactive bash.
+if [ -f "$HOME/.profile" ]; then
+    . "$HOME/.profile"
+fi

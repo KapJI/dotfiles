@@ -34,6 +34,10 @@ bin
 # Desktop-only excludes (macOS, Windows, Linux desktop).
 .tmux.conf
 .config/zsh/config.d/tmux_attach.zsh
+# The bash->zsh login handoff (~/.bash_profile) is only meaningful on headless
+# Linux servers whose login shell is bash. Desktops and macOS use a real login
+# shell (chsh / dscl), so keep it off them.
+.bash_profile
 {{ else }}
 # Server-only excludes (Linux server, headless).
 .config/sublime_text

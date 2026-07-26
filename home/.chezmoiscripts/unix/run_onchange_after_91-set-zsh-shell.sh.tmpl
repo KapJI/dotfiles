@@ -16,12 +16,13 @@ current_shell="$(dscl . -read /Users/$USER UserShell | awk '{print $2}')"
 if [ "$current_shell" != "$zsh_path" ]; then
     sudo dscl . -create "/Users/$USER" UserShell "$zsh_path"
 fi
-{{ else -}}
-# Linux: prefer a system zsh listed in /etc/shells. chsh-ing to a nix
-# profile path that isn't in /etc/shells can lock the user out of SSH
-# (PAM/shell-validity check) — and even if chsh succeeds, removing apt
-# zsh later would invalidate the login shell. System zsh stays as the
-# login shell; nix zsh is still available interactively for non-login use.
+{{ else if .is_desktop -}}
+# Linux desktop: chsh to a system zsh listed in /etc/shells. GUI terminals and
+# display managers spawn the login shell recorded in /etc/passwd, so a real
+# login shell matters here. chsh-ing to a nix profile path that isn't in
+# /etc/shells can lock the user out (PAM/shell-validity check), and even if it
+# succeeds, GC'ing that store path later would invalidate the login shell — so
+# require a system zsh.
 zsh_path=""
 for candidate in /usr/bin/zsh /bin/zsh; do
     if [ -x "$candidate" ] && grep -qxF "$candidate" /etc/shells; then
@@ -40,4 +41,11 @@ new_shell="$(readlink -f "$zsh_path")"
 if [ "$current_shell" != "$new_shell" ]; then
     chsh -s "$zsh_path"
 fi
+{{ else -}}
+# Linux server (headless): the login shell in /etc/passwd stays bash on
+# purpose; ~/.bash_profile hands interactive logins off to the pinned nix zsh
+# (no chsh, no root, no password, no lock-out). This branch does nothing and,
+# crucially, never reverts a server that an older host already chsh'd to an apt
+# zsh — that login shell is left exactly as it is.
+:
 {{ end }}
