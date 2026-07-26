@@ -13,6 +13,12 @@ reload() {
         SSH_AUTH_SOCK SSH_CONNECTION SSH_CLIENT SSH_TTY
         TMUX TMUX_PANE
         DISPLAY WAYLAND_DISPLAY
+        # macOS gives each login session a private TMPDIR (/var/folders/.../T)
+        # set by launchd, not by any rc file — so env -i would blank it and
+        # $TMPDIR consumers (mktemp, the yz wrapper above) would silently fall
+        # back to the world-readable /tmp. Preserve it like the session vars
+        # below; harmless on Linux where it's usually unset anyway.
+        TMPDIR
         # Session-identity vars that rc files don't repopulate: the
         # session bus (GUI/notify tools), and wezterm's control socket +
         # pane id (so `wezterm cli` keeps working after a reload).
