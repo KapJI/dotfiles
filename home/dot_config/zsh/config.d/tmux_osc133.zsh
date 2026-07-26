@@ -15,10 +15,13 @@
 # (a bare `zsh -f`, a login shell without the plugin) leaves it unset, and
 # Alt-Y cleanly reports "nothing to copy" instead of copying garbage.
 #
-# Set once, at the first prompt — the hook removes itself — so it costs a
-# single tmux invocation per shell, not one per command. ITERM_SHELL_-
-# INTEGRATION_INSTALLED is set (to "Yes") by the integration plugin only when
-# it actually armed itself for this interactive shell.
+# Re-assert on every prompt (idempotent), not once: the retract hook below
+# clears the flag whenever an integrated shell exits, so a *parent* integrated
+# shell — one that spawned a nested integrated zsh which has since exited and
+# retracted — must be able to set it again on its next prompt. One tmux
+# invocation per prompt is negligible for an interactive shell.
+# ITERM_SHELL_INTEGRATION_INSTALLED is set (to "Yes") by the integration plugin
+# only when it actually armed itself for this interactive shell.
 if [[ -n ${TMUX:-} ]]; then
   autoload -Uz add-zsh-hook
 
@@ -26,9 +29,20 @@ if [[ -n ${TMUX:-} ]]; then
     if [[ -n ${ITERM_SHELL_INTEGRATION_INSTALLED:-} && -n ${TMUX_PANE:-} ]]; then
       command tmux set -p -t "$TMUX_PANE" @osc133_capable 1 2>/dev/null
     fi
-    add-zsh-hook -d precmd _osc133_advertise_to_tmux
-    unfunction _osc133_advertise_to_tmux 2>/dev/null
   }
-
   add-zsh-hook precmd _osc133_advertise_to_tmux
+
+  # Retract the capability when this shell exits, so a pane handed back to a
+  # non-integrated shell (an integrated zsh exiting to a plain login bash)
+  # doesn't leave Alt-Y trusting OSC 133 marks whose emitter is gone. This
+  # covers the nested-shell-exit path. It does NOT cover ssh'ing from here into
+  # a host without the integration: this zsh stays alive, so zshexit never
+  # fires and no prompt redraws to re-assert — the flag lingers at 1 for that
+  # remote session, a narrow edge the binding degraded on before this flag
+  # existed and no worse now. Unsetting an already-unset option, or one on a
+  # pane that vanished as the shell exited, is a harmless no-op.
+  _osc133_retract_from_tmux() {
+    [[ -n ${TMUX_PANE:-} ]] && command tmux set -up -t "$TMUX_PANE" @osc133_capable 2>/dev/null
+  }
+  add-zsh-hook zshexit _osc133_retract_from_tmux
 fi
