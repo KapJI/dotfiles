@@ -2,15 +2,39 @@
 
 . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
 
+# nvim-treesitter (main branch) compiles parsers by shelling out to the
+# `tree-sitter` CLI, which chezmoi installs to ~/.local/bin (.chezmoiexternal.toml),
+# NOT the nix profile. chezmoi runs this script with whatever PATH invoked it,
+# which on a fresh machine need not include ~/.local/bin — and nix-daemon.sh
+# above doesn't add it. Without this, every parser build fails with
+# `ENOENT: 'tree-sitter'` and the work silently defers to the first interactive
+# nvim launch. gcc for the compile comes from build-essential on the system PATH.
+export PATH="$HOME/.local/bin:$PATH"
+
 # Update nvim plugins
 # Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 
-# First pass: sync Lazy. If nvim-treesitter is changing branches (master→main
-# during the migration window), this is where Lazy fetches and checks out the
-# new branch on disk. The lua module loaded into THIS nvim process is still
-# the pre-switch version, so we can't call main-branch APIs here.
+# Drive parser installation from here rather than letting the plugin's startup
+# config do it: nvim-treesitter's install() is async, so the config's fire-and-
+# forget install() would be cut off by +qall (only the fastest parsers would
+# finish before nvim exits, leaving the rest to compile on the first
+# interactive launch). TS_PREINSTALL=1 makes treesitter.lua skip that startup
+# install() so the explicit install():wait() below is the single, authoritative
+# pass — and can't race a second install() in the same nvim instance.
+export TS_PREINSTALL=1
+
+# First pass: sync Lazy so plugins are cloned/checked out at their locked
+# commits — on a fresh machine this is where nvim-treesitter lands on disk.
 nvim --headless "+Lazy! sync" +qall
 
-# Second pass: fresh nvim, plugin loads from the now-current branch. update()
-# is main-branch's async parser updater; :wait blocks until parsers finish.
-nvim --headless "+lua require('nvim-treesitter').update():wait(300000)" +qall
+# Second pass: compile parsers and WAIT for them (install()/update() are
+# nvim-treesitter async tasks; :wait() blocks until they finish).
+#   install(<manifest>) — compile every manifest parser not yet present. This
+#     is what makes a fresh `chezmoi apply` finish the parsers HERE instead of
+#     on the first interactive nvim; it no-ops already-installed parsers, so
+#     repeat weekly runs are cheap.
+#   update()            — refresh already-installed parsers to their latest
+#     revision (the weekly-maintenance job; install() alone never updates).
+# The parser list is the single source of truth in lua/config/ts-parsers.lua,
+# shared with the plugin config (lua/plugins/treesitter.lua).
+nvim --headless "+lua local ts = require('nvim-treesitter'); ts.install(require('config.ts-parsers'), { summary = true }):wait(600000); ts.update({ summary = true }):wait(600000)" +qall
