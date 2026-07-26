@@ -23,6 +23,16 @@ export PATH="$HOME/.local/bin:$PATH"
 # pass — and can't race a second install() in the same nvim instance.
 export TS_PREINSTALL=1
 
+# Migration cleanup: machines set up under the old nvim-treesitter master
+# branch carry a tmux.so (+ revision + queries) that the main-branch registry
+# doesn't know about. update() below then logs "Parser not available for
+# language tmux" every run while trying to reconcile it. Remove the dead
+# artifacts (parser, revision, queries) so get_installed() no longer reports
+# tmux. Idempotent — a no-op once they're gone, and absent on fresh machines.
+ts_site="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site"
+rm -f "$ts_site/parser/tmux.so" "$ts_site/parser-info/tmux.revision"
+rm -rf "$ts_site/queries/tmux"
+
 # First pass: sync Lazy so plugins are cloned/checked out at their locked
 # commits — on a fresh machine this is where nvim-treesitter lands on disk.
 nvim --headless "+Lazy! sync" +qall
