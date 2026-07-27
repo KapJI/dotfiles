@@ -26,6 +26,10 @@
 ## "pass this through unchanged" mechanism. Outside tmux, emit the
 ## bare OSC directly to the terminal.
 _wezterm_emit_is_tmux() {
+    # Only when stdout is a terminal. Without this, an interactive shell whose
+    # stdout is captured — e.g. out=$(zsh -ic '…') — emits this OSC into the
+    # captured text, corrupting it. The terminal is the only consumer anyway.
+    [[ -t 1 ]] || return
     if [[ -n "$TMUX" ]]; then
         printf '\033Ptmux;\033\033]1337;SetUserVar=IS_TMUX=dHJ1ZQ==\007\033\\'
     else
