@@ -52,9 +52,9 @@
     program = C:/Windows/System32/OpenSSH/ssh-keygen.exe
 {{- end }}
 [commit]
-    gpgsign = {{ ne (get .chezmoi.osRelease "id") "centos" }}
+    gpgsign = {{ and (not (index . "is_container" | default false)) (ne (get .chezmoi.osRelease "id") "centos") }}
 [tag]
-    forceSignAnnotated = {{ ne (get .chezmoi.osRelease "id") "centos" }}
+    forceSignAnnotated = {{ and (not (index . "is_container" | default false)) (ne (get .chezmoi.osRelease "id") "centos") }}
 [init]
     defaultBranch = main
 [core]

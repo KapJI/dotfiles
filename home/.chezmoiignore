@@ -61,3 +61,14 @@ bin
 !.ssh/pubkeys/sudo_key.pub
 {{ end }}
 {{ end }}
+
+{{ if (index . "is_container" | default false) }}
+# Ephemeral Coder/CI container: skip every installer script (nix/apt/desktop
+# repos + age-key decryption) and all SSH material (the encrypted ssh config
+# would need an age key we don't ship into workspaces). Tools come from the
+# workspace image, git identity from Coder's git-config module, and GitHub auth
+# from Coder external auth. Placed last so these ignores win over the pubkey
+# re-includes above.
+.chezmoiscripts/**
+.ssh/**
+{{ end }}

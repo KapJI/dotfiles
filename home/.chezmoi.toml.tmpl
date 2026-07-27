@@ -24,6 +24,12 @@ encryption = "age"
     {{-   $is_desktop = promptBoolOnce . "is_desktop" "Is this a desktop machine (GUI)?" false -}}
     {{- end }}
     is_desktop = {{ $is_desktop }}
+    {{- /* Ephemeral container (Coder workspace / CI): the workspace exports
+           CHEZMOI_IS_CONTAINER; CODER_AGENT_TOKEN is a fallback for any Coder
+           workspace. Consumers skip installer scripts and encrypted secrets so
+           `chezmoi apply` stays non-interactive (see .chezmoiignore, dot_gitconfig). */ -}}
+    {{- $is_container := or (ne (env "CHEZMOI_IS_CONTAINER") "") (ne (env "CODER_AGENT_TOKEN") "") }}
+    is_container = {{ $is_container }}
 
 [age]
     identity = "~/.config/chezmoi/key.txt"
