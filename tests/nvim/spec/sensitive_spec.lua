@@ -7,12 +7,23 @@ describe("is_sensitive_undo_path", function()
     [[C:\Users\x\.ssh\config]], -- Windows backslashes
     "/tmp/chezmoi-encrypted123/.ssh/config",
     "/tmp/chezmoi-encrypted999/foo", -- chezmoi temp without .ssh
+    "/Users/x/.aws/credentials", -- AWS creds
+    "/home/x/.aws/config", -- AWS config (may hold sso/session data)
+    "/Users/x/.netrc", -- netrc
+    [[C:\Users\x\_netrc]], -- Windows netrc variant
+    "/Users/x/project/.env", -- dotenv
+    "/Users/x/project/.env.local", -- dotenv variant
+    "/srv/app/.env.production", -- dotenv variant, absolute
   }
   local negatives = {
     "/Users/x/notes/ssh_notes.md", -- "ssh" but not "/.ssh/"
     "/Users/x/.sshfoo/config", -- ".ssh" not followed by "/"
     "/Users/x/docs/chezmoi-encryption.md", -- "encrypt" not "encrypted"
     "/Users/x/project/init.lua",
+    "/Users/x/project/.envrc", -- direnv, committed, not a secret store
+    "/Users/x/.awsome/config", -- ".aws" not followed by "/"
+    "/Users/x/notes/environment.md", -- "env" but not a dotenv file
+    "/Users/x/_netrcfoo", -- "_netrc" not at end of segment
   }
 
   for _, p in ipairs(positives) do

@@ -7,9 +7,10 @@ local augroup = vim.api.nvim_create_augroup("user_autocmds", { clear = true })
 -- (undofile, options.lua) otherwise leaves a decrypted copy of secrets
 -- on disk indefinitely — most sharply the plaintext temp files chezmoi
 -- writes when you `chezmoi edit` an age-encrypted source, which silently
--- defeats encryption-at-rest. Match SSH files (~/.ssh/*) and chezmoi's
--- decrypted temps (…/chezmoi-encrypted<rand>/…). Set on read/create
--- before the undofile is ever written.
+-- defeats encryption-at-rest. Match SSH files (~/.ssh/*), chezmoi's
+-- decrypted temps (…/chezmoi-encrypted<rand>/…), and other secret stores
+-- (~/.aws/*, ~/.netrc, .env*) — see config.sensitive for the full list. Set
+-- on read/create before the undofile is ever written.
 --
 -- Test BOTH the buffer name (always absolute here) and its symlink-
 -- resolved path:
