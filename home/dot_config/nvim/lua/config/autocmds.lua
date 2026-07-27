@@ -54,6 +54,11 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 -- line. Skipped where trailing whitespace is meaningful: markdown
 -- (two trailing spaces = hard line break), diff/patch (context lines
 -- start with a significant space), mail (signature separator "-- ").
+-- The substitution is syntax-blind, so it also eats *semantic* trailing
+-- spaces inside a string literal / heredoc / YAML block scalar / fixture.
+-- Per-buffer or global escape hatch (mirrors conform's disable_autoformat):
+-- set vim.b.disable_strip_whitespace for one such file, or
+-- vim.g.disable_strip_whitespace to turn it off everywhere.
 local strip_whitespace_excluded = { markdown = true, diff = true, mail = true }
 vim.api.nvim_create_autocmd("BufWritePre", {
   group = augroup,
@@ -68,6 +73,10 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     -- there are data, not whitespace to trim, and stripping them corrupts
     -- the file.
     if vim.bo.buftype ~= "" or not vim.bo.modifiable or vim.bo.binary then
+      return
+    end
+    -- Escape hatch for buffers/sessions where trailing whitespace is data.
+    if vim.b.disable_strip_whitespace or vim.g.disable_strip_whitespace then
       return
     end
     if strip_whitespace_excluded[vim.bo.filetype] then

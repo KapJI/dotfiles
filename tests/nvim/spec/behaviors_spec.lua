@@ -78,6 +78,27 @@ describe("whitespace strip on save", function()
     assert.equals("payload   ", vim.fn.readfile(f, "b")[1])
     vim.cmd("bwipeout!")
   end)
+
+  it("strips trailing whitespace on a normal buffer by default", function()
+    local d = tmpdir()
+    local f = d .. "/plain.txt"
+    vim.cmd("enew")
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, { "code   " })
+    vim.cmd("write! " .. vim.fn.fnameescape(f))
+    assert.equals("code", vim.fn.readfile(f)[1])
+    vim.cmd("bwipeout!")
+  end)
+
+  it("honors the per-buffer disable_strip_whitespace escape hatch", function()
+    local d = tmpdir()
+    local f = d .. "/fixture.txt"
+    vim.cmd("enew")
+    vim.b.disable_strip_whitespace = true
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, { "semantic   " })
+    vim.cmd("write! " .. vim.fn.fnameescape(f))
+    assert.equals("semantic   ", vim.fn.readfile(f)[1])
+    vim.cmd("bwipeout!")
+  end)
 end)
 
 describe("terminal title", function()
