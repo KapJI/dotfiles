@@ -2,6 +2,8 @@
 -- snacks.dashboard auto-detects this plugin and adds an "s" key on the
 -- dashboard for restore-cwd-session. The leader keys below cover the
 -- mid-session and cross-project cases.
+local sensitive = require("config.sensitive")
+
 return {
   "folke/persistence.nvim",
   event = "BufReadPre",
@@ -34,8 +36,23 @@ return {
       callback = function()
         local function is_real_file(buf)
           local name = vim.api.nvim_buf_get_name(buf)
-          local buftype = vim.bo[buf].buftype
-          return buftype == "" and name ~= "" and vim.fn.filereadable(name) == 1
+          if vim.bo[buf].buftype ~= "" or name == "" or vim.fn.filereadable(name) ~= 1 then
+            return false
+          end
+          -- Treat sensitive buffers as non-real so they're closed/dropped
+          -- before :mksession. `chezmoi edit <secret>` opens a decrypted
+          -- plaintext at a …/chezmoi-encrypted<rand>/… temp that chezmoi
+          -- deletes once the editor exits; persisting a badd/edit for it both
+          -- restores a stale, gone path next session AND records the secret's
+          -- filename in the plaintext session file. Same predicate we already
+          -- use to withhold persistent undo (SSH, .aws, .netrc, .env, chezmoi
+          -- temps), checked against the resolved path too (a symlink whose
+          -- name is innocuous but points into ~/.ssh).
+          local resolved = (vim.uv or vim.loop).fs_realpath(name) or name
+          if sensitive.is_sensitive_undo_path(name) or sensitive.is_sensitive_undo_path(resolved) then
+            return false
+          end
+          return true
         end
 
         for _, win in ipairs(vim.api.nvim_list_wins()) do
