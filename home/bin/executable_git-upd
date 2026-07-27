@@ -8,9 +8,23 @@ if [[ $repos == *"upstream"* ]]; then
 else
     default_repo="origin"
 fi
-default_branch=$(git remote show $default_repo | grep 'HEAD branch' | cut -d' ' -f5)
+# Resolve the default branch without parsing localized `git remote show`
+# output. Prefer the locally-recorded origin/HEAD symref; if it isn't set,
+# ask the remote via `ls-remote --symref` (the "ref:" prefix is stable
+# across locales, unlike the "HEAD branch:" prose) and avoid a network
+# round-trip when the symref is already known locally.
+default_branch=$(git symbolic-ref --quiet --short "refs/remotes/$default_repo/HEAD" 2>/dev/null || true)
+default_branch=${default_branch#"$default_repo/"}
+if [ -z "$default_branch" ]; then
+    default_branch=$(git ls-remote --symref "$default_repo" HEAD 2>/dev/null \
+        | awk '$1 == "ref:" { sub(/^refs\/heads\//, "", $2); print $2; exit }')
+fi
+if [ -z "$default_branch" ]; then
+    echo "git-upd: cannot determine default branch of $default_repo" >&2
+    exit 1
+fi
 
 git fetch $default_repo
-git checkout $default_branch
+git checkout "$default_branch"
 git rebase "$default_repo/$default_branch"
 git submodule update --recursive

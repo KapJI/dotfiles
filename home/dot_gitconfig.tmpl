@@ -38,7 +38,7 @@
     unshelve = stash pop
     uncommit = reset --soft HEAD^
     unamend = reset HEAD@{1}
-    undo = reset --hard HEAD@{1}
+    undo = reset --keep HEAD@{1}
     backout = revert
 [color]
     ui = auto
