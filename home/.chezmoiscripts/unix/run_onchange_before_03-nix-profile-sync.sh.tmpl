@@ -76,6 +76,14 @@ profile_target="{{ if .is_desktop }}desktop{{ else }}default{{ end }}"
 # change and we shouldn't invalidate the compdump cache.
 profile_before=$(readlink -f "$HOME/.nix-profile" 2>/dev/null || true)
 
+# Build the new profile BEFORE removing the current entry. A network,
+# evaluation, or build failure aborts here (set -e) while the live
+# generation is still intact, instead of after the remove — which would
+# otherwise leave the profile without our tool bundle until the next
+# successful apply. The store path is cached, so `nix profile add` below
+# just reuses it.
+nix build --no-link "path:$HOME/.config/nix-profile#${profile_target}"
+
 # Remove our previous entry before re-adding so a new flake content
 # actually rebuilds (otherwise Nix short-circuits as "already installed
 # at this priority" and packages.yaml additions silently drop on the
