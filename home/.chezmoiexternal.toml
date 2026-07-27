@@ -49,12 +49,17 @@
 # disabled in this build"), so the tool version is frozen too and bumps stay
 # deliberate. HEAD is 21 commits past the newest tag (v2.1.0) with nothing
 # newer published, so this pins the SHA (as mode-indicator does) rather than
-# downgrade to the tag. Bump by replacing the SHA with the current tip:
+# downgrade to the tag. exact = true prunes files a future version would drop,
+# and checksum.sha256 makes the fetch byte-exact and tamper-evident. When
+# bumping, update BOTH the SHA in the url and the checksum, or the fetch fails:
 #   git ls-remote https://github.com/mattmc3/antidote HEAD
+#   curl -fsSL <new-url> | sha256sum
 [".config/zsh/antidote"]
     type = "archive"
     url = "https://github.com/mattmc3/antidote/archive/67120be33ce52dfbf64278c07bc03f7c10e7eb9d.tar.gz"
     stripComponents = 1
+    exact = true
+    checksum.sha256 = "8e4170e07b76358db8322b8efefb17e48c771f8a8f9294495be097507957eacf"
     refreshPeriod = {{ $default_refresh }}
 {{ end }}
 
@@ -75,31 +80,40 @@
 {{ end }}
 
 {{ if and (eq .chezmoi.os "linux") (not .is_desktop) }}
-# tmux plugins, pinned to release tags. The tag is baked into the tarball
-# URL, so the URL encodes the version (mirroring flake.lock for nix tools) —
-# no plugin manager and no @plugin list needed. A tag is not a cryptographic
-# pin the way a commit SHA is (a maintainer can move it, and GitHub's auto
-# tarballs aren't guaranteed byte-stable forever), but chezmoi re-fetches on
-# refresh anyway; tags are chosen here for readability. mode-indicator below,
-# which publishes no tags, pins to a SHA out of necessity. .tmux.conf loads
-# each one directly via run-shell; they resolve their own dir self-relatively
-# and make no runtime git calls, so a plain archive works.
+# tmux plugins, pinned to release tags AND to a checksum.sha256 of the exact
+# tarball. The tag encodes the version (mirroring flake.lock for nix tools);
+# the checksum upgrades that to a byte-exact, tamper-evident pin, so a moved
+# tag or altered tarball fails the fetch loudly instead of silently changing.
+# The flip side: if GitHub ever regenerates an auto-tarball differently, the
+# fetch fails until the hash is refreshed (recompute: curl -fsSL <url> |
+# sha256sum). exact = true also prunes files a version bump would otherwise
+# leave behind. When bumping a plugin, update its tag/SHA and its checksum
+# together. mode-indicator below, which publishes no tags, pins to a SHA out of
+# necessity. .tmux.conf loads each one directly via run-shell; they resolve
+# their own dir self-relatively and make no runtime git calls, so a plain
+# archive works.
 [".tmux/plugins/catppuccin"]
     type = "archive"
     url = "https://github.com/catppuccin/tmux/archive/refs/tags/v2.3.0.tar.gz"
     stripComponents = 1
+    exact = true
+    checksum.sha256 = "6072ac982aaba71a1ee2a4780a2b5debecfb272857d6ae2ffb9b52649ee07b1a"
     refreshPeriod = {{ $default_refresh }}
 
 [".tmux/plugins/tmux-resurrect"]
     type = "archive"
     url = "https://github.com/tmux-plugins/tmux-resurrect/archive/refs/tags/v4.0.0.tar.gz"
     stripComponents = 1
+    exact = true
+    checksum.sha256 = "f8559d86d81be769054d63b28a268229a09bc6cc311f0623656c3090ec781b76"
     refreshPeriod = {{ $default_refresh }}
 
 [".tmux/plugins/tmux-continuum"]
     type = "archive"
     url = "https://github.com/tmux-plugins/tmux-continuum/archive/refs/tags/v3.1.0.tar.gz"
     stripComponents = 1
+    exact = true
+    checksum.sha256 = "311dddeebbf7b803cd19c339ab887784b715fd8ef206ec430028cabb8574de87"
     refreshPeriod = {{ $default_refresh }}
 
 # mode-indicator publishes no tags (dormant since 2021), so it pins to a
@@ -109,6 +123,8 @@
     type = "archive"
     url = "https://github.com/MunifTanjim/tmux-mode-indicator/archive/7027903adca37c54cb8f5fa99fc113b11c23c2c4.tar.gz"
     stripComponents = 1
+    exact = true
+    checksum.sha256 = "28be6faf8f6c8f3b916bf901c1f1b269fa52d23372a38f192533352c1bf4ebd7"
     refreshPeriod = {{ $default_refresh }}
 {{ end }}
 
