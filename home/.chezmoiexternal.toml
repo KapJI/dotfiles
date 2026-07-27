@@ -47,19 +47,19 @@
 # .zsh_plugins.txt. Fetched as an archive rather than a git clone: with no
 # .git, antidote's own `antidote update` self-update no-ops ("self updating is
 # disabled in this build"), so the tool version is frozen too and bumps stay
-# deliberate. HEAD is 21 commits past the newest tag (v2.1.0) with nothing
-# newer published, so this pins the SHA (as mode-indicator does) rather than
-# downgrade to the tag. exact = true prunes files a future version would drop,
-# and checksum.sha256 makes the fetch byte-exact and tamper-evident. When
-# bumping, update BOTH the SHA in the url and the checksum, or the fetch fails:
-#   git ls-remote https://github.com/mattmc3/antidote HEAD
+# deliberate. Pinned to v2.2.0 (tag commit 762857a), the newest release.
+# exact = true prunes files a future version would drop, and
+# checksum.sha256 makes the fetch byte-exact and tamper-evident. When
+# bumping, update BOTH the SHA in the url and the checksum, or the fetch
+# fails:
+#   git ls-remote --tags https://github.com/mattmc3/antidote
 #   curl -fsSL <new-url> | sha256sum
 [".config/zsh/antidote"]
     type = "archive"
-    url = "https://github.com/mattmc3/antidote/archive/67120be33ce52dfbf64278c07bc03f7c10e7eb9d.tar.gz"
+    url = "https://github.com/mattmc3/antidote/archive/762857af1fb89ae482f755c26212c0a9a3b68d4c.tar.gz"
     stripComponents = 1
     exact = true
-    checksum.sha256 = "8e4170e07b76358db8322b8efefb17e48c771f8a8f9294495be097507957eacf"
+    checksum.sha256 = "ae883e23ba0934fb1291a71dc3feca0f3c8aea9cf8e40a29d907d00f5c9cfedc"
     refreshPeriod = {{ $default_refresh }}
 {{ end }}
 
