@@ -1,23 +1,31 @@
-#!/bin/bash
+#!/bin/sh
+# git fixup <commit> [extra git-commit args...]
+#
+# Create a fixup! commit for <commit> from the currently-staged changes,
+# then fold it in via a non-interactive autosquash rebase onto <commit>^.
+#
+# Usage:
+#   git add -p                 # stage the correction
+#   git fixup HEAD~2           # fix up an earlier commit (SHA or ref)
+#   git fixup abc123 --no-verify
+#
+# Invoked as `!sh ~/bin/git-fixup.sh` from the `fixup` alias, so this must
+# stay POSIX sh (no bash arrays). "$@" preserves each extra arg verbatim —
+# the previous version built a command string and re-ran it through
+# `sh -c`, which word-split quoted values (e.g. `-m 'two words'` reached
+# git as `-m two words`) and let metacharacters become shell syntax.
+#
+# GIT_DIR / GIT_WORK_TREE are honoured by git from the environment
+# directly, so they don't need to be threaded through explicitly.
+set -eu
 
-## Usage
-# $ git commit -am 'bad commit'
-#
-# $ git commit -am 'good commit'
-#
-## Stage changes to correct the bad commit
-# $ git add .
-#
-## Fixup the bad commit. HEAD^ can be replaced by the SHA of the bad commit
-# $ git fixup HEAD^
-
-git_extra_args=""
-if [ ! -z "$GIT_DIR" ]; then
-    git_extra_args="$git_extra_args --git-dir=$GIT_DIR"
+if [ "$#" -eq 0 ]; then
+    echo "usage: git fixup <commit> [git-commit args...]" >&2
+    exit 1
 fi
-if [ ! -z "$GIT_WORK_TREE" ]; then
-    git_extra_args="$git_extra_args --work-tree=$GIT_WORK_TREE"
-fi
 
-TARGET=$(sh -c "git $git_extra_args rev-parse \"$1\"")
-sh -c "git $git_extra_args commit --fixup=$TARGET ${@:2}" && EDITOR=true sh -c "git $git_extra_args rebase -i --autostash --autosquash $TARGET^"
+target=$(git rev-parse "$1")
+shift
+
+git commit --fixup="$target" "$@"
+EDITOR=true git rebase -i --autostash --autosquash "$target^"
