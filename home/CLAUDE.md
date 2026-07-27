@@ -153,6 +153,17 @@ chezmoi cd && git diff
 
 To bump one plugin, edit its SHA by hand and `chezmoi apply`. `ohmyzsh` spans several lines but is one clone — all its lines must share the same SHA (antidote errors on a pin conflict within a bundle). antidote itself bumps by editing the SHA in `.chezmoiexternal.toml`.
 
+### Neovim plugin lockfile
+
+`home/dot_config/nvim/lazy-lock.json` pins every lazy.nvim plugin to a commit for cross-host reproducibility — it is the source of truth a fresh `chezmoi apply` restores from. lazy.nvim writes the *deployed* copy (`~/.config/nvim/lazy-lock.json`) whenever you `:Lazy update` / `:Lazy sync` in the editor, which is a chezmoi target — so the two **drift** until you push the change back:
+
+```bash
+chezmoi re-add ~/.config/nvim/lazy-lock.json   # after any in-editor :Lazy update/sync
+chezmoi cd && git diff home/dot_config/nvim/lazy-lock.json
+```
+
+Skip this and a fresh install (or `:Lazy restore` on another host) rolls the drifted plugins *backward* to the stale source commits — the opposite of what you want. `chezmoi diff` surfaces the drift if you forget.
+
 ### Encryption
 
 Sensitive files (SSH keys, age key) are encrypted with `age`. The encrypted key is stored at `.data/key.txt.age`. The unix script `10-decrypt-private-key.sh` decrypts private keys on apply.
