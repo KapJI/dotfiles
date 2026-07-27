@@ -84,6 +84,14 @@ _set_term_title_precmd() {
     fi
     local short=$_atit_cached_short
     local full=${PWD/#$HOME/\~}
+    # Sanitize control bytes (ESC/BEL -> visible ^[, ^G) BEFORE emitting, so a
+    # directory name carrying raw terminal-control bytes can't inject an escape
+    # (e.g. close the OSC and write the clipboard via OSC 52). The tmux `title`
+    # override below already does this; doing it here too covers the NON-tmux
+    # path, where `title` is OMZ's print -P, which emits control bytes verbatim.
+    # The caret forms ${(V)} produces survive print -P without re-interpretation.
+    short=${(V)short}
+    full=${(V)full}
     # Folder glyph prefix marks "a shell sitting at a prompt in this
     # directory" — visually distinct from running-program titles,
     # which the preexec hook below prefixes with a gear glyph.
@@ -103,7 +111,11 @@ add-zsh-hook precmd _set_term_title_precmd
 # isn't an env-assignment, a wrapper (sudo/ssh/…), or a -flag.
 _atit_preexec_glyph() {
     [[ ${DISABLE_AUTO_TITLE:-} == true ]] && return
-    local cmd="${1[(wr)^(*=*|sudo|ssh|mosh|rake|-*)]:gs/%/%%}"
+    # ${(V)} sanitizes control bytes (see _set_term_title_precmd) before the
+    # non-tmux OMZ title would emit them verbatim; then double `%` -> `%%`.
+    local cmd=${1[(wr)^(*=*|sudo|ssh|mosh|rake|-*)]}
+    cmd=${(V)cmd}
+    cmd=${cmd:gs/%/%%}
     title " $cmd"
 }
 
