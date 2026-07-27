@@ -118,7 +118,10 @@ bump-locks() {
         rc=1
     fi
     print "==> chezmoi re-add"
-    chezmoi re-add ~/.config/nix-profile/flake.lock $f
+    chezmoi re-add ~/.config/nix-profile/flake.lock $f || {
+        rc=1
+        print -u2 "bump-locks: WARNING: chezmoi re-add failed"
+    }
     if (( rc )); then
         print -u2 "bump-locks: FINISHED WITH ERRORS — some pins were left unchanged (see warnings above)."
         print -u2 "Review carefully before committing: chezmoi cd && git diff"
@@ -137,10 +140,14 @@ bump-locks() {
 function yz() {
   local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
   yazi "$@" --cwd-file="$tmp"
+  # Preserve Yazi's exit status: the cd/rm below would otherwise make `rm` the
+  # function's return value, masking a Yazi failure as success.
+  local rc=$?
   if cwd="$(< "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
     builtin cd -- "$cwd"
   fi
   rm -f -- "$tmp"
+  return $rc
 }
 
 # Git aliases from oh-my-zsh
