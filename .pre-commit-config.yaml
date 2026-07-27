@@ -39,4 +39,4 @@ repos:
         entry: tests/shell/run.sh
         language: system
         pass_filenames: false
-        files: ^(home/dot_config/zsh/.*\.(zsh|tmpl)|home/\.chezmoiscripts/.*\.sh\.tmpl|home/dot_tmux\.conf\.tmpl|tests/shell/.*)$
+        files: ^(home/dot_config/zsh/.*\.(zsh|tmpl)|home/dot_z[a-z]*(\.tmpl)?|home/\.chezmoiscripts/.*\.sh\.tmpl|home/dot_tmux\.conf\.tmpl|tests/shell/.*)$

@@ -12,9 +12,10 @@
 #     on macOS/desktop hosts).
 #
 # Rendering uses the committing host's chezmoi data, so a host-gated branch is
-# exercised on the host that actually has it. A template that fails to render
-# here (e.g. it targets another OS) is noted and skipped, not failed — chezmoi
-# apply is the real template-validity gate. Exits non-zero if any check fails.
+# exercised on the host that actually has it. A host-gated template renders to
+# EMPTY output (exit 0), which the checks tolerate; a template that FAILS to
+# render is a real bug (it would fail chezmoi apply too) and is a failure, not
+# a skip. Exits non-zero if any check fails.
 set -u
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -25,28 +26,43 @@ render() { chezmoi execute-template <"$1"; }
 nonblank() { [ -n "$(printf '%s' "$1" | tr -d '[:space:]')" ]; }
 
 echo "== zsh -n =="
-for f in $(find "$root/home/dot_config/zsh" -name '*.zsh' -type f | sort); do
-    if ! out=$(zsh -n "$f" 2>&1); then
-        printf 'FAIL zsh -n: %s\n%s\n' "$f" "$out"
-        rc=1
-    fi
-done
-for f in $(find "$root/home/dot_config/zsh" -name '*.tmpl' -type f | sort); do
-    if ! r=$(render "$f" 2>&1); then
-        printf 'SKIP (render failed here): %s\n' "$f"
-        continue
-    fi
-    if ! out=$(printf '%s\n' "$r" | zsh -n 2>&1); then
-        printf 'FAIL zsh -n (rendered): %s\n%s\n' "$f" "$out"
-        rc=1
-    fi
+# Every zsh source: config.d + completions under dot_config/zsh, PLUS the
+# home-root startup files (~/.zshenv etc.) that live at home/ root, not under
+# zsh/ — a syntax error there breaks every shell. Templates are rendered with
+# chezmoi first (a raw {{…}} template is not valid zsh).
+for f in $(
+    {
+        find "$root/home/dot_config/zsh" \( -name '*.zsh' -o -name '*.tmpl' \) -type f
+        find "$root/home" -maxdepth 1 -type f -name 'dot_z*'
+    } | sort -u
+); do
+    case "$f" in
+    *.tmpl)
+        if ! r=$(render "$f" 2>&1); then
+            printf 'FAIL render: %s\n%s\n' "$f" "$r"
+            rc=1
+            continue
+        fi
+        if ! out=$(printf '%s\n' "$r" | zsh -n 2>&1); then
+            printf 'FAIL zsh -n (rendered): %s\n%s\n' "$f" "$out"
+            rc=1
+        fi
+        ;;
+    *)
+        if ! out=$(zsh -n "$f" 2>&1); then
+            printf 'FAIL zsh -n: %s\n%s\n' "$f" "$out"
+            rc=1
+        fi
+        ;;
+    esac
 done
 
 echo "== shellcheck =="
 if command -v shellcheck >/dev/null 2>&1; then
     for f in $(find "$root/home/.chezmoiscripts" -name '*.sh.tmpl' -type f | sort); do
         if ! r=$(render "$f" 2>&1); then
-            printf 'SKIP (render failed here): %s\n' "$f"
+            printf 'FAIL render: %s\n%s\n' "$f" "$r"
+            rc=1
             continue
         fi
         nonblank "$r" || continue # host-gated script renders empty here
