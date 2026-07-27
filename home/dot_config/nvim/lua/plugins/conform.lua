@@ -5,8 +5,11 @@
 -- Formatter binaries are installed fleet-wide via .data/packages.yaml
 -- (nix): stylua, shfmt, prettier, taplo, goimports, plus ruff/nixfmt/
 -- rustfmt under their own entries. conform finds them on PATH. Exception:
--- terraform_fmt needs the terraform binary (unfree in nixpkgs) — not
--- installed, so terraform format-on-save is a no-op until you add it.
+-- terraform_fmt needs the terraform binary (unfree in nixpkgs), usually
+-- absent — so it's registered only when `terraform` is on PATH (executable()
+-- gate below). Registering it unconditionally is NOT a silent no-op: with
+-- notify_on_error, every .tf/.tfvars save toasts "Formatters unavailable for
+-- terraform file". The gate self-heals if terraform is ever installed.
 return {
   {
     "stevearc/conform.nvim",
@@ -22,8 +25,8 @@ return {
         desc = "Format buffer/selection",
       },
     },
-    opts = {
-      formatters_by_ft = {
+    opts = function()
+      local formatters_by_ft = {
         lua = { "stylua" },
         python = { "ruff_organize_imports", "ruff_format" },
         sh = { "shfmt" },
@@ -37,19 +40,26 @@ return {
         nix = { "nixfmt" },
         go = { "goimports" }, -- goimports already applies gofmt formatting; a second gofmt pass is redundant
         rust = { "rustfmt" },
-        terraform = { "terraform_fmt" },
-        ["terraform-vars"] = { "terraform_fmt" },
         toml = { "taplo" },
-      },
-      format_on_save = function(bufnr)
-        -- Skip format-on-save for buffers explicitly opted out (vim.b.disable_autoformat=true)
-        -- or if the global flag is set (vim.g.disable_autoformat=true).
-        if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
-          return
-        end
-        return { timeout_ms = 1500, lsp_format = "fallback" }
-      end,
-      notify_on_error = true,
-    },
+      }
+      -- Only wire up terraform_fmt when terraform is actually installed (see
+      -- header) — otherwise every .tf/.tfvars save toasts an error.
+      if vim.fn.executable("terraform") == 1 then
+        formatters_by_ft.terraform = { "terraform_fmt" }
+        formatters_by_ft["terraform-vars"] = { "terraform_fmt" }
+      end
+      return {
+        formatters_by_ft = formatters_by_ft,
+        format_on_save = function(bufnr)
+          -- Skip format-on-save for buffers explicitly opted out (vim.b.disable_autoformat=true)
+          -- or if the global flag is set (vim.g.disable_autoformat=true).
+          if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+            return
+          end
+          return { timeout_ms = 1500, lsp_format = "fallback" }
+        end,
+        notify_on_error = true,
+      }
+    end,
   },
 }
