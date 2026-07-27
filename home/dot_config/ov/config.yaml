@@ -1,5 +1,5 @@
 General:
-  SectionDelimiter: "^^(added|copied|modified|removed|renamed):"
+  SectionDelimiter: "^(added|copied|modified|removed|renamed):"
 StyleSectionLine:
   Background: "none"
   Foreground: "yellow"
