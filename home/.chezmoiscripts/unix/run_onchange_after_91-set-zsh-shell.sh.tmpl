@@ -6,13 +6,9 @@ if [[ $SHELL == */zsh ]]; then
     exit 0
 fi
 
-YELLOW='\033[0;33m'
-CYAN='\033[0;36m'
-NC='\033[0m'
-
 {{ if eq .osid "darwin" -}}
 zsh_path="$(command -v zsh)"
-current_shell="$(dscl . -read /Users/$USER UserShell | awk '{print $2}')"
+current_shell="$(dscl . -read /Users/"$USER" UserShell | awk '{print $2}')"
 if [ "$current_shell" != "$zsh_path" ]; then
     sudo dscl . -create "/Users/$USER" UserShell "$zsh_path"
 fi
@@ -31,6 +27,8 @@ for candidate in /usr/bin/zsh /bin/zsh; do
     fi
 done
 if [ -z "$zsh_path" ]; then
+    YELLOW='\033[0;33m'
+    NC='\033[0m'
     printf "${YELLOW}No system zsh in /etc/shells found; not running chsh.${NC}\n"
     printf "${YELLOW}Install with: sudo apt install zsh${NC}\n"
     exit 0

@@ -31,3 +31,12 @@ repos:
         language: system
         pass_filenames: false
         files: ^(home/dot_config/nvim/.*\.lua|tests/nvim/.*)$
+
+      # zsh -n on the zsh config, shellcheck on rendered chezmoi shell scripts,
+      # and a tmux -f syntax smoke test (shellcheck/tmux self-skip if absent).
+      - id: shell-checks
+        name: shell + tmux syntax checks
+        entry: tests/shell/run.sh
+        language: system
+        pass_filenames: false
+        files: ^(home/dot_config/zsh/.*\.(zsh|tmpl)|home/\.chezmoiscripts/.*\.sh\.tmpl|home/dot_tmux\.conf\.tmpl|tests/shell/.*)$

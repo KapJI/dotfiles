@@ -1,0 +1,12 @@
+# Repo-wide ShellCheck config for the chezmoi scripts, applied by the
+# `shell-checks` pre-commit hook (tests/shell/run.sh) which renders each
+# *.sh.tmpl and pipes it to `shellcheck -`.
+#
+# SC1091 (Not following: … was not specified as input): every `source` here
+#   targets a system path outside the repo — chiefly the nix-daemon profile
+#   script — which ShellCheck can't and shouldn't follow.
+# SC2059 (Don't use variables in the printf format string): color codes are
+#   interpolated into printf format strings on purpose across these scripts;
+#   the format strings are literals, never user input, so there's no format
+#   injection risk.
+disable=SC1091,SC2059
