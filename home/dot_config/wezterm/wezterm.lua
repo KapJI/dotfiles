@@ -1,14 +1,33 @@
 local wezterm = require 'wezterm'
 local config = {}
 
-config.font = wezterm.font_with_fallback {
-    {
-        family = 'MesloLGS NF',
+-- Primary monospace family. macOS/Linux use MesloLGS NF (deployed via the
+-- p10k-media TTFs on Linux, present locally on macOS). Windows installs
+-- Cascadia Code Nerd Font (scoop CascadiaCode-NF-Mono), not Meslo, so
+-- prefer it there — otherwise wezterm silently falls back to a bundled
+-- face and loses the intended typography. The exact Nerd Font family name
+-- varies by packaging/version, so list the known variants; font_with_fallback
+-- just skips any that aren't installed.
+local mono_families = { 'MesloLGS NF' }
+if wezterm.target_triple:find('windows') then
+    mono_families = {
+        'CaskaydiaCove Nerd Font Mono',
+        'CaskaydiaCove NF Mono',
+        'CaskaydiaMono Nerd Font',
+        'Cascadia Code NF',
+        'MesloLGS NF',
+    }
+end
+local mono_fonts = {}
+for _, family in ipairs(mono_families) do
+    mono_fonts[#mono_fonts + 1] = {
+        family = family,
         harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' },
-    },
-    -- Covers Nerd Font glyphs missing from MesloLGS NF (e.g. MDI yaml icon U+E8EB).
-    'Symbols Nerd Font Mono',
-}
+    }
+end
+-- Covers Nerd Font glyphs missing from the primary family (e.g. MDI yaml icon U+E8EB).
+mono_fonts[#mono_fonts + 1] = 'Symbols Nerd Font Mono'
+config.font = wezterm.font_with_fallback(mono_fonts)
 config.line_height = 1.0
 if wezterm.target_triple:find("darwin") then
     config.font_size = 14.0
@@ -102,7 +121,10 @@ config.colors               = {
 local function is_inner_app(pane)
     local uv = pane:get_user_vars()
     if uv.IS_NVIM == 'true' or uv.IS_TMUX == 'true' then return true end
-    local proc = (pane:get_foreground_process_name() or ''):gsub('^.*/', '')
+    -- Strip the directory (both / and Windows \) and a trailing .exe so the
+    -- name matches on Windows too, where get_foreground_process_name returns
+    -- e.g. C:\...\nvim.exe — otherwise the local fallback never matched there.
+    local proc = (pane:get_foreground_process_name() or ''):gsub('^.*[/\\]', ''):gsub('%.exe$', '')
     return proc == 'tmux' or proc == 'nvim'
 end
 

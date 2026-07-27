@@ -8,6 +8,10 @@ $env:BAT_PAGER = "ov"
 $env:BAT_THEME = "1337"
 $env:EZA_CONFIG_DIR="$HOME\.config\eza"
 $env:TEALDEER_CONFIG_DIR="$HOME\.config\tealdeer"
+# lazygit's Windows default config path is %LOCALAPPDATA%\lazygit, so it
+# never finds the chezmoi-managed ~/.config/lazygit/config.yml unless we
+# point it there explicitly (the Unix side exports this from env.zsh).
+$env:LG_CONFIG_FILE = "$HOME\.config\lazygit\config.yml"
 
 # Delayed modules load. The child runspace only WARMS the module files
 # (disk/assembly cache) so the deferred init below imports them fast in
