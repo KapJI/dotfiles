@@ -101,7 +101,18 @@ bump-locks() {
             fi
             out+=$line
         done < $f
-        print -rl -- "${out[@]}" > $f
+        # Atomic write: a truncating `> $f` could leave a half-written manifest
+        # if the shell dies mid-write. Write a sibling temp and rename it over
+        # $f (same dir, so the rename is atomic) — $f is then always either the
+        # old file or the fully-written new one, never a partial.
+        local tmp=$f.bump.$$
+        if print -rl -- "${out[@]}" > $tmp && mv -f -- $tmp $f; then
+            :
+        else
+            rm -f -- $tmp
+            print -u2 "bump-locks: ERROR: failed to write $f"
+            return 1
+        fi
     else
         print -u2 "bump-locks: skipping plugins ($f not readable)"
         rc=1
