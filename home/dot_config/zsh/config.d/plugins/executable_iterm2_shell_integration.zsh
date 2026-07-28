@@ -12,7 +12,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-if [[ -o interactive ]]; then
+# Local modification to the vendored upstream script: also require stdout
+# to be a terminal before arming. This file emits OSC sequences immediately
+# at the bottom (iterm2_print_state_data, ShellIntegrationVersion) and from
+# every precmd/preexec hook; in an interactive shell whose stdout is
+# captured — out=$(zsh -ic '…'), VS Code tasks, expect-style drivers —
+# those raw escape bytes land in the captured text ahead of the real
+# output. Same guard as config.d/wezterm_user_var.zsh. Skipping the whole
+# install (not just the emissions) also leaves
+# ITERM_SHELL_INTEGRATION_INSTALLED unset, so config.d/tmux_osc133.zsh
+# correctly declines to advertise OSC 133 marks this shell never emits.
+if [[ -o interactive && -t 1 ]]; then
   if [ "${ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX-}""$TERM" != "screen" -a "${ITERM_SHELL_INTEGRATION_INSTALLED-}" = "" -a "$TERM" != linux -a "$TERM" != dumb ]; then
     ITERM_SHELL_INTEGRATION_INSTALLED=Yes
     ITERM2_SHOULD_DECORATE_PROMPT="1"
