@@ -1,10 +1,21 @@
+{{- /* In an ephemeral container the account signer (1Password/op-ssh-sign) is absent.
+       If a container-local SSH key exists, sign + push over SSH with it; otherwise
+       fall back to the unsigned/HTTPS behaviour so a keyless container still works. */ -}}
+{{- $isc := index . "is_container" | default false -}}
+{{- $ckey := joinPath .chezmoi.homeDir ".ssh/id_ed25519.pub" -}}
+{{- $hasckey := and $isc (stat $ckey) -}}
+{{- $signdefault := and (not $isc) (ne (get .chezmoi.osRelease "id") "centos") -}}
 [user]
     name = {{ .full_name }}
     email = {{ .git_email }}
-    signingkey = {{ .git_signingkey }}
+    signingkey = {{ if $hasckey }}{{ $ckey }}{{ else }}{{ .git_signingkey }}{{ end }}
 [push]
     default = simple
     autoSetupRemote = true
+{{- if $hasckey }}
+[url "git@github.com:"]
+    pushInsteadOf = https://github.com/
+{{- end }}
 [alias]
     # sync with zsh
     a = add
@@ -52,9 +63,9 @@
     program = C:/Windows/System32/OpenSSH/ssh-keygen.exe
 {{- end }}
 [commit]
-    gpgsign = {{ and (not (index . "is_container" | default false)) (ne (get .chezmoi.osRelease "id") "centos") }}
+    gpgsign = {{ if $hasckey }}true{{ else }}{{ $signdefault }}{{ end }}
 [tag]
-    forceSignAnnotated = {{ and (not (index . "is_container" | default false)) (ne (get .chezmoi.osRelease "id") "centos") }}
+    forceSignAnnotated = {{ if $hasckey }}true{{ else }}{{ $signdefault }}{{ end }}
 [init]
     defaultBranch = main
 [core]
