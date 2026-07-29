@@ -104,4 +104,17 @@ profile_after=$(readlink -f "$HOME/.nix-profile" 2>/dev/null || true)
 if [ -n "$profile_after" ] && [ "$profile_before" != "$profile_after" ]; then
     rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*
 fi
+{{- if index . "is_container" | default false }}
+
+# This workspace bind-mounts the host's /nix. The profile's normal gcroot lives
+# under $HOME (a separate volume the host's nix can't see), so pin a direct root
+# in the shared store; otherwise `nix-collect-garbage` on the host could reclaim
+# these tool paths out from under the container.
+if [ -n "$profile_after" ]; then
+    gcdir="/nix/var/nix/gcroots/per-user/$USER"
+    mkdir -p "$gcdir" 2>/dev/null \
+        && ln -sfn "$profile_after" "$gcdir/dotfiles-profile" \
+        || echo "note: could not pin nix gcroot in shared store (host GC may reclaim tools)"
+fi
+{{- end }}
 {{ end -}}

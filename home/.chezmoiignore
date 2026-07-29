@@ -63,12 +63,16 @@ bin
 {{ end }}
 
 {{ if (index . "is_container" | default false) }}
-# Ephemeral Coder/CI container: skip every installer script (nix/apt/desktop
-# repos + age-key decryption) and all SSH material (the encrypted ssh config
-# would need an age key we don't ship into workspaces). Tools come from the
-# workspace image, git identity from Coder's git-config module, and GitHub auth
-# from Coder external auth. Placed last so these ignores win over the pubkey
-# re-includes above.
+# Ephemeral Coder/CI container: skip installer scripts (apt/desktop repos +
+# age-key decryption) and all SSH material (the encrypted ssh config would need
+# an age key we don't ship into workspaces). Git identity comes from Coder's
+# git-config module, GitHub auth from Coder external auth. Placed last so these
+# ignores win over the pubkey re-includes above.
 .chezmoiscripts/**
+# Exception: the nix-profile sync. The workspace bind-mounts the host's /nix, so
+# build this user's tool profile from packages.yaml against that shared store
+# (reusing already-built paths). nix install / upgrade / GC stay ignored — nix
+# comes from the mount and the container must never mutate the host's store.
+!.chezmoiscripts/unix/03-nix-profile-sync.sh
 .ssh/**
 {{ end }}
