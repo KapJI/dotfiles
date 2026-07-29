@@ -4,4 +4,13 @@ ZDOTDIR=$HOME/.config/zsh
 if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
 fi
+{{- if index . "is_container" | default false }}
+# Containers bind-mount the host's /nix but have no OS-level nix login
+# integration, so source it here (before .zshrc) to put the profile on PATH and
+# set NIX_REMOTE=daemon ahead of tool init like fzf. On real hosts the nix
+# installer's /etc hooks already do this before any user config runs.
+if [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
+    . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+fi
+{{- end }}
 {{- end }}
