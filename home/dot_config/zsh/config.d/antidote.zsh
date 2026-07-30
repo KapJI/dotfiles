@@ -28,6 +28,15 @@ zstyle ':omz:update' mode disabled
 fpath=($ZDOTDIR/antidote/functions $fpath)
 autoload -Uz antidote
 
+# add-zsh-hook ships with zsh, but it only becomes usable once something
+# autoloads it — and today that "something" is a plugin in the bundle.
+# Several config.d files call add-zsh-hook before any such plugin is
+# guaranteed loaded (auto_title.zsh runs before tmux_osc133.zsh's own
+# autoload), and the degraded no-plugins path below loads no bundle at
+# all. Autoload it here, unconditionally and ahead of the bundle, so
+# those callers never hit command-not-found. Idempotent and fork-free.
+autoload -Uz add-zsh-hook
+
 zsh_plugins=$ZDOTDIR/.zsh_plugins.zsh
 zsh_plugins_txt=$ZDOTDIR/.zsh_plugins.txt
 
