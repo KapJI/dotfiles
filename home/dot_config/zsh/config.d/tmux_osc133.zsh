@@ -15,11 +15,12 @@
 # (a bare `zsh -f`, a login shell without the plugin) leaves it unset, and
 # Alt-Y cleanly reports "nothing to copy" instead of copying garbage.
 #
-# Re-assert on every prompt (idempotent), not once: the retract hook below
-# clears the flag whenever an integrated shell exits, so a *parent* integrated
-# shell — one that spawned a nested integrated zsh which has since exited and
-# retracted — must be able to set it again on its next prompt. One tmux
-# invocation per prompt is negligible for an interactive shell.
+# Re-assert on every prompt (idempotent), not once: the retract hooks below
+# clear the flag whenever a foreground command starts or an integrated shell
+# exits, so each next prompt — of this shell, or of a *parent* integrated
+# shell whose nested integrated zsh has since exited and retracted — must set
+# it again. One tmux invocation per prompt is negligible for an interactive
+# shell.
 # ITERM_SHELL_INTEGRATION_INSTALLED is set (to "Yes") by the integration plugin
 # only when it actually armed itself for this interactive shell.
 if [[ -n ${TMUX:-} ]]; then
@@ -32,17 +33,29 @@ if [[ -n ${TMUX:-} ]]; then
   }
   add-zsh-hook precmd _osc133_advertise_to_tmux
 
-  # Retract the capability when this shell exits, so a pane handed back to a
-  # non-integrated shell (an integrated zsh exiting to a plain login bash)
-  # doesn't leave Alt-Y trusting OSC 133 marks whose emitter is gone. This
-  # covers the nested-shell-exit path. It does NOT cover ssh'ing from here into
-  # a host without the integration: this zsh stays alive, so zshexit never
-  # fires and no prompt redraws to re-assert — the flag lingers at 1 for that
-  # remote session, a narrow edge the binding degraded on before this flag
-  # existed and no worse now. Unsetting an already-unset option, or one on a
-  # pane that vanished as the shell exited, is a harmless no-op.
+  # Retract the capability whenever this shell stops controlling the pane, so
+  # Alt-Y never trusts OSC 133 marks whose emitter is gone:
+  #
+  #   - preexec: from here until the next precmd, a foreground command owns
+  #     the pane — and it may hand it to a shell with no integration (ssh to
+  #     a host without it, docker exec, a plain nested bash). If the flag
+  #     stayed set, Alt-Y during that session would navigate this shell's old
+  #     local prompt marks and copy a stale span — potentially a large chunk
+  #     of remote output — to the clipboard. Retracting first makes Alt-Y
+  #     degrade to "nothing to copy" for the whole foreground session; the
+  #     next local prompt re-asserts. That also disables Alt-Y *during* quick
+  #     local commands — a deliberate fail-safe trade, and it costs one tmux
+  #     call per command, same order as the precmd advertise.
+  #   - zshexit: the pane is handed back to whatever spawned this shell (an
+  #     integrated zsh exiting to a plain login bash). Needed besides preexec
+  #     because an exit that never runs a command (^D at the prompt) fires no
+  #     preexec, and the parent re-assert path in the header relies on it.
+  #
+  # Unsetting an already-unset option, or one on a pane that vanished as the
+  # shell exited, is a harmless no-op.
   _osc133_retract_from_tmux() {
     [[ -n ${TMUX_PANE:-} ]] && command tmux set -up -t "$TMUX_PANE" @osc133_capable 2>/dev/null
   }
+  add-zsh-hook preexec _osc133_retract_from_tmux
   add-zsh-hook zshexit _osc133_retract_from_tmux
 fi

@@ -39,8 +39,11 @@ if [[ ! -e $zsh_plugins || $zsh_plugins_txt -nt $zsh_plugins ]]; then
     # and `source`s the broken bundle on every subsequent startup. The
     # per-PID temp keeps racing shells from clobbering each other; mv
     # picks one winner atomically. Keep the previous bundle on failure.
-    if antidote bundle <"$zsh_plugins_txt" >| "$zsh_plugins.tmp.$$"; then
-        mv -f -- "$zsh_plugins.tmp.$$" "$zsh_plugins"
+    # The mv is checked too (read-only ZDOTDIR, full disk): an unchecked
+    # mv failure would drop the compdump for a plugin set that never
+    # actually changed and pretend the regen landed.
+    if antidote bundle <"$zsh_plugins_txt" >| "$zsh_plugins.tmp.$$" \
+            && mv -f -- "$zsh_plugins.tmp.$$" "$zsh_plugins"; then
         # Plugin set changed (added/removed/reordered) — the cached
         # compdump may reference completion functions from plugins that
         # are no longer loaded. Drop it so zephyr's run_compinit does a
@@ -53,11 +56,19 @@ if [[ ! -e $zsh_plugins || $zsh_plugins_txt -nt $zsh_plugins ]]; then
     fi
 fi
 
-if [[ ! -e $zsh_plugins.zwc || $zsh_plugins -nt $zsh_plugins.zwc ]]; then
-    zcompile -R -- $zsh_plugins.zwc $zsh_plugins
+# On a fresh host (or after bundle loss) a failed regen leaves nothing to
+# load. Skip compile+source with one clear message instead of cascading a
+# zcompile error, a source error, and undefined-function noise from every
+# later config file that assumes the plugins loaded. The bundle stays
+# absent, so the next shell retries the regen from scratch.
+if [[ -e $zsh_plugins ]]; then
+    if [[ ! -e $zsh_plugins.zwc || $zsh_plugins -nt $zsh_plugins.zwc ]]; then
+        zcompile -R -- $zsh_plugins.zwc $zsh_plugins
+    fi
+    source $zsh_plugins
+else
+    print -u2 "antidote: no plugin bundle to load; starting without plugins"
 fi
-
-source $zsh_plugins
 unset zsh_plugins zsh_plugins_txt
 
 # Stretch zephyr's compinit cache window from the hardcoded 20 hours
