@@ -65,7 +65,14 @@ _fzf_comprun() {
 # redisplay. Must run AFTER fzf-tab and FSH have wired their
 # widgets — the current binding here is FSH's wrap (autosuggest
 # adds its own outer wrap later via its precmd hook).
-if [[ -n ${widgets[fzf-tab-complete]-} ]]; then
+# Guard against re-wrapping our own wrapper. A full `.zshrc` reload is
+# safe (antidote re-sources the bundle first, so fzf-tab re-registers
+# fzf-tab-complete before we get here), but sourcing *this file alone*
+# would otherwise rebind _fzf_tab_complete_orig to the wrapper — making
+# the wrapper call itself via zle and recurse until zsh bails. Skip when
+# the current widget is already ours.
+if [[ -n ${widgets[fzf-tab-complete]-} \
+        && ${widgets[fzf-tab-complete]#user:} != _fzf_tab_complete_with_redisplay ]]; then
     zle -N _fzf_tab_complete_orig "${widgets[fzf-tab-complete]#user:}"
 
     _fzf_tab_complete_with_redisplay() {
