@@ -12,8 +12,10 @@
        no identities) so `output` doesn't abort with a cryptic "exit status 2";
        the empty-check below then fails with an actionable message. sh isn't on
        Windows, so only wrap elsewhere. */ -}}
+{{- /* .chezmoi isn't in scope here (this sub-template is called with a bare
+       dict), so detect Windows via its OS env var rather than .chezmoi.os. */ -}}
 {{- $output := "" -}}
-{{- if eq .chezmoi.os "windows" -}}
+{{- if eq (env "OS") "Windows_NT" -}}
 {{-   $output = output "ssh-add" "-L" | trim -}}
 {{- else -}}
 {{-   $output = output "sh" "-c" "ssh-add -L 2>/dev/null || true" | trim -}}
