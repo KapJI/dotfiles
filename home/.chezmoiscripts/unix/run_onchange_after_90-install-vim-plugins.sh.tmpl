@@ -11,8 +11,9 @@
 # nvim launch. gcc for the compile comes from build-essential on the system PATH.
 export PATH="$HOME/.local/bin:$PATH"
 
-# Update nvim plugins
-# Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
+# Sync nvim plugins to the pinned lazy-lock.json + refresh treesitter parsers.
+# Re-runs weekly (parser refresh; also re-pins plugins, healing any lazy-lock
+# drift). Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 
 # Drive parser installation from here rather than letting the plugin's startup
 # config do it: nvim-treesitter's install() is async, so the config's fire-and-
@@ -33,9 +34,14 @@ ts_site="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site"
 rm -f "$ts_site/parser/tmux.so" "$ts_site/parser-info/tmux.revision"
 rm -rf "$ts_site/queries/tmux"
 
-# First pass: sync Lazy so plugins are cloned/checked out at their locked
-# commits — on a fresh machine this is where nvim-treesitter lands on disk.
-nvim --headless "+Lazy! sync" +qall
+# First pass: bring plugins to exactly the state pinned in lazy-lock.json —
+# install missing (on a fresh machine this is where nvim-treesitter lands on
+# disk), clean any no longer in the spec, and restore the rest to their locked
+# commits. Deliberately NOT `Lazy! sync`: sync also *updates* past the lock and
+# rewrites lazy-lock.json on every run, drifting a chezmoi-managed file. Bump
+# versions on purpose with `:Lazy update` then
+# `chezmoi re-add ~/.config/nvim/lazy-lock.json` (mirrors bump-locks for nix).
+nvim --headless "+Lazy! install" "+Lazy! clean" "+Lazy! restore" +qall
 
 # Second pass: compile parsers and WAIT for them (install()/update() are
 # nvim-treesitter async tasks; :wait() blocks until they finish).
