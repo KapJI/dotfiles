@@ -3,6 +3,13 @@ if [ ! -d "$HOME/.ssh" ]; then
 fi
 
 if [ "$MACOS" = true ]; then
+    # 1Password's agent socket lives at this fixed path. Export it
+    # unconditionally — even when 1Password isn't running yet (fresh login,
+    # or the agent stopped after an app update): the path is stable, so the
+    # moment the agent comes up this already-running shell's SSH_AUTH_SOCK is
+    # live with no reload. Guarding on socket existence would instead pin
+    # whatever was inherited and force a reload once the agent starts. Same
+    # self-heal idea as the stable-symlink path in the Linux branch below.
     export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 elif [ -S "$HOME/.1password/agent.sock" ]; then
     # Linux with 1Password running: use its agent directly. Anything inherited
@@ -20,12 +27,4 @@ else
         ln -sf $VSCODE_IPC_HOOK_CLI "$HOME/.vscode_sock"
     fi
     export VSCODE_IPC_HOOK_CLI="$HOME/.vscode_sock"
-
-    if [ -d "$FB_VSC_BIN_FOLDER" ] && [ "$FB_VSC_BIN_FOLDER" != "$HOME/.fb_vsc_dir" ]; then
-        if [ -L "$HOME/.fb_vsc_dir" ]; then
-            rm "$HOME/.fb_vsc_dir"
-        fi
-        ln -sf $FB_VSC_BIN_FOLDER "$HOME/.fb_vsc_dir" || echo "Failed to create vsc_dir symlink from $FB_VSC_BIN_FOLDER"
-    fi
-    export FB_VSC_BIN_FOLDER="$HOME/.fb_vsc_dir"
 fi
