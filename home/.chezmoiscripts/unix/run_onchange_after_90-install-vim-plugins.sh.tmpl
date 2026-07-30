@@ -34,14 +34,17 @@ ts_site="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site"
 rm -f "$ts_site/parser/tmux.so" "$ts_site/parser-info/tmux.revision"
 rm -rf "$ts_site/queries/tmux"
 
-# First pass: bring plugins to exactly the state pinned in lazy-lock.json —
-# install missing (on a fresh machine this is where nvim-treesitter lands on
-# disk), clean any no longer in the spec, and restore the rest to their locked
-# commits. Deliberately NOT `Lazy! sync`: sync also *updates* past the lock and
-# rewrites lazy-lock.json on every run, drifting a chezmoi-managed file. Bump
-# versions on purpose with `:Lazy update` then
+# First pass: pin plugins to lazy-lock.json. Order matters: `restore` first,
+# checking out every installed plugin to its locked commit (reverting any drift)
+# WITHOUT rewriting the lock — then `install` to clone anything missing (on a
+# fresh machine this is where nvim-treesitter lands on disk) at its locked
+# commit. Deliberately NOT `Lazy! sync`, which *updates* past the lock and
+# rewrites lazy-lock.json every run, drifting a chezmoi-managed file. And NOT
+# install-before-restore: install rewrites the lock to the on-disk commit, so a
+# drifted plugin would get re-pinned to its drifted commit before restore ran.
+# Bump versions on purpose: `:Lazy update` then
 # `chezmoi re-add ~/.config/nvim/lazy-lock.json` (mirrors bump-locks for nix).
-nvim --headless "+Lazy! install" "+Lazy! clean" "+Lazy! restore" +qall
+nvim --headless "+Lazy! restore" "+Lazy! install" +qall
 
 # Second pass: compile parsers and WAIT for them (install()/update() are
 # nvim-treesitter async tasks; :wait() blocks until they finish).
