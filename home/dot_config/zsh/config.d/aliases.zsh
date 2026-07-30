@@ -29,11 +29,15 @@ reload() {
     for v in $preserve; do
         [[ -n ${(P)v} ]] && env_args+=("$v=${(P)v}")
     done
-    # Exec $SHELL by absolute path, not bare `zsh`: with PATH stripped,
-    # `env` would resolve `zsh` against its built-in default path
-    # (/usr/bin:/bin), which on NixOS holds no zsh. $SHELL is preserved
-    # above and is already absolute.
-    exec env -i "${env_args[@]}" "$SHELL" -l
+    # Exec zsh by absolute path, not bare `zsh`: with PATH stripped, `env`
+    # would resolve `zsh` against its built-in default path (/usr/bin:/bin),
+    # which on NixOS holds no zsh. Resolve it here against the *current* PATH
+    # (this shell's nix generation) so reload always lands on a live zsh —
+    # and, unlike $SHELL, without depending on the login shell being zsh (on
+    # Linux it may be bash) or on a possibly-gc'd store path. $commands
+    # entries are already absolute; fall back to $SHELL if zsh isn't on PATH.
+    local zsh_bin=${commands[zsh]:-$SHELL}
+    exec env -i "${env_args[@]}" "$zsh_bin" -l
 }
 
 # Aliases
