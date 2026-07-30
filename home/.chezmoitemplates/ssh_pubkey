@@ -8,9 +8,18 @@
   session's SSH_AUTH_SOCK pointed at a dead socket.
 */ -}}
 {{- $name := .name -}}
-{{- $output := output "ssh-add" "-L" | trim -}}
+{{- /* Tolerate ssh-add's non-zero exit (agent not running, unreachable socket, or
+       no identities) so `output` doesn't abort with a cryptic "exit status 2";
+       the empty-check below then fails with an actionable message. sh isn't on
+       Windows, so only wrap elsewhere. */ -}}
+{{- $output := "" -}}
+{{- if eq .chezmoi.os "windows" -}}
+{{-   $output = output "ssh-add" "-L" | trim -}}
+{{- else -}}
+{{-   $output = output "sh" "-c" "ssh-add -L 2>/dev/null || true" | trim -}}
+{{- end -}}
 {{- if eq $output "" -}}
-{{-   fail (printf "ssh-add -L returned no keys; cannot render pubkey %q. Ensure the SSH agent is running, SSH_AUTH_SOCK is reachable, and the agent has the needed key loaded." $name) -}}
+{{-   fail (printf "ssh-add -L returned no keys; cannot render pubkey %q. Ensure the SSH agent is running (on macOS, the 1Password app must be open with SSH agent enabled — it stops after an app update), SSH_AUTH_SOCK is reachable, and the agent has the needed key loaded." $name) -}}
 {{- end -}}
 {{- $found := "" -}}
 {{- range $output | splitList "\n" -}}

@@ -75,4 +75,7 @@ bin
 # comes from the mount and the container must never mutate the host's store.
 !.chezmoiscripts/unix/03-nix-profile-sync.sh
 .ssh/**
+# nvim's lazy.nvim rewrites lazy-lock.json in place when plugins install/update
+# in the workspace; let it own the lock here so apply doesn't fight that drift.
+.config/nvim/lazy-lock.json
 {{ end }}

@@ -39,3 +39,11 @@ fi
 if [ -f "$HOME/.profile" ]; then
     . "$HOME/.profile"
 fi
+{{ if index . "is_container" | default false -}}
+# In a Coder workspace the claude-code/codex modules idempotently append
+# ~/.local/bin to PATH here (grep-guarded). Emit the identical line so their
+# check finds it already present and they skip the append — otherwise this
+# managed file drifts on every apply. Dead on the interactive path (it's after
+# the exec-to-zsh above); it only ever runs on the non-interactive fall-through.
+export PATH="$PATH:{{ .chezmoi.homeDir }}/.local/bin"
+{{ end -}}

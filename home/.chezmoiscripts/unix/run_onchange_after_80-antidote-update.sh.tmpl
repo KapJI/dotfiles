@@ -4,40 +4,17 @@
 # Antidote plugins hash: {{ include $antidote_plugins | sha256sum }}
 # Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 
-# Update antidote plugins.
+# Maintain the antidote plugin cache.
 #
-# Both antidote itself and every bundle in .zsh_plugins.txt are pinned (the
-# tool via an archive in .chezmoiexternal.toml, the bundles via pin:<sha>), and
-# antidote skips pinned bundles during `antidote update` — so this run no
-# longer rolls anything forward on its own (the self-update also no-ops with no
-# .git). What it still does: purge stale bundles and re-apply the fzf-tab /
-# you-should-use patches below. Version bumps are deliberate: run `bump-locks`
-# (aliases.zsh), then commit; the new SHAs are checked out at the next shell
-# (bundle regen) or on other hosts at the next apply.
-#
-# Force git/ssh into non-interactive mode. Antidote's git wrappers redirect
-# stderr to /dev/null (antidote.zsh's git_fetch/git_pull), so any
-# interactive prompt (SSH host-key confirmation, credential ask) would
-# hang silently waiting on stdin. With these flags any such prompt fails
-# fast with a visible error instead of an invisible deadlock.
-#   GIT_TERMINAL_PROMPT=0       — git refuses to ask for usernames/passwords.
-#   ssh BatchMode=yes           — ssh refuses to ask for passwords.
-#   ssh StrictHostKeyChecking=accept-new — auto-accept never-seen-before
-#                                  hosts (added to known_hosts), still
-#                                  reject changed keys (MITM protection).
+# Antidote and every bundle are pinned (the tool via an archive in
+# .chezmoiexternal.toml, the bundles via pin:<sha>), so there is nothing to
+# fetch: `antidote update` would only attempt its disabled self-update and skip
+# every pinned bundle — a no-op that also exits non-zero — so it is
+# intentionally NOT run. Instead this purges bundles dropped from the list and
+# re-applies our fzf-tab / you-should-use patches, which get clobbered whenever
+# antidote re-checks-out a plugin after a `bump-locks` pin change (the weekly
+# re-run heals them). Version bumps are deliberate: run `bump-locks`, then commit.
 if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
-    export GIT_TERMINAL_PROMPT=0
-    export GIT_SSH_COMMAND="ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new"
-
-    # We patch files inside two plugin clones below (fzf-tab, you-should-use),
-    # leaving their working trees dirty. Antidote updates via `git pull
-    # --rebase`, which refuses to run against a dirty tree unless autostash is
-    # on — and antidote only passes --autostash when ANTIDOTE_GIT_AUTOSTASH is
-    # exactly "true". Without this, the weekly update fails the moment either
-    # upstream gets a commit. With it, our patches are stashed across the
-    # rebase and re-applied afterward (and re-patched below anyway).
-    export ANTIDOTE_GIT_AUTOSTASH=true
-
     antidote_home="${ANTIDOTE_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/antidote}"
     [ -d "$antidote_home" ] || antidote_home="$HOME/Library/Caches/antidote"
 
@@ -66,41 +43,6 @@ if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
                 fi
             done
         '
-    fi
-
-    # Snapshot each plugin's checked-out commit BEFORE update so we can
-    # detect whether anything actually changed. This runs weekly but most
-    # weeks no plugin updates; we only invalidate the zsh compdump cache
-    # when at least one plugin's HEAD commit moved.
-    #
-    # Hash the resolved commit SHA, NOT the .git/HEAD file: every plugin
-    # is checked out on a branch, so HEAD is a symbolic ref
-    # ("ref: refs/heads/master") whose bytes never change as commits
-    # advance — hashing the file would compare equal every week and
-    # silently skip invalidation.
-    _antidote_head_snapshot() {
-        find "$antidote_home" -maxdepth 3 -name .git -type d 2>/dev/null \
-            | sort \
-            | while IFS= read -r gitdir; do
-                git --git-dir="$gitdir" rev-parse HEAD 2>/dev/null
-            done | sha256sum
-    }
-    hash_before=$(_antidote_head_snapshot)
-
-    if ! zsh -c 'source ~/.config/zsh/antidote/antidote.zsh; antidote update'; then
-        echo "antidote update failed — likely an auth or host-key issue." >&2
-        echo "Reproduce with stderr visible: antidote update" >&2
-        exit 1
-    fi
-
-    hash_after=$(_antidote_head_snapshot)
-    if [ "$hash_before" != "$hash_after" ]; then
-        # At least one plugin moved. Invalidate compdump in case the
-        # update added/removed completion files, and drop the static
-        # bundle's .zwc so antidote.zsh regenerates it on next shell
-        # against the updated plugin store.
-        rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*
-        rm -f -- "$HOME/.config/zsh/.zsh_plugins.zsh.zwc"
     fi
 
     # fzf-tab's active-group-style upstream supports only bold|underline|none.
