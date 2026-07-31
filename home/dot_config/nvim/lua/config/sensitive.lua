@@ -2,8 +2,9 @@
 -- unit-tested without booting the config. Consumed by config.autocmds.
 local M = {}
 
--- True when a persistent undo file for `path` would leak secrets. Denylist of
--- known-sensitive locations:
+-- True when persisting `path`'s contents to disk would leak secrets — used
+-- to withhold persistent undo, disable ShaDa (registers/history), and drop
+-- the buffer from saved sessions. Denylist of known-sensitive locations:
 --   - SSH files (~/.ssh/*)
 --   - chezmoi's decrypted-edit temp dirs (…/chezmoi-encrypted<rand>/…)
 --   - AWS creds/config (~/.aws/*)
@@ -13,7 +14,7 @@ local M = {}
 -- Backslashes are normalized to forward slashes first so Windows paths
 -- (C:\Users\…\.ssh\) match too. Returns an explicit boolean so callers and
 -- tests get true/false, never a match string or nil.
-function M.is_sensitive_undo_path(path)
+function M.is_sensitive_path(path)
   path = path:gsub("\\", "/")
   return path:match("/%.ssh/") ~= nil
     or path:match("chezmoi%-encrypted") ~= nil

@@ -93,7 +93,10 @@ local servers = {}
 if executable("nil") then
   table.insert(servers, "nil_ls")
 end
-if executable("pyright-langserver") or executable("pyright") then
+-- pyright's language server binary is pyright-langserver (the `pyright`
+-- CLI is a separate wrapper nvim never launches), so gate on the one that
+-- actually runs — matching every other server here.
+if executable("pyright-langserver") then
   table.insert(servers, "pyright")
 end
 if executable("ruff") then

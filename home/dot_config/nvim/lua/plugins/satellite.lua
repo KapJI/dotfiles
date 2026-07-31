@@ -30,6 +30,7 @@ return {
     -- marks.nvim has no User events; refresh on idle so dm{x}/dm-/dm<space>
     -- propagate to the bar without manual :SatelliteRefresh.
     vim.api.nvim_create_autocmd("CursorHold", {
+      group = vim.api.nvim_create_augroup("user_satellite", { clear = true }),
       callback = function()
         pcall(vim.cmd, "SatelliteRefresh")
       end,

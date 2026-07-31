@@ -3,7 +3,7 @@
 -- editing config — replaces the handlers instead of stacking duplicates.
 local augroup = vim.api.nvim_create_augroup("user_autocmds", { clear = true })
 
--- Never persist undo history for sensitive files. Persistent undo
+-- Never persist sensitive files' contents to disk. Persistent undo
 -- (undofile, options.lua) otherwise leaves a decrypted copy of secrets
 -- on disk indefinitely — most sharply the plaintext temp files chezmoi
 -- writes when you `chezmoi edit` an age-encrypted source, which silently
@@ -36,8 +36,18 @@ vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile", "BufFilePost", "BufWri
   callback = function(ev)
     local name = vim.api.nvim_buf_get_name(ev.buf)
     local resolved = (vim.uv or vim.loop).fs_realpath(name) or name
-    if sensitive.is_sensitive_undo_path(name) or sensitive.is_sensitive_undo_path(resolved) then
+    if sensitive.is_sensitive_path(name) or sensitive.is_sensitive_path(resolved) then
       vim.api.nvim_set_option_value("undofile", false, { buf = ev.buf })
+      -- Undo isn't the only on-disk copy. ShaDa persists register
+      -- contents (the <50 item) plus search/command history at exit, so a
+      -- yank/delete/change in a secret buffer would round-trip plaintext
+      -- through ~/.local/state/nvim/shada. Kill ShaDa session-wide the
+      -- moment any sensitive buffer is touched — it's global (no per-buffer
+      -- shada), and register provenance isn't tracked so a surgical scrub
+      -- can't be made reliable. Cost: this session's oldfiles/marks aren't
+      -- saved — a fair trade against leaking secrets. (Verified: setting
+      -- shadafile=NONE at runtime suppresses the exit write.)
+      vim.o.shadafile = "NONE"
     end
   end,
 })
@@ -53,13 +63,16 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 -- win{save,rest}view so the cursor doesn't jump to the last stripped
 -- line. Skipped where trailing whitespace is meaningful: markdown
 -- (two trailing spaces = hard line break), diff/patch (context lines
--- start with a significant space), mail (signature separator "-- ").
+-- start with a significant space), mail (signature separator "-- "), and
+-- bigfile (snacks tags files >1.5MB; the full-buffer :s is exactly the
+-- expensive pass bigfile exists to skip, and such files are often
+-- generated/minified where trailing bytes are data).
 -- The substitution is syntax-blind, so it also eats *semantic* trailing
 -- spaces inside a string literal / heredoc / YAML block scalar / fixture.
 -- Per-buffer or global escape hatch (mirrors conform's disable_autoformat):
 -- set vim.b.disable_strip_whitespace for one such file, or
 -- vim.g.disable_strip_whitespace to turn it off everywhere.
-local strip_whitespace_excluded = { markdown = true, diff = true, mail = true }
+local strip_whitespace_excluded = { markdown = true, diff = true, mail = true, bigfile = true }
 vim.api.nvim_create_autocmd("BufWritePre", {
   group = augroup,
   pattern = "*",

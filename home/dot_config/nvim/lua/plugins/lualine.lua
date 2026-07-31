@@ -57,8 +57,12 @@ return {
       if abs == "" then
         return "[No Name]"
       end
+      -- Normalize Windows backslash paths to "/" so the cwd ancestry test
+      -- and the "/"-split below work (nvim returns "\" paths on Windows;
+      -- filereadable accepts "/" there too). Mirrors config.sensitive.
+      abs = abs:gsub("\\", "/")
       local display = abs
-      local cwd = vim.fn.getcwd()
+      local cwd = vim.fn.getcwd():gsub("\\", "/")
       if abs:sub(1, #cwd + 1) == cwd .. "/" then
         display = abs:sub(#cwd + 2)
       end

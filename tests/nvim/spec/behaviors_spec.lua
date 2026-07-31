@@ -1,6 +1,6 @@
--- Load the real autocmds under test (undo protection, whitespace strip,
--- title). plenary runs each spec file in its own nvim with minimal_init,
--- so this is a clean instance.
+-- Load the real autocmds under test (undo/shada protection, whitespace
+-- strip, title). plenary runs each spec file in its own nvim with
+-- minimal_init, so this is a clean instance.
 require("config.autocmds")
 
 local uv = vim.uv or vim.loop
@@ -67,6 +67,37 @@ describe("undo secret-protection", function()
   end)
 end)
 
+describe("shada secret-protection", function()
+  -- minimal_init sets shadafile=NONE for isolation; each test resets it to
+  -- "" first so a passing NONE assertion proves the autocmd set it (not the
+  -- harness), then after_each restores NONE so the child nvim's exit write
+  -- stays disabled.
+  after_each(function()
+    vim.o.shadafile = "NONE"
+  end)
+
+  it("kills shada for the session when a .ssh file is read", function()
+    vim.o.shadafile = ""
+    local d = tmpdir()
+    vim.fn.mkdir(d .. "/.ssh", "p")
+    local f = d .. "/.ssh/config"
+    vim.fn.writefile({ "secret" }, f)
+    vim.cmd.edit({ args = { f } })
+    assert.equals("NONE", vim.o.shadafile)
+    vim.cmd("bwipeout!")
+  end)
+
+  it("leaves shada enabled for a normal file", function()
+    vim.o.shadafile = ""
+    local d = tmpdir()
+    local f = d .. "/notes.md"
+    vim.fn.writefile({ "hi" }, f)
+    vim.cmd.edit({ args = { f } })
+    assert.equals("", vim.o.shadafile)
+    vim.cmd("bwipeout!")
+  end)
+end)
+
 describe("whitespace strip on save", function()
   it("preserves trailing bytes in a binary buffer", function()
     local d = tmpdir()
@@ -97,6 +128,17 @@ describe("whitespace strip on save", function()
     vim.api.nvim_buf_set_lines(0, 0, -1, false, { "semantic   " })
     vim.cmd("write! " .. vim.fn.fnameescape(f))
     assert.equals("semantic   ", vim.fn.readfile(f)[1])
+    vim.cmd("bwipeout!")
+  end)
+
+  it("skips the strip for bigfile buffers (snacks >1.5MB)", function()
+    local d = tmpdir()
+    local f = d .. "/big.log"
+    vim.cmd("enew")
+    vim.bo.filetype = "bigfile"
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, { "data   " })
+    vim.cmd("write! " .. vim.fn.fnameescape(f))
+    assert.equals("data   ", vim.fn.readfile(f)[1])
     vim.cmd("bwipeout!")
   end)
 end)

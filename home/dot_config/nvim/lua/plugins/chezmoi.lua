@@ -13,6 +13,7 @@ return {
 
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "conf.chezmoitmpl",
+        group = vim.api.nvim_create_augroup("user_chezmoi", { clear = true }),
         callback = function(args)
           local name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(args.buf), ":t")
           if name == ".chezmoiignore" or name == ".chezmoiremove" then
