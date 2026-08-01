@@ -27,18 +27,20 @@ _zsh_cache_eval() {
     [[ -s $cache ]] && IFS= read -r first < $cache
     if [[ $first != $stamp ]]; then
         [[ -d ${cache:h} ]] || mkdir -p ${cache:h}
-        # Generate into a temp file and swap it in only if the generator
-        # exits 0 — otherwise a failed/partial `fzf --zsh` gets written
-        # straight to the live cache and, matching the stamp, is cached as
-        # success forever. On failure keep the previous good cache; if
-        # there's none, skip init this round.
+        # Generate into a temp file and swap it in atomically — and only if
+        # BOTH the generator exits 0 AND the rename lands. Writing the live
+        # cache directly would let a failed/partial `fzf --zsh` be stamped as
+        # success forever; an unchecked mv would (on a read-only target — an
+        # ACL/immutable bit, or $cache occupied by a dir) go on to source a
+        # STALE cache for a changed binary, or hit `source: no such file` on
+        # first init, and leak the temp. On either failure keep the previous
+        # good cache; if there's none, skip init this round.
         local tmp=$cache.tmp.$$
-        if { print -r -- $stamp; "$@" } >| $tmp; then
-            mv -f -- $tmp $cache
+        if { print -r -- $stamp; "$@" } >| $tmp && mv -f -- $tmp $cache; then
             zcompile -R -- $cache 2>/dev/null   # source below uses the .zwc
         else
             rm -f -- $tmp
-            print -u2 "zsh: $name init failed; keeping previous cache"
+            print -u2 "zsh: $name init/cache-install failed; keeping previous cache"
             [[ -s $cache ]] || return
         fi
     fi
