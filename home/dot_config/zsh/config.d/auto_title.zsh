@@ -135,7 +135,15 @@ add-zsh-hook preexec _atit_preexec_glyph
 # / ghostty / kitty etc. — keep OMZ's original behaviour, which is
 # already OSC 2/1 for xterm-class terminals and natively supports
 # per-pane tab title tracking in those terminals.
-if [[ -n $TMUX ]]; then
+#
+# Second condition: also define it when nothing else provides `title`.
+# In the degraded no-plugins path (antidote loaded no bundle) OMZ's
+# path:lib `title` — which the precmd/preexec hooks above call — never
+# loads, so a non-tmux shell would emit `command not found: title` every
+# prompt, exactly the cascade antidote.zsh's no-bundle branch promises to
+# avoid. Emitting the short string as the title is a fine fallback; the
+# normal non-tmux path (OMZ present) is unaffected.
+if [[ -n $TMUX ]] || (( ! ${+functions[title]} )); then
     function title {
         [[ ${DISABLE_AUTO_TITLE:-} == true ]] && return
         [[ $EMACS == *term* ]] && return
