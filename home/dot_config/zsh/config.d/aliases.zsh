@@ -8,8 +8,15 @@
 reload() {
     local -a preserve=(
         HOME USER SHELL TERM LANG LC_ALL
-        XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_RUNTIME_DIR
+        XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME XDG_RUNTIME_DIR
         COLORTERM TERM_PROGRAM TERM_PROGRAM_VERSION
+        # A terminal shipping a custom $TERM (kitty, ghostty) or a NixOS
+        # profile can point $TERM's terminfo at a session/store path via
+        # these; no rc file repopulates them, so env -i would strip the
+        # pointer and leave $TERM (preserved above) resolving to nothing
+        # — "unknown terminal type" / lost capabilities. Unset on this
+        # setup (plain xterm-256color), so the loop below skips them free.
+        TERMINFO TERMINFO_DIRS
         SSH_AUTH_SOCK SSH_CONNECTION SSH_CLIENT SSH_TTY
         TMUX TMUX_PANE
         DISPLAY WAYLAND_DISPLAY
@@ -138,17 +145,25 @@ bump-locks() {
 
 # yazi wrapper: cd shell to whatever directory yazi was in when you quit.
 # Without this, quitting yazi leaves you in the dir you started from,
-# defeating the point of using it as a navigator. Canonical wrapper from
-# yazi-rs.github.io/docs/quick-start#shell-wrapper. Named yz to avoid
-# colliding with vim-yank muscle memory; type yz to launch.
+# defeating the point of using it as a navigator. Based on the canonical
+# wrapper (yazi-rs.github.io/docs/quick-start#shell-wrapper), hardened
+# below against mktemp and cd failures. Named yz to avoid colliding with
+# vim-yank muscle memory; type yz to launch.
 function yz() {
-  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  # Split declaration from assignment: `local tmp="$(mktemp …)"` always
+  # returns 0 (the `local` succeeds), so a mktemp failure (broken TMPDIR)
+  # would be masked and yazi would run with an empty --cwd-file=, then
+  # `$(< "")` errors. Capture the status and bail instead.
+  local tmp cwd
+  tmp="$(mktemp -t "yazi-cwd.XXXXXX")" || return
   yazi "$@" --cwd-file="$tmp"
   # Preserve Yazi's exit status: the cd/rm below would otherwise make `rm` the
   # function's return value, masking a Yazi failure as success.
   local rc=$?
+  # Fold a failed cd into rc too — changing to yazi's final dir is the whole
+  # point of the wrapper, so a cd that fails must not report success.
   if cwd="$(< "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-    builtin cd -- "$cwd"
+    builtin cd -- "$cwd" || rc=$?
   fi
   rm -f -- "$tmp"
   return $rc
