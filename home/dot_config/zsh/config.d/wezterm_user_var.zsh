@@ -30,6 +30,13 @@ _wezterm_emit_is_tmux() {
     # stdout is captured — e.g. out=$(zsh -ic '…') — emits this OSC into the
     # captured text, corrupting it. The terminal is the only consumer anyway.
     [[ -t 1 ]] || return
+    # Skip terminals that don't speak OSC 1337: the Linux VC and dumb parse
+    # unknown OSC poorly (garbage/bells on some), and neither is wezterm. Same
+    # guard the vendored iterm2 integration already applies
+    # (plugins/iterm2_shell_integration.zsh). Every other TERM still emits —
+    # the detach self-heal depends on plain-ssh shells (TERM=xterm-*)
+    # advertising IS_TMUX=false, and well-behaved terminals ignore unknown OSC.
+    [[ $TERM == (linux|dumb) ]] && return
     if [[ -n "$TMUX" ]]; then
         printf '\033Ptmux;\033\033]1337;SetUserVar=IS_TMUX=dHJ1ZQ==\007\033\\'
     else
