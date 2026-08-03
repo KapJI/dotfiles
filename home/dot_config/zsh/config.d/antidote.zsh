@@ -71,7 +71,17 @@ fi
 # later config file that assumes the plugins loaded. The bundle stays
 # absent, so the next shell retries the regen from scratch.
 if [[ -e $zsh_plugins ]]; then
-    if [[ ! -e $zsh_plugins.zwc || $zsh_plugins -nt $zsh_plugins.zwc ]]; then
+    # Recompile when the source is newer OR the existing .zwc can't be loaded
+    # by the running zsh. zsh embeds its full version in the .zwc and silently
+    # ignores a mismatched one — reparsing the .zsh text every startup, no
+    # error — and since a zsh upgrade leaves that stale .zwc still newer than
+    # its unchanged source, the mtime check alone would keep the dead cache
+    # forever, quietly losing the bytecode savings until the next bundle regen.
+    # `zcompile -t` is a fork-free header read that applies zsh's own compat
+    # rule (and catches a truncated/corrupt .zwc too). Its success line goes to
+    # STDOUT, so silence both streams, not just stderr.
+    if [[ ! -e $zsh_plugins.zwc || $zsh_plugins -nt $zsh_plugins.zwc ]] \
+            || ! zcompile -t -- $zsh_plugins.zwc >/dev/null 2>&1; then
         zcompile -R -- $zsh_plugins.zwc $zsh_plugins
     fi
     source $zsh_plugins
