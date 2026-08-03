@@ -20,6 +20,14 @@ reload() {
         SSH_AUTH_SOCK SSH_CONNECTION SSH_CLIENT SSH_TTY
         TMUX TMUX_PANE
         DISPLAY WAYLAND_DISPLAY
+        # X11/XWayland credential paths: XAUTHORITY (and, rarer, ICEAUTHORITY)
+        # often point at a per-session temp cookie file (GDM/Xwayland's
+        # ~/.mutter-Xwaylandauth.*, or an sshd-created path under X11
+        # forwarding) that no rc file recreates. Dropping it across env -i
+        # leaves DISPLAY set but auth gone — X clients fail "cannot open
+        # display" while the shell looks fine. Unset off-X (this host), so the
+        # loop below skips them free.
+        XAUTHORITY ICEAUTHORITY
         # macOS gives each login session a private TMPDIR (/var/folders/.../T)
         # set by launchd, not by any rc file — so env -i would blank it and
         # $TMPDIR consumers (mktemp, the yz wrapper above) would silently fall
