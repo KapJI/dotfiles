@@ -44,6 +44,15 @@ _zsh_cache_eval() {
             [[ -s $cache ]] || return
         fi
     fi
+    # Bytecode revalidation, independent of the stamp: the stamp keys on the
+    # binary + args, not $ZSH_VERSION, so after a zsh upgrade $cache.zwc still
+    # embeds the old version and zsh silently reparses $cache text every
+    # startup (the stamp still matches, so no regen fires above). Rebuild the
+    # .zwc from the existing text cache — no tool fork — when it's unloadable.
+    # On the regen path above this is a no-op (freshly valid). Same stdout
+    # chatter caveat as antidote.zsh, hence >/dev/null 2>&1.
+    [[ -f $cache.zwc ]] && ! zcompile -t -- $cache.zwc >/dev/null 2>&1 \
+        && zcompile -R -- $cache 2>/dev/null
     source $cache
 }
 
