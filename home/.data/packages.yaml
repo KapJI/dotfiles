@@ -44,6 +44,8 @@
 # Windows continues using winget.
 - winget: Anthropic.ClaudeCode
 
+- nix: codex
+
 - brew-cask: google-chrome
   deb-desktop: google-chrome-stable
   winget: Google.Chrome
@@ -148,7 +150,10 @@
 - nix: lazygit
   winget: JesseDuffield.lazygit
 
-- brew-cask: logi-options+
+# Local-first alternative to Logitech Options+ for HID++ devices.
+# Replaces the logi-options+ manifest entry; the app itself isn't
+# uninstalled automatically, remove it manually if desired.
+- brew-cask: openlogi
 
 - brew-cask: notion
 
