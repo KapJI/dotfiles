@@ -127,6 +127,8 @@
 
 - brew-cask: hazel
 
+- nix: herdr
+
 - brew-cask: hex-fiend
 
 - nix: hexyl
