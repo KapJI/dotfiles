@@ -39,12 +39,10 @@
 
 - brew-cask: chatgpt
 
-# claude-code on macOS+Linux comes from the claude-code-nix flake input
-# (sadjow/claude-code-nix), which auto-bumps within hours of upstream releases.
-# Windows continues using winget.
-- winget: Anthropic.ClaudeCode
+- llm-agents: claude-code
+  winget: Anthropic.ClaudeCode
 
-- nix: codex
+- llm-agents: codex
 
 - brew-cask: google-chrome
   deb-desktop: google-chrome-stable
@@ -182,6 +180,8 @@
   winget: OpenJS.NodeJS
 
 - winget: JanDeDobbeleer.OhMyPosh
+
+- llm-agents: omp
 
 - nix: ov
   winget: noborus.ov

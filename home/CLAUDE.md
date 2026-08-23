@@ -65,6 +65,7 @@ All packages are defined in a single central manifest: `.data/packages.yaml`. Ea
 - nix: ripgrep           # Nix (macOS arm64 + Linux x86_64/aarch64; cross-platform CLI tools)
   nix-desktop: ...       # Nix, included only when is_desktop=true
   nix-server: ...        # Nix, included only when is_desktop=false (Linux server)
+  llm-agents: omp        # numtide/llm-agents.nix flake (AI coding agents)
   brew-cask: ...         # macOS GUI apps
   brew-tap: ...          # Homebrew taps
   brew-appstore: ...     # mas (Mac App Store)
@@ -86,6 +87,9 @@ Default routing:
 - **macOS GUI apps** → `brew-cask:`. Mac App Store apps → `brew-appstore:`.
 - **Linux GUI apps / system libraries** → `deb:` / `deb-desktop:` (apt is intentionally retained for these).
 - **Windows** → `winget:` (preferred) / `scoop:` (fallback).
+- **AI coding agents** → `llm-agents:` — the `numtide/llm-agents.nix` flake, rebuilt daily and
+  prebuilt in `cache.numtide.com`. Prefer it over `nix:` for agents: nixpkgs lags upstream badly
+  and some (`omp`) aren't packaged there at all.
 - **npm-only tools** (no nix/brew packaging) → `npm:` — installed by `macos/run_onchange_after_75-install-npm-packages.sh.tmpl` (macOS-only for now; add a Linux consumer when needed).
 
 Install scripts in `.chezmoiscripts/` read this YAML and install packages for their platform. When adding a new CLI tool, prefer `nix:` and skip `brew:` / `deb:` unless you have a reason (system lib, GUI integration).
@@ -94,9 +98,9 @@ Install scripts in `.chezmoiscripts/` read this YAML and install packages for th
 
 #### Nix flake
 
-A flake at `~/.config/nix-profile/flake.nix` is rendered inline by `home/.chezmoiscripts/unix/run_onchange_before_03-nix-profile-sync.sh.tmpl` from the `nix:` / `nix-desktop:` / `nix-server:` keys. It has two flake inputs:
+A flake at `~/.config/nix-profile/flake.nix` is rendered inline by `home/.chezmoiscripts/unix/run_onchange_before_03-nix-profile-sync.sh.tmpl` from the `nix:` / `nix-desktop:` / `nix-server:` / `llm-agents:` keys. It has two flake inputs:
 - `nixpkgs` (nixos-unstable channel) — most CLI tools.
-- `claude-code-nix` (`github:sadjow/claude-code-nix`) — daily-fresh `claude-code`, decoupled from nixpkgs cadence so it gets bumped within hours of upstream releases.
+- `llm-agents` (`github:numtide/llm-agents.nix`) — AI coding agents (`claude-code`, `codex`, `omp`), rebuilt daily and published prebuilt to `cache.numtide.com`, so they track upstream far faster than nixpkgs. The `llm-agents` input deliberately omits `inputs.nixpkgs.follows`: overriding it changes every derivation hash and misses that cache, which for `omp` means a local ~16 min Rust build on every host. `unix/02-nix-substituters` adds the cache to `/etc/nix/nix.custom.conf` (root-owned, because nix ignores substituters from untrusted users).
 
 `flake.lock` is chezmoi-managed at `home/dot_config/nix-profile/flake.lock` for cross-host reproducibility. The before_03 script reads it from `chezmoi sourceDir` directly (because chezmoi target-state writes happen *after* `before_*` scripts) and chezmoi's later target-write phase is a no-op when content matches.
 

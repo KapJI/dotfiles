@@ -18,18 +18,29 @@ cat > "$HOME/.config/nix-profile/flake.nix" <<'NIXEOF'
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    claude-code-nix.url = "github:sadjow/claude-code-nix";
-    claude-code-nix.inputs.nixpkgs.follows = "nixpkgs";
+    # AI coding agents (claude-code, codex, omp, ...): rebuilt daily, and
+    # published prebuilt to cache.numtide.com for every system we target —
+    # fresher than nixpkgs, and omp isn't in nixpkgs at all.
+    #
+    # Deliberately no `inputs.nixpkgs.follows` here: overriding the inputs
+    # changes every derivation hash and misses that cache, which for omp means
+    # compiling its Rust engine locally (~16 min) on every host. The cache is
+    # added by unix/02-nix-substituters.
+    llm-agents.url = "github:numtide/llm-agents.nix";
   };
 
-  outputs = { self, nixpkgs, claude-code-nix }:
+  outputs = { self, nixpkgs, llm-agents }:
     let
       systems = [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
 
       defaultPaths = pkgs: system: with pkgs; [
-        claude-code-nix.packages.${system}.default
 {{- $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml }}
+{{- range $packages }}
+{{-   if hasKey . "llm-agents" }}
+        llm-agents.packages.${system}.{{ get . "llm-agents" }}
+{{-   end }}
+{{- end }}
 {{- range $packages }}
 {{-   if hasKey . "nix" }}
         {{ get . "nix" }}
