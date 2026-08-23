@@ -1,0 +1,84 @@
+{{ if has .chezmoi.os (list "darwin" "linux") -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Extra binary caches, for flake inputs that aren't in nixpkgs.
+#
+# A flake can declare its own cache via `nixConfig.extra-substituters`, but nix
+# only honours that from a trusted user — and the Determinate installer leaves
+# `trusted-users = root`. So an untrusted user's nix silently ignores it and
+# builds from source instead. Root-owned config is the only place nix will take
+# these from, hence sudo. Runs before 03-nix-profile-sync so the cache is in
+# place before the profile is built.
+#
+# Currently needed for: numtide/llm-agents.nix (claude-code, codex, omp).
+# Verified populated for all three systems we target — without it omp compiles
+# its Rust engine locally, ~16 min per host per bump.
+#
+# Add a cache by adding one "<url> <public-key>" line below; the content hash
+# changes, so this re-runs on every host on the next apply.
+
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
+
+command -v nix >/dev/null 2>&1 || exit 0
+
+caches=(
+    "https://cache.numtide.com niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+)
+
+# Only the ones nix isn't already reporting, so this no-ops on a configured
+# host and never appends a duplicate.
+active=$(nix config show substituters 2>/dev/null || true)
+missing=()
+for cache in "${caches[@]}"; do
+    url=${cache%% *}
+    case " $active " in
+        *" $url "*) ;;
+        *) missing+=("$cache") ;;
+    esac
+done
+
+[ ${#missing[@]} -gt 0 ] || exit 0
+
+# Determinate owns /etc/nix/nix.conf ("do not modify! this file will be
+# replaced!") and !include's nix.custom.conf for exactly this purpose.
+conf=/etc/nix/nix.custom.conf
+[ -e "$conf" ] || conf=/etc/nix/nix.conf
+
+echo "==> adding ${#missing[@]} binary cache(s) to $conf"
+
+# Warn rather than fail: without the cache the profile still builds, just
+# slowly, and a hard failure here would break apply on any host where sudo
+# isn't available at that moment.
+if ! sudo -v; then
+    echo "    sudo unavailable — skipping; nix will build these from source" >&2
+    exit 0
+fi
+
+{
+    echo
+    echo "# Added by chezmoi (unix/02-nix-substituters)."
+    for cache in "${missing[@]}"; do
+        echo "extra-substituters = ${cache%% *}"
+        echo "extra-trusted-public-keys = ${cache#* }"
+    done
+} | sudo tee -a "$conf" >/dev/null
+
+# Substitution happens daemon-side and the daemon reads its config once at
+# startup, so the new cache is inert until it restarts. (`determinate-nixd`
+# has no restart subcommand — go through the service manager.)
+#
+# Non-fatal: the config is already written at this point, so the worst case is
+# that the next build compiles from source until something restarts the daemon.
+# Say so loudly rather than aborting the whole apply.
+if [ "$(uname -s)" = "Darwin" ]; then
+    restart=(launchctl kickstart -k system/systems.determinate.nix-daemon)
+else
+    restart=(systemctl restart nix-daemon)
+fi
+
+if ! sudo "${restart[@]}"; then
+    echo "    could not restart the nix daemon; it will not use the new cache" >&2
+    echo "    until it restarts. Run: sudo ${restart[*]}" >&2
+fi
+{{ end -}}
