@@ -125,7 +125,7 @@
 
 - brew-cask: hazel
 
-- nix: herdr
+- llm-agents: herdr
 
 - brew-cask: hex-fiend
 
