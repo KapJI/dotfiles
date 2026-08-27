@@ -18,6 +18,19 @@ set -euo pipefail
 # Add a cache by adding one "<url> <public-key>" line below; the content hash
 # changes, so this re-runs on every host on the next apply.
 
+{{- if index . "is_container" | default false }}
+
+# This host shares the docker host's /nix, and its nix client talks to that
+# host's daemon. Substitution is decided daemon-side, so a cache written here
+# would be inert no matter where it landed — and there is no /etc/nix to write
+# it to, nor systemd to restart the daemon with. Worse, `sudo tee -a` cannot
+# create /etc/nix's missing parent, so without this guard the failed write trips
+# pipefail and aborts the apply before the profile sync in before_03 ever runs.
+# Configure the cache on the docker host instead.
+echo "==> container: binary caches come from the host's nix daemon; skipping"
+exit 0
+{{- end }}
+
 . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
 
 command -v nix >/dev/null 2>&1 || exit 0
