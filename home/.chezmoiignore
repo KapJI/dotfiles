@@ -106,6 +106,10 @@ bin
 # Exception: agent plugins. The whole point of declaring them is that a rebuilt
 # workspace comes back with the same plugin set as the laptop.
 !.chezmoiscripts/unix/76-install-agent-plugins.sh
+# Exception: the Coder git SSH key fetch. Without it a workspace has no signer
+# at all, and it is the one piece of SSH material a workspace can obtain by
+# itself (from the agent API, no age key involved).
+!.chezmoiscripts/unix/04-coder-gitssh-key.sh
 .ssh/**
 # nvim's lazy.nvim rewrites lazy-lock.json in place when plugins install/update
 # in the workspace; let it own the lock here so apply doesn't fight that drift.
