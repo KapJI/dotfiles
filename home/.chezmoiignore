@@ -106,6 +106,10 @@ bin
 # Exception: agent plugins. The whole point of declaring them is that a rebuilt
 # workspace comes back with the same plugin set as the laptop.
 !.chezmoiscripts/unix/76-install-agent-plugins.sh
+# Exception: the login-shell switch. The image ships bash, and `ssh <workspace>
+# <cmd>` runs the login shell — bash gets no nix profile here, zsh does (see
+# dot_zshenv.tmpl's is_container branch), so remote tooling needs zsh.
+!.chezmoiscripts/unix/91-set-zsh-shell.sh
 # Exception: the Coder git SSH key fetch. Without it a workspace has no signer
 # at all, and it is the one piece of SSH material a workspace can obtain by
 # itself (from the agent API, no age key involved).

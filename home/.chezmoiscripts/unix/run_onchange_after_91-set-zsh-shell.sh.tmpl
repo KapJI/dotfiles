@@ -12,10 +12,19 @@ current_shell="$(dscl . -read /Users/"$USER" UserShell | awk '{print $2}')"
 if [ "$current_shell" != "$zsh_path" ]; then
     sudo dscl . -create "/Users/$USER" UserShell "$zsh_path"
 fi
-{{ else if .is_desktop -}}
+{{ else if or .is_desktop (index . "is_container" | default false) -}}
 # Linux desktop: chsh to a system zsh listed in /etc/shells. GUI terminals and
 # display managers spawn the login shell recorded in /etc/passwd, so a real
-# login shell matters here. chsh-ing to a nix profile path that isn't in
+# login shell matters here.
+#
+# Coder/CI container: same requirement, and here is why it is worth doing. The
+# image's login shell is bash, and `ssh <workspace> <cmd>` runs it — but bash
+# gets no nix profile in the container, because Debian's ~/.bashrc returns early
+# for non-interactive shells and the nix hook is zsh-side. So anything driving
+# the workspace over ssh finds no tools (`herdr --remote` cannot locate the
+# remote herdr). zsh fixes it with nothing new: dot_zshenv.tmpl's is_container
+# branch sources nix-daemon.sh, and zshenv is read by EVERY zsh — including the
+# non-interactive `zsh -c` that ssh uses for a remote command. chsh-ing to a nix profile path that isn't in
 # /etc/shells can lock the user out (PAM/shell-validity check), and even if it
 # succeeds, GC'ing that store path later would invalidate the login shell — so
 # require a system zsh.
@@ -34,10 +43,21 @@ if [ -z "$zsh_path" ]; then
     exit 0
 fi
 
-current_shell="$(readlink -f "$SHELL")"
+# getent, not $SHELL: $SHELL reflects the shell this session started under, so
+# after a successful chsh it would keep reporting the old one until the next
+# login and the change would look like it never happened.
+current_shell="$(readlink -f "$(getent passwd "$(id -un)" | cut -d: -f7)")"
 new_shell="$(readlink -f "$zsh_path")"
 if [ "$current_shell" != "$new_shell" ]; then
+{{- if (index . "is_container" | default false) }}
+    # Plain chsh fails in the container with a PAM password prompt; passwordless
+    # sudo is available instead. -n so a sudo that does want a password skips
+    # rather than hanging a non-interactive apply forever.
+    sudo -n chsh -s "$zsh_path" "$(id -un)" \
+        || echo "could not chsh to $zsh_path; login shell left as $current_shell"
+{{- else }}
     chsh -s "$zsh_path"
+{{- end }}
 fi
 {{ else -}}
 # Linux server (headless): the login shell in /etc/passwd stays bash on
