@@ -51,6 +51,11 @@
 
 - llm-agents: codex
 
+# codex's Linux sandbox. Without it codex warns on every start and falls back
+# to a bundled copy. nix-server, not nix: bubblewrap has no darwin platform, and
+# nix-desktop is shared with macOS — both would break the Mac profile build.
+- nix-server: bubblewrap
+
 - brew-cask: google-chrome
   deb-desktop: google-chrome-stable
   winget: Google.Chrome
