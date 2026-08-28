@@ -26,8 +26,8 @@
 # bundles during `antidote update` (run_onchange_after_80), so shells no
 # longer roll forward on their own. Update deliberately with `bump-locks`
 # (aliases.zsh): it rewrites these SHAs to each repo's upstream HEAD (and bumps
-# the nix flake) and re-adds the changed files to the chezmoi source; then
-# review `chezmoi cd && git diff` and commit. To bump a single
+# the nix flake), re-adds the changed files to the chezmoi source and commits
+# them (never pushes); then review `chezmoi cd && git show`. To bump a single
 # plugin, edit its SHA by hand and `chezmoi apply`. To see what a SHA is:
 # `git -C "$(antidote path <owner>/<repo>)" describe --tags --always`.
 # NOTE: ohmyzsh appears on several lines but is ONE clone, so all its lines

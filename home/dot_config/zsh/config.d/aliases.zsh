@@ -80,8 +80,10 @@ alias czmcd='cd "$(chezmoi source-path)"'
 #      so ohmyzsh's several lines stay in lockstep on one commit; a failed
 #      lookup leaves that pin untouched.
 # (antidote itself is pinned in .chezmoiexternal.toml, a chezmoi-config file
-# with no re-add target — bump it there by hand.) After running, review/commit:
-#   chezmoi cd && git diff
+# with no re-add target — bump it there by hand.) On success it commits just
+# those two source files as "deps: bump flake.lock + plugin pins"; it never
+# pushes, and it commits nothing if any pin lookup failed. After running:
+#   chezmoi cd && git show   # then `git push` when you are happy
 # The new plugin SHAs are checked out at the next shell (antidote regenerates
 # its static bundle and syncs pins), or on other hosts at the next apply.
 bump-locks() {
@@ -143,12 +145,33 @@ bump-locks() {
     }
     if (( rc )); then
         print -u2 "bump-locks: FINISHED WITH ERRORS — some pins were left unchanged (see warnings above)."
-        print -u2 "Review carefully before committing: chezmoi cd && git diff"
-    else
-        print "bump-locks: flake.lock + plugin pins updated and re-added to chezmoi."
-        print "Review/commit: chezmoi cd && git diff"
+        print -u2 "Nothing was committed. Review carefully: chezmoi cd && git diff"
+        return $rc
     fi
-    return $rc
+    # Commit only the two files this function re-added, by their source paths —
+    # `git commit -- <paths>` so an unrelated edit sitting in the working tree
+    # (or staged) never rides along in a "deps: bump" commit. Never push:
+    # bumping is deliberate, publishing it to the fleet is a separate decision.
+    print "==> git commit"
+    local src=$(chezmoi source-path)
+    local -a paths
+    paths=(${(f)"$(chezmoi source-path ~/.config/nix-profile/flake.lock $f)"})
+    if [[ -z $src ]] || (( ! $#paths )); then
+        print -u2 "bump-locks: WARNING: could not resolve chezmoi source paths — nothing committed."
+        print -u2 "Commit by hand: chezmoi cd && git diff"
+        return 1
+    fi
+    if git -C $src diff --quiet HEAD -- $paths; then
+        print "bump-locks: locks already at upstream HEAD — nothing to commit."
+        return 0
+    fi
+    git -C $src commit -q -m "deps: bump flake.lock + plugin pins" -- $paths || {
+        print -u2 "bump-locks: WARNING: git commit failed — the bump is still in the working tree."
+        print -u2 "Commit by hand: chezmoi cd && git diff"
+        return 1
+    }
+    print "bump-locks: flake.lock + plugin pins bumped and committed (not pushed)."
+    print "Review: chezmoi cd && git show    Publish: git push"
 }
 
 # yazi wrapper: cd shell to whatever directory yazi was in when you quit.

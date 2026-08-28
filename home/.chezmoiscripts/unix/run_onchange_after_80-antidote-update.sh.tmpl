@@ -13,7 +13,7 @@
 # intentionally NOT run. Instead this purges bundles dropped from the list and
 # re-applies our fzf-tab / you-should-use patches, which get clobbered whenever
 # antidote re-checks-out a plugin after a `bump-locks` pin change (the weekly
-# re-run heals them). Version bumps are deliberate: run `bump-locks`, then commit.
+# re-run heals them). Version bumps are deliberate: run `bump-locks` (it commits).
 if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
     antidote_home="${ANTIDOTE_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/antidote}"
     [ -d "$antidote_home" ] || antidote_home="$HOME/Library/Caches/antidote"

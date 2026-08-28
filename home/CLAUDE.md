@@ -106,11 +106,13 @@ A flake at `~/.config/nix-profile/flake.nix` is rendered inline by `home/.chezmo
 
 Bump versions on a primary host with `bump-locks` (see Zsh Configuration — it bumps the flake **and** the antidote plugin pins in one shot):
 ```bash
-bump-locks           # nix flake update + antidote plugin pins, then chezmoi re-add
-chezmoi cd && git diff
-git commit -am "deps: bump flake.lock + plugin pins"
+bump-locks           # nix flake update + plugin pins + chezmoi re-add + commit
+chezmoi cd && git show   # review the "deps: bump flake.lock + plugin pins" commit
 git push
 ```
+`bump-locks` commits the two re-added files itself (by source path, so unrelated
+working-tree edits stay out of it) but never pushes; it skips the commit
+entirely if any pin lookup failed, leaving the bump in the working tree.
 Other hosts: `chezmoi update` → before_03 reruns (lock hash changed) → `nix profile remove` + `nix profile add` rebuilds the profile entry atomically.
 
 Scripts that invoke nix-installed tools (`uv`, `nvim`, etc.) source `/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh` at the top so the nix profile is on PATH (chezmoi runs each script in a fresh non-interactive shell).
@@ -150,9 +152,9 @@ The plugin manager is **antidote** (configured in `dot_config/zsh/dot_zsh_plugin
 Every plugin is **pinned to a commit SHA** (`pin:<sha>` in `dot_zsh_plugins.txt`) for cross-host reproducibility, mirroring `flake.lock` and the tag-pinned tmux plugins. antidote itself is pinned too (an archive at a SHA in `.chezmoiexternal.toml`, which also disables its self-update). `antidote update` (weekly, `run_onchange_after_80`) skips pinned bundles, so shells don't roll forward on their own. Bump deliberately with `bump-locks` (also bumps the nix flake):
 
 ```bash
-bump-locks         # rewrites every pin: to upstream HEAD + nix flake, then chezmoi re-add
-# then review/commit:
-chezmoi cd && git diff
+bump-locks         # rewrites every pin: to upstream HEAD + nix flake, re-adds, commits
+# then review and push:
+chezmoi cd && git show
 ```
 
 To bump one plugin, edit its SHA by hand and `chezmoi apply`. `ohmyzsh` spans several lines but is one clone — all its lines must share the same SHA (antidote errors on a pin conflict within a bundle). antidote itself bumps by editing the SHA in `.chezmoiexternal.toml`.
