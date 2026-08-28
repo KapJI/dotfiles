@@ -61,10 +61,8 @@ echo "== shellcheck =="
 if command -v shellcheck >/dev/null 2>&1; then
     for f in $(find "$root/home/.chezmoiscripts" -name '*.sh.tmpl' -type f | sort); do
         # Another OS's scripts can call that OS's binaries at *render* time
-        # (macos/50 runs sw_vers), which fails here for a reason that says
-        # nothing about the script. chezmoi doesn't render them on this host
-        # either — .chezmoiignore drops the directory — so leave them to the
-        # host that runs them, per the note above about host-gated branches.
+        # (macos/50 runs sw_vers). chezmoi doesn't render them on this host
+        # either — .chezmoiignore drops the directory — so leave them be.
         case "$f" in
         */macos/*) [ "$(uname -s)" = Darwin ] || continue ;;
         */linux/*) [ "$(uname -s)" = Linux ] || continue ;;
@@ -75,9 +73,8 @@ if command -v shellcheck >/dev/null 2>&1; then
             continue
         fi
         nonblank "$r" || continue # host-gated script renders empty here
-        # -e SC2317 (unreachable command): a host-gated template can render to
-        # an early `exit 0` followed by the branch this host doesn't take — see
-        # unix/02-nix-substituters in a container. Correct output, not dead code.
+        # -e SC2317: a host-gated template can render an early `exit 0` ahead
+        # of the branch this host skips (02-nix-substituters in a container).
         if ! out=$(printf '%s\n' "$r" | shellcheck -e SC2317 - 2>&1); then
             printf 'FAIL shellcheck: %s\n%s\n' "$f" "$out"
             rc=1

@@ -1,13 +1,8 @@
-{{- /* In an ephemeral container the account signer (1Password/op-ssh-sign) is absent.
-       Auth and signing are separate problems there:
-         - auth: Coder exports GIT_SSH_COMMAND="coder gitssh --", and that key is
-           already registered on GitHub, so rewrite github.com to SSH and let it
-           authenticate. HTTPS is not an option: the Coder external-auth token is
-           read-only, so pushes over it 403.
-         - signing: unix/before_04 fetches that same Coder key to disk (Coder
-           otherwise keeps it in a temp file for one ssh call only) and it is
-           registered on GitHub as a signing key, so sign with it. No key means
-           signing stays off, so a keyless container still works. */ -}}
+{{- /* An ephemeral container has no account signer (1Password's op-ssh-sign).
+       Instead: Coder's GIT_SSH_COMMAND=`coder gitssh` carries a key GitHub
+       already accepts, so rewrite github.com to SSH — HTTPS cannot work, the
+       Coder external-auth token is read-only and pushes over it 403.
+       unix/before_04 puts that same key on disk, and it signs too. */ -}}
 {{- $isc := index . "is_container" | default false -}}
 {{- $ckey := joinPath .chezmoi.homeDir ".ssh/coder_gitssh_key.pub" -}}
 {{- $hasckey := and $isc (stat $ckey) -}}

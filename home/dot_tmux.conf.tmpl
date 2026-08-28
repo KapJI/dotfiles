@@ -8,9 +8,8 @@ set -g mouse on
 set -g allow-passthrough on
 
 # Let applications set the outer terminal's clipboard with OSC 52. tmux's
-# default (`external`) silently drops an application's OSC 52 — that is what
-# broke copy in herdr; nvim was exempt because with $TMUX set it copies via
-# `tmux load-buffer`, i.e. as tmux itself, which `external` allows.
+# default (`external`) drops an application's OSC 52 — that broke copy in
+# herdr; nvim was exempt, with $TMUX set it copies via tmux itself.
 set -g set-clipboard on
 
 # History buffer (default ~2000)
