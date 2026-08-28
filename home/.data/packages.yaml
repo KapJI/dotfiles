@@ -378,6 +378,13 @@
 - claude-plugin: claude-md-management@claude-plugins-official
   agent-marketplace: anthropics/claude-plugins-official
 
+# Multi-agent PR review with confidence-based scoring to filter false
+# positives, plus the `ultra` cloud mode. ~20 tok always-on, the cheapest thing
+# in the set, and a different mechanism from pr-review-toolkit's subagent
+# fan-out rather than a duplicate of it — worth carrying both.
+- claude-plugin: code-review@claude-plugins-official
+  agent-marketplace: anthropics/claude-plugins-official
+
 # Official GitHub MCP server: issues, PRs, code review, search. Claude-only
 # here on purpose — codex ships its own GitHub integration, and wiring this one
 # in would mean re-adding the whole 290-plugin claude-plugins-official snapshot
@@ -394,9 +401,15 @@
 
 # Six specialist review agents (code-reviewer, comment-analyzer,
 # pr-test-analyzer, silent-failure-hunter, type-design-analyzer,
-# code-simplifier) fanned out from one /review-pr command. Note it ships its own
-# code-simplifier agent, a longer rewrite of the standalone code-simplifier
-# plugin's — installing both leaves two agents of that name.
+# code-simplifier) fanned out from one /review-pr command. Its code-simplifier
+# agent is a longer rewrite of the standalone code-simplifier plugin's (5292 vs
+# 3129 bytes, same agent name), which is why that plugin is deliberately NOT
+# declared and was uninstalled: two agents of one name, no upside.
+#
+# Costs ~2,033 tok always-on — six agent descriptions sit in context on every
+# session, ~100x code-review's ~20. Carried knowingly, for the four specialists
+# nothing else here provides: silent-failure-hunter, comment-analyzer,
+# pr-test-analyzer, type-design-analyzer.
 - claude-plugin: pr-review-toolkit@claude-plugins-official
   agent-marketplace: anthropics/claude-plugins-official
 
