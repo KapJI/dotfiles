@@ -1,23 +1,11 @@
 #!/usr/bin/env bash
-# Coder workspace: make the Coder git SSH key available for signing commits.
+# Sign commits in a Coder workspace with the Coder git SSH key: the same key
+# `coder gitssh` pushes with, registered on GitHub for signing too, so nothing
+# is enrolled per workspace. gitssh only materialises it for one ssh call, so
+# refetch it from the agent endpoint gitssh uses — a plain GET any process here
+# can already make; what is new is only that the copy persists (0600).
 #
-# The account signer (1Password's op-ssh-sign) doesn't exist in a workspace, but
-# Coder already holds a per-account git SSH key, and `coder gitssh` — which the
-# workspace wires into GIT_SSH_COMMAND — authenticates GitHub pushes with it.
-# That key is registered on GitHub for signing too, so reusing it means there is
-# nothing to enrol per workspace: a rebuilt one just fetches it again.
-#
-# gitssh only materialises the key in a temp file for the length of one ssh
-# call, so pull it from the same agent endpoint gitssh uses. That is a plain GET
-# with the agent token, which any process in the workspace can already make;
-# what is new here is only that the copy persists (0600, on the home volume).
-#
-# A `before_` script because dot_gitconfig.tmpl stats the public key to decide
-# whether to enable signing at all. It writes ~/.ssh/allowed_signers itself
-# rather than leaving that to a managed file: .chezmoiignore ignores .ssh/**
-# wholesale in a container, and re-including one file there also resurfaces the
-# pubkeys the block above deliberately hides (those render from `ssh-add -L`,
-# which fails an apply in a workspace with no agent).
+# `before_` because dot_gitconfig.tmpl stats the pubkey to decide on signing.
 set -euo pipefail
 
 # jq comes from the nix profile; chezmoi runs each script in a bare shell.
@@ -27,13 +15,12 @@ if [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
 fi
 
 KEY="${HOME}/.ssh/coder_gitssh_key"
-SIGNERS="${HOME}/.ssh/allowed_signers"
 
 # Not a Coder workspace: nothing to fetch, and no key means signing stays off.
 if [ -z "${CODER_AGENT_TOKEN:-}" ] || [ -z "${CODER_AGENT_URL:-}" ]; then
     exit 0
 fi
-if [ -s "${KEY}" ] && [ -s "${KEY}.pub" ] && [ -s "${SIGNERS}" ]; then
+if [ -s "${KEY}" ] && [ -s "${KEY}.pub" ]; then
     exit 0
 fi
 
@@ -56,11 +43,6 @@ printf '%s\n' "${priv}" >"${KEY}"
 printf '%s\n' "${pub}" >"${KEY}.pub"
 chmod 600 "${KEY}"
 chmod 644 "${KEY}.pub"
-
-# Trust our own signature, or `git log --show-signature` can't verify the
-# commits we just made (gpg.ssh.allowedSignersFile points here).
-printf '%s %s\n' '{{ .git_email }}' "${pub}" >"${SIGNERS}"
-chmod 644 "${SIGNERS}"
 
 # Fail loudly on a truncated key instead of letting git report an unhelpful
 # signing error on every single commit.
