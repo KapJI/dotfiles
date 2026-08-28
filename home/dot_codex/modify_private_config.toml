@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+# Ensure `codex --approve-for-me` is the default, without owning the file.
+#
+# ~/.codex/config.toml is codex's own state: plugin enablement, marketplace
+# sources, hooks.state trust hashes, per-project trust levels, and MCP servers
+# the ChatGPT app injects. A normal managed file would fight every one of those
+# writes, the same reason ~/.claude/settings.json stays unmanaged. A `modify_`
+# script instead receives the current target on stdin and returns the new
+# contents on stdout, so it can assert three keys and leave the rest untouched.
+#
+# The three keys are exactly what --approve-for-me sets, read out of the
+# binary's own flag definition:
+#     approvals_reviewer="auto_review" approval_policy="on-request"
+#     sandbox_mode="workspace-write"
+# approval_policy and sandbox_mode are confirmed settable — `codex doctor`
+# reflects them back as "approval policy OnRequest" and a restricted sandbox.
+# approvals_reviewer is NOT confirmed: codex silently ignores unknown config
+# keys (a deliberately bogus key still reports "config.toml parse ok") and
+# exposes no resolved-config dump. If it is wrong the setting simply does
+# nothing and approvals stay on-request — it fails closed, not open.
+#
+# TOML ordering matters: bare keys belong to the root table, so they must come
+# before the first [section] header or they would silently land inside whatever
+# table precedes them. Hence the insert-before-first-header logic below rather
+# than a plain append.
+
+set -euo pipefail
+
+awk '
+BEGIN {
+    split("approvals_reviewer|approval_policy|sandbox_mode", k, "|")
+    val["approvals_reviewer"] = "\"auto_review\""
+    val["approval_policy"]    = "\"on-request\""
+    val["sandbox_mode"]       = "\"workspace-write\""
+    marker = "# Managed by chezmoi: makes `codex --approve-for-me` the default."
+}
+{ line[NR] = $0 }
+END {
+    # Where does the root table end? At the first [table] / [[array]] header.
+    first_header = 0
+    for (i = 1; i <= NR; i++) {
+        if (line[i] ~ /^[[:space:]]*\[/) { first_header = i; break }
+    }
+    limit = (first_header ? first_header - 1 : NR)
+
+    # Rewrite any of our keys already in the root table; note which we saw.
+    for (i = 1; i <= limit; i++) {
+        for (j in k) {
+            if (line[i] ~ "^[[:space:]]*" k[j] "[[:space:]]*=") {
+                line[i] = k[j] " = " val[k[j]]
+                seen[k[j]] = 1
+            }
+        }
+        if (line[i] == marker) seen_marker = 1
+    }
+
+    missing = 0
+    for (j in k) if (!(k[j] in seen)) missing = 1
+
+    for (i = 1; i <= NR; i++) {
+        # Emit whatever is absent just before the root table closes.
+        if (missing && first_header && i == first_header) emit(line[i - 1])
+        print line[i]
+    }
+    # No headers at all (or an empty file): everything is root table, append.
+    if (missing && !first_header) emit(line[NR])
+}
+
+# prev is the line we are inserting after, so a blank separator is only added
+# when there is not already one — otherwise a re-run would grow the file.
+function emit(prev,   j) {
+    if (!seen_marker) {
+        if (NR > 0 && prev != "") print ""
+        print marker
+    }
+    for (j = 1; j <= 3; j++) if (!(k[j] in seen)) print k[j] " = " val[k[j]]
+    if (first_header) print ""
+    missing = 0
+}
+'
