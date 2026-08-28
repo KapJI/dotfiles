@@ -392,6 +392,14 @@
   omp-plugin: "@dietrichgebert/ponytail"
   agent-marketplace: DietrichGebert/ponytail
 
+# Six specialist review agents (code-reviewer, comment-analyzer,
+# pr-test-analyzer, silent-failure-hunter, type-design-analyzer,
+# code-simplifier) fanned out from one /review-pr command. Note it ships its own
+# code-simplifier agent, a longer rewrite of the standalone code-simplifier
+# plugin's — installing both leaves two agents of that name.
+- claude-plugin: pr-review-toolkit@claude-plugins-official
+  agent-marketplace: anthropics/claude-plugins-official
+
 # Pyright language server for Python. Claude-only: it plugs into Claude Code's
 # own LSP component type, which codex and omp do not share.
 - claude-plugin: pyright-lsp@claude-plugins-official

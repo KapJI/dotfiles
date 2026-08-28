@@ -79,7 +79,11 @@ All packages are defined in a single central manifest: `.data/packages.yaml`. Ea
   scoop: ripgrep         # Windows Scoop
   uv-tool: ...           # Python tools via uv (Windows; Unix uses nix:)
   ps-module: ...         # PowerShell modules from PSGallery (Windows)
-  npm: agent-tty         # npm globals into the ~/.npm prefix (macOS-only for now)
+  npm: agent-tty         # npm globals into the ~/.npm prefix (desktop + container)
+  claude-plugin: ...     # Claude Code plugin, "<plugin>@<marketplace>"
+  codex-plugin: ...      # Codex plugin, "<plugin>@<marketplace>"
+  omp-plugin: ...        # omp (Pi harness) plugin: npm spec or git: ref
+  agent-marketplace: ... # marketplace source added before the two above install
 ```
 
 Default routing:
@@ -90,7 +94,10 @@ Default routing:
 - **AI coding agents** → `llm-agents:` — the `numtide/llm-agents.nix` flake, rebuilt daily and
   prebuilt in `cache.numtide.com`. Prefer it over `nix:` for agents: nixpkgs lags upstream badly
   and some (`omp`) aren't packaged there at all.
-- **npm-only tools** (no nix/brew packaging) → `npm:` — installed by `macos/run_onchange_after_75-install-npm-packages.sh.tmpl` (macOS-only for now; add a Linux consumer when needed).
+- **npm-only tools** (no nix/brew packaging) → `npm:` — installed by `unix/run_onchange_after_75-install-npm-packages.sh.tmpl` into the `~/.npm` prefix (the nix node's own global prefix is a read-only store path). `.chezmoiignore` gates the script, and `.claude/skills/agent-tty` with it, to desktop + container: headless servers have no TUI to drive.
+- **AI agent plugins** → `claude-plugin:` / `codex-plugin:` / `omp-plugin:` / `agent-marketplace:` — installed by `unix/run_onchange_after_76-install-agent-plugins.sh.tmpl` for whichever agents the host has. One entry per logical plugin; the per-agent keys are install methods for the *same* plugin, exactly as `brew-cask`/`deb`/`winget` are for an OS package. Claude and Codex take `<plugin>@<marketplace>` and need `agent-marketplace:` (the source added first); omp has no marketplace and takes an npm spec or `git:` ref, which needs **`nix: bun`** — `omp install` shells out to bun and fails without it. Every step in the script is non-fatal: a registry being down must never fail an apply.
+
+**Coder/CI containers ignore `.chezmoiscripts/**` wholesale** (last block of `.chezmoiignore`, placed last so it wins). A new script that must run in a workspace needs its own `!.chezmoiscripts/<dir>/<name>.sh` re-include there, keyed on the *target* name — no `run_onchange_after_` prefix. Three are re-included today: the nix-profile sync, npm packages, and agent plugins.
 
 Install scripts in `.chezmoiscripts/` read this YAML and install packages for their platform. When adding a new CLI tool, prefer `nix:` and skip `brew:` / `deb:` unless you have a reason (system lib, GUI integration).
 
