@@ -94,6 +94,9 @@ bin
 # Exception: npm packages. agent-tty drives TUIs, which is exactly what an
 # agent workspace needs; the container has its own writable ~/.npm prefix.
 !.chezmoiscripts/unix/75-install-npm-packages.sh
+# Exception: agent plugins. The whole point of declaring them is that a rebuilt
+# workspace comes back with the same plugin set as the laptop.
+!.chezmoiscripts/unix/76-install-agent-plugins.sh
 .ssh/**
 # nvim's lazy.nvim rewrites lazy-lock.json in place when plugins install/update
 # in the workspace; let it own the lock here so apply doesn't fight that drift.

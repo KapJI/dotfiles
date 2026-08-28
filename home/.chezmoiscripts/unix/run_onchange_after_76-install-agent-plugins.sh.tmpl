@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+
+# Install AI-agent plugins from packages.yaml (`claude-plugin:` / `codex-plugin:`
+# / `omp-plugin:` / `agent-marketplace:` keys) for whichever of claude, codex and
+# omp exist on this host. Without this, plugins live only in each agent's own
+# state dir — hand-installed per machine, never reaching a rebuilt container.
+#
+# An `after` script for the same reason as 75: the agents come from the nix
+# profile that unix/before_03-nix-profile-sync builds, so in the before phase
+# they would not exist yet on a fresh machine.
+#
+# Every step is non-fatal. A marketplace being unreachable, or one agent's
+# registry being down, must never fail the whole `chezmoi apply`.
+#
+# Run weekly (plugin installs always fetch latest).
+# Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
+
+{{- $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml -}}
+{{- $claudeMarkets := list -}}
+{{- $claudePlugins := list -}}
+{{- $codexMarkets := list -}}
+{{- $codexPlugins := list -}}
+{{- $ompPlugins := list -}}
+{{- range $packages -}}
+    {{- $market := "" -}}
+    {{- if hasKey . "agent-marketplace" -}}
+        {{- $market = get . "agent-marketplace" -}}
+    {{- end -}}
+    {{- if hasKey . "claude-plugin" -}}
+        {{- $claudePlugins = append $claudePlugins (get . "claude-plugin") -}}
+        {{- if $market -}}{{- $claudeMarkets = append $claudeMarkets $market -}}{{- end -}}
+    {{- end -}}
+    {{- if hasKey . "codex-plugin" -}}
+        {{- $codexPlugins = append $codexPlugins (get . "codex-plugin") -}}
+        {{- if $market -}}{{- $codexMarkets = append $codexMarkets $market -}}{{- end -}}
+    {{- end -}}
+    {{- if hasKey . "omp-plugin" -}}
+        {{- $ompPlugins = append $ompPlugins (get . "omp-plugin") -}}
+    {{- end -}}
+{{- end }}
+
+set -e
+
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
+
+# Coder's claude-code / codex modules install into ~/.local/bin, which a
+# non-interactive shell does not have on PATH. Look there too so a workspace
+# gets its plugins even though its agents are not the nix-profile ones.
+PATH="$HOME/.local/bin:$PATH"
+export PATH
+
+{{ if $claudePlugins }}
+if command -v claude >/dev/null 2>&1; then
+{{- range (uniq $claudeMarkets) }}
+    claude plugin marketplace add {{ . | quote }} >/dev/null 2>&1 \
+        || echo "claude: marketplace {{ . }} already configured or unreachable"
+{{- end }}
+    # --yes: accept the marketplace-declared install command; without it the
+    # CLI waits for a confirmation nobody is here to give.
+{{- range $claudePlugins }}
+    claude plugin install --yes {{ . | quote }} >/dev/null 2>&1 \
+        || echo "claude: {{ . }} already installed or unavailable"
+{{- end }}
+else
+    echo "claude not on PATH; skipping its plugins"
+fi
+{{ end }}
+
+{{- if $codexPlugins }}
+if command -v codex >/dev/null 2>&1; then
+{{- range (uniq $codexMarkets) }}
+    codex plugin marketplace add {{ . | quote }} >/dev/null 2>&1 \
+        || echo "codex: marketplace {{ . }} already configured or unreachable"
+{{- end }}
+{{- range $codexPlugins }}
+    codex plugin add {{ . | quote }} >/dev/null 2>&1 \
+        || echo "codex: {{ . }} already installed or unavailable"
+{{- end }}
+else
+    echo "codex not on PATH; skipping its plugins"
+fi
+{{ end }}
+
+{{- if $ompPlugins }}
+if ! command -v omp >/dev/null 2>&1; then
+    echo "omp not on PATH; skipping its plugins"
+elif ! command -v bun >/dev/null 2>&1; then
+    # `omp install` shells out to bun for npm specs and git refs alike. bun is
+    # declared in packages.yaml, but on a fresh host the nix profile is built by
+    # before_03 in this same apply, so warn rather than fail — the weekly re-run
+    # picks it up.
+    echo "bun not on PATH; skipping omp plugins (nix: bun should provide it)"
+else
+{{- range $ompPlugins }}
+    omp install {{ . | quote }} >/dev/null 2>&1 \
+        || echo "omp: {{ . }} already installed or unavailable"
+{{- end }}
+fi
+{{ end }}

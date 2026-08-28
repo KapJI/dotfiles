@@ -30,6 +30,12 @@
 
 - deb: build-essential
 
+# Runtime for omp's plugin installer: `omp install` shells out to bun for both
+# npm specs and git refs and fails with "Executable not found in $PATH: bun"
+# without it. Not used directly — it is here so the agent-plugin entries at the
+# bottom of this file can install at all.
+- nix: bun
+
 - scoop: CascadiaCode-NF-Mono
 
 # Icon-only Nerd Font, used as fallback for glyphs missing from MesloLGS NF
@@ -357,3 +363,47 @@
 - brew-vscode: ms-python.debugpy
 - brew-vscode: ms-python.python
 - brew-vscode: ms-python.vscode-pylance
+
+# AI agent plugins. One entry per logical plugin; the per-agent keys are
+# install methods for the SAME plugin, exactly like brew-cask/deb/winget are
+# for an OS package. Consumed by unix/run_onchange_after_76-install-agent-plugins.
+#   claude-plugin: / codex-plugin:  "<plugin>@<marketplace>"; the marketplace
+#                                   named after the @ is added first, from
+#                                   agent-marketplace:.
+#   omp-plugin:                     npm spec or `git:` ref — omp has no
+#                                   marketplace, it installs the package direct.
+
+# Audit and maintain CLAUDE.md files. Claude-only by nature — there is no
+# codex/omp analogue of CLAUDE.md to manage.
+- claude-plugin: claude-md-management@claude-plugins-official
+  agent-marketplace: anthropics/claude-plugins-official
+
+# Official GitHub MCP server: issues, PRs, code review, search. Claude-only
+# here on purpose — codex ships its own GitHub integration, and wiring this one
+# in would mean re-adding the whole 290-plugin claude-plugins-official snapshot
+# to codex for a single entry.
+- claude-plugin: github@claude-plugins-official
+  agent-marketplace: anthropics/claude-plugins-official
+
+# Biases the agent toward writing less code. Ships adapters for 14 harnesses;
+# omp is the Pi harness, which takes the npm package rather than a marketplace.
+- claude-plugin: ponytail@ponytail
+  codex-plugin: ponytail@ponytail
+  omp-plugin: "@dietrichgebert/ponytail"
+  agent-marketplace: DietrichGebert/ponytail
+
+# Pyright language server for Python. Claude-only: it plugs into Claude Code's
+# own LSP component type, which codex and omp do not share.
+- claude-plugin: pyright-lsp@claude-plugins-official
+  agent-marketplace: anthropics/claude-plugins-official
+
+# Process skills: TDD, systematic debugging, verification before completion.
+# No codex-plugin key on purpose — codex already ships superpowers via its own
+# openai-curated marketplace, and claude-plugins-official resolves to the same
+# upstream (obra/superpowers), so declaring it would install a second copy of
+# the same thing. omp installs that upstream directly, so its version tracks
+# git HEAD while Claude's tracks the marketplace pin; that skew is each
+# ecosystem's own pinning, not a mistake.
+- claude-plugin: superpowers@claude-plugins-official
+  omp-plugin: "git:github.com/obra/superpowers"
+  agent-marketplace: anthropics/claude-plugins-official
