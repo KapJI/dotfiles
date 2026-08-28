@@ -406,12 +406,14 @@
   agent-marketplace: anthropics/claude-plugins-official
 
 # Process skills: TDD, systematic debugging, verification before completion.
-# No codex-plugin key on purpose — codex already ships superpowers via its own
-# openai-curated marketplace, and claude-plugins-official resolves to the same
-# upstream (obra/superpowers), so declaring it would install a second copy of
-# the same thing. omp installs that upstream directly, so its version tracks
-# git HEAD while Claude's tracks the marketplace pin; that skew is each
-# ecosystem's own pinning, not a mistake.
+# Codex ships its own copy via the bundled openai-curated marketplace, but only
+# where that marketplace exists — the Coder workspace's codex has just the
+# marketplaces we add, so relying on it left the container without superpowers
+# entirely. Declare it from claude-plugins-official (which resolves to the same
+# obra/superpowers upstream omp installs) so every host converges on one source,
+# and remove the openai-curated copy where it was pre-installed:
+#     codex plugin remove superpowers@openai-curated
 - claude-plugin: superpowers@claude-plugins-official
+  codex-plugin: superpowers@claude-plugins-official
   omp-plugin: "git:github.com/obra/superpowers"
   agent-marketplace: anthropics/claude-plugins-official
