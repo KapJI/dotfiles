@@ -15,6 +15,11 @@
 #     sandbox_mode="workspace-write"
 # approval_policy and sandbox_mode are confirmed settable — `codex doctor`
 # reflects them back as "approval policy OnRequest" and a restricted sandbox.
+#
+# sandbox_mode is danger-full-access in a container: codex's Linux sandbox is
+# bubblewrap, which needs unprivileged user namespaces, and Ubuntu's
+# kernel.apparmor_restrict_unprivileged_userns=1 denies those to a container —
+# not fixable from inside one. The container is the isolation boundary instead.
 # approvals_reviewer is NOT confirmed: codex silently ignores unknown config
 # keys (a deliberately bogus key still reports "config.toml parse ok") and
 # exposes no resolved-config dump. If it is wrong the setting simply does
@@ -32,7 +37,7 @@ BEGIN {
     split("approvals_reviewer|approval_policy|sandbox_mode", k, "|")
     val["approvals_reviewer"] = "\"auto_review\""
     val["approval_policy"]    = "\"on-request\""
-    val["sandbox_mode"]       = "\"workspace-write\""
+    val["sandbox_mode"]       = "\"{{ if index . "is_container" | default false }}danger-full-access{{ else }}workspace-write{{ end }}\""
     marker = "# Managed by chezmoi: makes `codex --approve-for-me` the default."
 }
 { line[NR] = $0 }
