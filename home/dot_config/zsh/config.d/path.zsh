@@ -1,7 +1,10 @@
 # Set PATH
 
-# Keep first occurrence of each entry
-typeset -U path
+# Keep first occurrence of each entry. `-g` because this file is also
+# re-sourced from inside a function (nix_heal.zsh): a bare `typeset` there
+# would declare a LOCAL `path`, so every change below would be discarded on
+# return, leaving the caller with whatever PATH it started with.
+typeset -gU path
 
 # Anonymous function so `extra` stays local — at file scope `local` is
 # just `typeset` and would leak a global into every shell.

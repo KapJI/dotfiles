@@ -115,6 +115,8 @@ working-tree edits stay out of it) but never pushes; it skips the commit
 entirely if any pin lookup failed, leaving the bump in the working tree.
 Other hosts: `chezmoi update` → before_03 reruns (lock hash changed) → `nix profile remove` + `nix profile add` rebuilds the profile entry atomically.
 
+**Boot race (macOS).** `/nix` is an encrypted APFS volume mounted by `determinate-nixd init` from a `RunAtLoad` LaunchDaemon with no ordering against login items, and `/etc/zshrc`'s nix hook is guarded by `[ -e .../nix-daemon.sh ]`. A terminal restored at login can start its first shell *before* the mount, and that shell then silently has no nix at all — no nix on `$PATH`, no `NIX_PROFILES`, no `z`/`zi`, no fzf widgets, no nix-tool completions, and `git` resolving to `/usr/bin/git` — while `.zshrc` still runs to completion, so it looks normal. `config.d/nix_heal.zsh` arms a `precmd` hook in exactly that case and redoes the missing work once the volume appears. It is not dead code; don't drop it because a healthy shell never runs it. Note this is why `path.zsh` uses `typeset -gU path`: it is re-sourced from inside that hook, and a bare `typeset` would make `path` local and throw the repair away.
+
 Scripts that invoke nix-installed tools (`uv`, `nvim`, etc.) source `/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh` at the top so the nix profile is on PATH (chezmoi runs each script in a fresh non-interactive shell).
 
 ### Templating
