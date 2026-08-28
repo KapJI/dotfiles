@@ -12,8 +12,9 @@
 # Terminal automation CLI for AI agents: real PTY sessions with wait
 # primitives, semantic snapshots, and PNG screenshots (drives nvim/TUIs
 # without tmux send-keys + sleep guesswork). npm-only upstream (no brew
-# formula, not in nixpkgs). macOS-only for now: the npm: key is consumed
-# solely by the macOS npm-packages script. Requires node >=24 <27.
+# formula, not in nixpkgs). Requires node >=24 <27, which `nix: nodejs_24`
+# below satisfies on every nix host; .chezmoiignore gates the installer to
+# desktop + container, so headless servers stay node-free.
 - npm: agent-tty
 
 - nix: autoconf

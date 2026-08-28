@@ -2,11 +2,13 @@
 
 # Install global npm packages from packages.yaml (`npm:` key) into the
 # ~/.npm prefix (~/.npm/bin is already on PATH via zsh config.d/path.zsh).
-# macOS-only for now: this is the sole consumer of the `npm:` key.
+# The sole consumer of the `npm:` key on macOS and Linux alike; .chezmoiignore
+# gates it to desktop + container, since the only thing it installs so far
+# (agent-tty) has no business pulling a node toolchain onto a headless server.
 #
-# An `after` script deliberately: node comes from the nix profile, and
-# macos/before_* scripts sort ahead of unix/before_03-nix-profile-sync,
-# so on a fresh machine node would not exist yet in the before phase.
+# An `after` script deliberately: node comes from the nix profile, which
+# unix/before_03-nix-profile-sync builds, so in the before phase node would not
+# exist yet on a fresh machine.
 #
 # Run weekly (npm install -g always fetches latest).
 # Current week: {{ div now.YearDay 7 }}, {{ now.Year }}

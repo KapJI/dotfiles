@@ -10,8 +10,16 @@ Library
 # Staging copy of the Мефодица keyboard layout. macOS-only — a chezmoi
 # script installs it system-wide (see .chezmoiscripts/macos/).
 .local/share/keyboard-layouts
-# agent-tty Claude Code skill: macOS-only, matching where agent-tty
-# itself is installed (see the npm: key in .data/packages.yaml).
+{{ end }}
+
+{{ if not (or .is_desktop (index . "is_container" | default false)) }}
+# agent-tty and its Claude Code skill: desktop + container only. The npm
+# package itself is cross-platform (no os/cpu restriction, engines node
+# >=24 <27, and `nix: nodejs_24` is in packages.yaml for every nix host) — this
+# gate is not about platform support, it is about not pulling a node toolchain
+# onto headless servers, which have no TUI to drive. Ignore the script and the
+# skill together so a server never gets a skill for a binary it lacks.
+.chezmoiscripts/unix/75-install-npm-packages.sh
 .claude/skills/agent-tty
 {{ end }}
 
@@ -83,6 +91,9 @@ bin
 # (reusing already-built paths). nix install / upgrade / GC stay ignored — nix
 # comes from the mount and the container must never mutate the host's store.
 !.chezmoiscripts/unix/03-nix-profile-sync.sh
+# Exception: npm packages. agent-tty drives TUIs, which is exactly what an
+# agent workspace needs; the container has its own writable ~/.npm prefix.
+!.chezmoiscripts/unix/75-install-npm-packages.sh
 .ssh/**
 # nvim's lazy.nvim rewrites lazy-lock.json in place when plugins install/update
 # in the workspace; let it own the lock here so apply doesn't fight that drift.
