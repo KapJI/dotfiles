@@ -57,5 +57,20 @@ vim.opt.foldlevelstart = 99
 vim.opt.foldcolumn = "auto:1" -- show only when something foldable is in view
 vim.opt.fillchars:append({ fold = " " })
 
+-- Clipboard: always OSC 52, never a native tool. It rides the terminal stream,
+-- so one mechanism covers a laptop, ssh, tmux and a `herdr --remote` pane
+-- alike. Neovim's autodetect cannot serve that last one at all: no clipboard
+-- binary, and no $SSH_TTY either, because the herdr server is spawned over ssh
+-- without a pty.
+--
+-- Needs the outer terminal to accept OSC 52, and tmux to pass it on
+-- (set-clipboard on, see dot_tmux.conf).
+local osc52 = require("vim.ui.clipboard.osc52")
+vim.g.clipboard = {
+  name = "OSC 52",
+  copy = { ["+"] = osc52.copy("+"), ["*"] = osc52.copy("*") },
+  paste = { ["+"] = osc52.paste("+"), ["*"] = osc52.paste("*") },
+}
+
 -- Values shared with other config modules (via require("config.options")).
 return { listchars = listchars }

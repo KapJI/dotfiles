@@ -13,10 +13,8 @@ keyset("n", "<C-l>", function()
   end
 end, { desc = "Toggle verbose listchars" })
 
--- System clipboard. vim.g.clipboard is left unset, so Neovim picks a
--- provider by environment: pbcopy on macOS; otherwise inside tmux it hands
--- off to tmux's buffer (`tmux load-buffer -w`, which relays to the local
--- terminal over OSC 52); bare SSH without tmux uses Neovim's own OSC 52.
+-- System clipboard. config/options.lua pins the provider to OSC 52 on every
+-- host, so this reaches the outer terminal rather than a local tool.
 keyset({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank to clipboard" })
 keyset({ "n", "v" }, "<leader>p", '"+p', { desc = "Paste from clipboard" })
 
