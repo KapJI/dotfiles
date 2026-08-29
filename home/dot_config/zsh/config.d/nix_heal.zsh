@@ -14,26 +14,41 @@
 #
 # Waiting for the mount inside .zshrc would block the first login shell for the
 # ~10-30s it takes, on every boot, to fix a shell that may never be used. So
-# instead: notice the situation, retry once per prompt, and redo the missing
-# work as soon as the volume appears. One [[ -e ]] per prompt, and only in the
-# already-broken case — a healthy shell has __ETC_PROFILE_NIX_SOURCED set and
-# never arms the hook at all.
+# instead: notice the situation, retry, and redo the missing work as soon as the
+# volume appears. One [[ -e ]] per hook firing, and only in the already-broken
+# case — a healthy shell has __ETC_PROFILE_NIX_SOURCED set and never arms
+# anything at all.
+#
+# BOTH precmd and preexec, because precmd alone heals one command too late.
+# precmd does fire before the first prompt, but at that instant the volume is
+# still not mounted (measured: shell at 15:06:34, mount at 15:06:43.8), so it
+# no-ops; its next firing is after the first command completes. That leaves the
+# first thing you type — `zi`, say — running in the un-healed shell and failing
+# with command-not-found. preexec runs after the line is parsed but before it
+# executes, and command resolution happens at execution, so a function defined
+# there is found by the very command that triggered it (verified). The two
+# unhook together on the first success, so it is still one repair.
 #
 # The function is left defined either way: in a shell that raced and was
 # already healed (or one where the guard below declined to arm), running
 # `_nix_profile_heal` by hand does the same repair.
+_nix_profile_heal_unhook() {
+    add-zsh-hook -d precmd _nix_profile_heal
+    add-zsh-hook -d preexec _nix_profile_heal
+}
+
 _nix_profile_heal() {
     local hook=/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
     if [[ ! -e $hook ]]; then
-        # Still not mounted — try again at the next prompt, but give up
-        # eventually so a host where /nix is simply gone doesn't carry the hook
-        # for the life of the shell. $SECONDS is this shell's own age, and the
-        # deadline is checked only AFTER the mount test above, so a first
-        # prompt typed hours after boot still heals.
-        (( SECONDS > 600 )) && add-zsh-hook -d precmd _nix_profile_heal
+        # Still not mounted — try again, but give up eventually so a host where
+        # /nix is simply gone doesn't carry the hooks for the life of the shell.
+        # $SECONDS is this shell's own age, and the deadline is checked only
+        # AFTER the mount test above, so a first prompt typed hours after boot
+        # still heals.
+        (( SECONDS > 600 )) && _nix_profile_heal_unhook
         return 0
     fi
-    add-zsh-hook -d precmd _nix_profile_heal
+    _nix_profile_heal_unhook
 
     # Do what /etc/zshrc's nix block would have done, then re-run the config
     # that consumed it. Each file below is safe to source twice: path.zsh
@@ -71,4 +86,5 @@ if [[ -z ${__ETC_PROFILE_NIX_SOURCED-} \
            || -e /Library/LaunchDaemons/systems.determinate.nix-store.plist \
            || -e /Library/LaunchDaemons/org.nixos.darwin-store.plist ]]; then
     add-zsh-hook precmd _nix_profile_heal
+    add-zsh-hook preexec _nix_profile_heal
 fi
