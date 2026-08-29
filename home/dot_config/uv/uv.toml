@@ -1,0 +1,33 @@
+# Prefer uv's own managed interpreters over whatever python is on PATH.
+#
+# On Linux the nix python is unusable for PyPI wheels with C extensions, and the
+# failure is obscure. nix binaries request nix's own dynamic loader:
+#
+#     nix python -> /nix/store/…-glibc-…/lib/ld-linux-x86-64.so.2
+#     uv  python -> /lib64/ld-linux-x86-64.so.2
+#
+# That loader deliberately ignores /etc/ld.so.cache and never searches
+# /usr/lib/x86_64-linux-gnu — it resolves only from each binary's RUNPATH (three
+# absolute store paths) plus LD_LIBRARY_PATH. A manylinux wheel is built to the
+# opposite contract: it ships a bare `NEEDED libstdc++.so.6` with no RUNPATH and
+# assumes the system loader's default search. Load one into nix python and it
+# fails with "libstdc++.so.6: cannot open shared object file" — while the file is
+# installed, in the ldconfig cache, and `ldd` on the extension resolves it
+# happily, because ldd uses the SYSTEM loader. Every obvious check says the
+# library is fine.
+#
+# Neither side is wrong; they are incompatible ABI contracts. LD_LIBRARY_PATH
+# "fixes" it because it is the one search mechanism both honour, but that treats
+# a wrong-interpreter problem as a missing-library one and leaks into every child
+# process. uv's managed interpreters (python-build-standalone) use the system
+# loader and are built for manylinux, so wheels work as designed.
+#
+# Set here rather than as UV_PYTHON_PREFERENCE in the zsh env: env.zsh is sourced
+# from .zshrc, so it is absent from `zsh -c` — which is exactly what
+# `ssh <host> 'uv run pytest'` runs. uv reads this file whatever the shell.
+#
+# Fleet-wide, not Linux-gated, so python behaves identically on macOS, Linux and
+# the Coder workspace instead of depending on which nix python happens to be
+# pinned. macOS does not hit the bug (dyld, plus delocated wheels bundle their
+# libraries); the setting is for consistency there.
+python-preference = "managed"
