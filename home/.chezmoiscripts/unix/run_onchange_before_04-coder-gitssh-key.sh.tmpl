@@ -6,6 +6,13 @@
 # can already make; what is new is only that the copy persists (0600).
 #
 # `before_` because dot_gitconfig.tmpl stats the pubkey to decide on signing.
+#
+# `onchange_` on an hourly stamp rather than `once_`: the fetch below exits 0
+# when it fails, so an agent that isn't answering yet must not be recorded as
+# done — that would leave the workspace unsigned until the state db is cleared
+# by hand. Re-running hourly retries a failed fetch and re-materialises a key
+# deleted under us, without an every-apply `R` in `chezmoi status`.
+# Run hourly. Current hour: {{ now.Hour }}, day {{ now.YearDay }}, {{ now.Year }}
 set -euo pipefail
 
 # jq comes from the nix profile; chezmoi runs each script in a bare shell.
