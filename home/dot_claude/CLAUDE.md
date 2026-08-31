@@ -3,6 +3,8 @@
 Host-wide rules that hold in any repo. Project-specific conventions belong in that
 project's own CLAUDE.md or its memory, not here — see the note at the bottom.
 
+Shared documentation guidance: @~/.codex/AGENTS.md
+
 ## Git
 
 - Never add `Co-Authored-By:` or `Claude-Session:` trailers to commit messages.
@@ -27,13 +29,22 @@ project's own CLAUDE.md or its memory, not here — see the note at the bottom.
 ## Writing for GitHub
 
 - **Short PR bodies.** A few sentences; three short paragraphs is the upper limit,
-  one is often right. Put reasoning, evidence and trade-offs in the commit message
-  instead — in a squash-merge repo that is what lands on the default branch.
+  one is often right. Check which text the repo's squash settings put on the default
+  branch: where the commit message lands, reasoning, evidence and trade-offs go
+  there; where the PR body lands, leave them out rather than lengthening it.
 - **ASCII only** in text written to GitHub — commit messages, PR bodies, comments:
   plain `-` not an em dash, `"` not smart quotes, `...` not an ellipsis character.
   This does not apply to documentation files, where house style may use them.
+- **Backtick every code identifier** in PR titles, bodies, and comments — file
+  names, classes, functions, logger names, flags.
+- **No hard line-wraps** inside a paragraph or bullet: write each as one line and
+  let GitHub flow it — a wrapped continuation starting with `-` renders as a
+  broken list. No stray blank lines.
 - Say what changed and why it is better. No narrative paragraphs, no rationale
-  essays, no meta-commentary about how the work was reviewed.
+  essays, no meta-commentary about how the work was reviewed — not even as a
+  parenthetical. Outcome statements are wanted: a behavior-preserving change
+  ends with a "No behavior change: ..." line. What gets cut is the verification
+  evidence behind it ("(verified stdout diff before and after)", test counts).
 
 ## Prose
 
