@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+# Attach to the herdr session inside the Coder workspace container.
+cid=$(docker ps -qf name=herdr)
+if [ -z "$cid" ]; then
+    echo "herdr-attach: no running container matching 'herdr'" >&2
+    exit 1
+fi
+# docker exec sets TERM=xterm regardless of the client; pass the real one
+# through so the TUI gets 256-color/truecolor.
+exec docker exec -it -e TERM="$TERM" "$cid" zsh -ilc herdr
