@@ -86,18 +86,23 @@ typeset -g _atit_pane_id=''
 # Memoized across precmd calls: _atit_short_pwd walks .git ancestors and
 # globs sibling names, but $PWD is unchanged for every command you run
 # without cd'ing (the common case), so recompute only when it moves.
-typeset -g _atit_cached_pwd='' _atit_cached_short=''
+typeset -g _atit_cached_pwd='' _atit_cached_short='' _atit_cached_suffix=''
 _set_term_title_precmd() {
     if [[ $PWD != $_atit_cached_pwd ]]; then
         _atit_cached_pwd=$PWD
         _atit_cached_short=$(_atit_short_pwd)
         # Suffix only under herdr's worktree root (its default `[worktrees]
-        # directory`); elsewhere the pane id is noise.
+        # directory`); elsewhere the pane id is noise. Kept separate from
+        # _atit_cached_short so it can join BOTH strings below: outside tmux,
+        # OMZ's `title` sends `short` via OSC 1 and `full` via OSC 2, and
+        # herdr's tab bar renders only the OSC 2 window title — a suffix on
+        # `short` alone is invisible there.
+        _atit_cached_suffix=''
         [[ -n $_atit_pane_id && $PWD == $HOME/.herdr/worktrees/* ]] \
-            && _atit_cached_short+=" $_atit_pane_id"
+            && _atit_cached_suffix=" $_atit_pane_id"
     fi
-    local short=$_atit_cached_short
-    local full=${PWD/#$HOME/\~}
+    local short=$_atit_cached_short$_atit_cached_suffix
+    local full=${PWD/#$HOME/\~}$_atit_cached_suffix
     # Sanitize control bytes (ESC/BEL -> visible ^[, ^G) BEFORE emitting, so a
     # directory name carrying raw terminal-control bytes can't inject an escape
     # (e.g. close the OSC and write the clipboard via OSC 52). The tmux `title`
