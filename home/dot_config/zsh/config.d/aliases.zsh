@@ -39,6 +39,11 @@ reload() {
         # pane id (so `wezterm cli` keeps working after a reload).
         DBUS_SESSION_BUS_ADDRESS
         WEZTERM_UNIX_SOCKET WEZTERM_PANE
+        # herdr's control socket + pane identity (the wezterm pair's twin):
+        # losing these kills the `herdr` CLI, every HERDR_ENV-gated config,
+        # and the pane-id title suffix for the rest of the pane's life.
+        HERDR_ENV HERDR_PANE_ID HERDR_TAB_ID HERDR_WORKSPACE_ID
+        HERDR_SOCKET_PATH HERDR_BIN_PATH
     )
     local -a env_args=() v
     for v in $preserve; do
