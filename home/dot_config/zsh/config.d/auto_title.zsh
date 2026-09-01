@@ -73,6 +73,16 @@ _atit_short_pwd() {
     fi
 }
 
+# Inside herdr, every pane opened on the same worktree renders the same
+# directory title — three panes on `fix-1050` are indistinguishable in the tab
+# bar. The pane id is the only agent identity an interactive shell has: herdr
+# keeps agent names (`impl16`, `rev15`) server-side, bound to the pane's
+# *current* occupant, and clears them the moment that agent exits — which is
+# exactly when the hook below runs again. The id is fixed for the life of the
+# shell, so read it once here rather than per prompt.
+typeset -g _atit_pane_id=''
+[[ -n ${HERDR_ENV:-} ]] && _atit_pane_id=${HERDR_PANE_ID:-}
+
 # Memoized across precmd calls: _atit_short_pwd walks .git ancestors and
 # globs sibling names, but $PWD is unchanged for every command you run
 # without cd'ing (the common case), so recompute only when it moves.
@@ -81,6 +91,10 @@ _set_term_title_precmd() {
     if [[ $PWD != $_atit_cached_pwd ]]; then
         _atit_cached_pwd=$PWD
         _atit_cached_short=$(_atit_short_pwd)
+        # Suffix only under herdr's worktree root (its default `[worktrees]
+        # directory`); elsewhere the pane id is noise.
+        [[ -n $_atit_pane_id && $PWD == $HOME/.herdr/worktrees/* ]] \
+            && _atit_cached_short+=" $_atit_pane_id"
     fi
     local short=$_atit_cached_short
     local full=${PWD/#$HOME/\~}
