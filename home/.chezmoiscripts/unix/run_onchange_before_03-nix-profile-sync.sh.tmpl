@@ -74,6 +74,23 @@ cat > "$HOME/.config/nix-profile/flake.nix" <<'NIXEOF'
       packages = forAllSystems (system: {
         default = mkProfile system serverExtras;     # Linux server (is_desktop=false)
         desktop = mkProfile system desktopExtras;    # macOS or Linux desktop
+
+        # Chromium for agent-tty's PNG screenshot / WebM renderer. Playwright's
+        # own downloaded build is a generic Linux binary that cannot start on a
+        # nix host ("libnspr4.so: cannot open shared object file"); nixpkgs' is
+        # patched to find its libraries. Deliberately NOT in either profile:
+        # it is built on demand by unix/75-install-npm-packages.sh, so only the
+        # hosts that actually run agent-tty pay for it. Headless shell only --
+        # that is what `chromium.launch({headless: true})` runs -- plus ffmpeg
+        # for WebM export: 423 MiB, against 2.1 GiB for the full browser set.
+        playwright-browsers =
+          nixpkgs.legacyPackages.${system}.playwright-driver.selectBrowsers {
+            withChromium = false;
+            withChromiumHeadlessShell = true;
+            withFfmpeg = true;
+            withFirefox = false;
+            withWebkit = false;
+          };
       });
     };
 }

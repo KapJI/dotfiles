@@ -34,17 +34,66 @@ fi
 # store path.
 npm_prefix="$HOME/.npm"
 
+# Browsers come from nix below, not from playwright's postinstall download.
+export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+
 {{ range $npm -}}
 npm install --global --prefix "$npm_prefix" "{{ . }}"
 {{ end }}
 
-# agent-tty renders screenshots/recordings through Playwright Chromium.
-# Install the browser build via agent-tty's own playwright binary so it
-# matches the exact-pinned playwright dependency (a floating
-# `npx playwright install` can fetch a build that version can't find).
-playwright="$npm_prefix/lib/node_modules/agent-tty/node_modules/.bin/playwright"
-if [ -x "$playwright" ]; then
-    "$playwright" install chromium
+# agent-tty renders screenshots and WebM through Playwright Chromium, but
+# playwright's own downloaded build is a generic Linux binary that cannot start
+# on a nix host ("libnspr4.so: cannot open shared object file"). Use nixpkgs'
+# patched build from the flake instead -- pinned by the same flake.lock as
+# everything else, and built here rather than installed into the nix profile so
+# headless servers don't pay 423 MiB for a renderer they never run.
+#
+# Playwright resolves a browser by the revision *it* pins, which rarely matches
+# nixpkgs'. Bridge the two: one real directory per pinned revision (playwright
+# and `agent-tty doctor` both require a directory, not a symlink) whose contents
+# link into the store. Both revisions are read at run time, so an agent-tty bump
+# or a flake.lock bump re-links instead of silently breaking.
+browsers_json="$npm_prefix/lib/node_modules/agent-tty/node_modules/playwright-core/browsers.json"
+
+if [ -f "$browsers_json" ]; then
+    # Build through an out-link so the store paths get a gcroot. In the
+    # container /nix is a shared mount and the host's nix cannot see roots
+    # under $HOME, so prefer the store's own per-user gcroot dir.
+    link_dir="/nix/var/nix/gcroots/per-user/$USER"
+    mkdir -p "$link_dir" 2>/dev/null || link_dir="$HOME/.cache/agent-tty"
+    mkdir -p "$link_dir"
+
+    # Non-fatal: a build that fails offline must not fail the whole apply, and
+    # it only costs screenshots -- snapshots, waits and the dashboard run on
+    # the native libghostty-vt engine either way.
+    if nix build --out-link "$link_dir/playwright-browsers" \
+        "path:$HOME/.config/nix-profile#playwright-browsers"; then
+        nix_browsers=$(readlink -f "$link_dir/playwright-browsers")
+
+        # agent-tty is playwright's only consumer on these hosts, so the cache
+        # is ours to rebuild; a symlink farm costs nothing to recreate. This
+        # also reclaims what the old `playwright install chromium` left behind.
+        case "$(uname -s)" in
+            Darwin) cache="$HOME/Library/Caches/ms-playwright" ;;
+            *)      cache="${XDG_CACHE_HOME:-$HOME/.cache}/ms-playwright" ;;
+        esac
+        rm -rf "$cache"
+
+        for src in "$nix_browsers"/*; do
+            [ -d "$src" ] || continue
+            base=${src##*/}
+            name=${base%-*}
+            # On disk playwright writes chromium_headless_shell; browsers.json
+            # names it chromium-headless-shell.
+            rev=$(node -p "(require('$browsers_json').browsers.find(b => b.name === '$(echo "$name" | tr _ -)') || {}).revision || ''")
+            [ -n "$rev" ] || continue
+            mkdir -p "$cache/$name-$rev"
+            ln -sfn "$src"/* "$cache/$name-$rev/"
+        done
+    else
+        echo "note: playwright-browsers build failed; agent-tty screenshots" \
+             "and WebM export stay unavailable until the next apply"
+    fi
 fi
 
 "$npm_prefix/bin/agent-tty" doctor \
