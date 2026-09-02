@@ -12,6 +12,9 @@ set -g allow-passthrough on
 # herdr; nvim was exempt, with $TMUX set it copies via tmux itself.
 set -g set-clipboard on
 
+# Confirm the copy landed: OSC 52 is invisible otherwise.
+set-hook -g pane-set-clipboard 'display-message "Copied #{buffer_size} bytes (OSC 52)"'
+
 # History buffer (default ~2000)
 set -g history-limit 50000
 
