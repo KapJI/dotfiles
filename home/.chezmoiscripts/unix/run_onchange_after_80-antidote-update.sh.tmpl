@@ -10,10 +10,19 @@
 # .chezmoiexternal.toml, the bundles via pin:<sha>), so there is nothing to
 # fetch: `antidote update` would only attempt its disabled self-update and skip
 # every pinned bundle — a no-op that also exits non-zero — so it is
-# intentionally NOT run. Instead this purges bundles dropped from the list and
-# re-applies our fzf-tab / you-should-use patches, which get clobbered whenever
-# antidote re-checks-out a plugin after a `bump-locks` pin change (the weekly
-# re-run heals them). Version bumps are deliberate: run `bump-locks` (it commits).
+# intentionally NOT run. Instead this purges bundles dropped from the list, moves
+# each patched plugin onto its pinned commit, and re-applies our fzf-tab /
+# you-should-use patches. Version bumps are deliberate: run `bump-locks` (it
+# commits).
+#
+# The pin checkout below is this script's job, not antidote's, because our
+# patches live in the plugin's git worktree. `git checkout --detach <pin>`
+# does NOT clobber a locally-modified file — it ABORTS ("Your local changes to
+# the following files would be overwritten by checkout"). So after a
+# `bump-locks` pin change, antidote's regen wedges permanently on the patched
+# plugin and falls back to the previous static bundle. Once HEAD already IS the
+# pin, antidote's own checkout changes no files and tolerates the patched
+# worktree, which is what makes the patches survivable at all.
 if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
     antidote_home="${ANTIDOTE_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/antidote}"
     [ -d "$antidote_home" ] || antidote_home="$HOME/Library/Caches/antidote"
@@ -44,6 +53,30 @@ if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
             done
         '
     fi
+
+    # Put a patched plugin on its pinned commit before patching it. Discards our
+    # previous patch first (it is regenerated below), fetches only when the pin
+    # object is genuinely absent — a `bump-locks` bump names a commit the local
+    # clone has never seen, which surfaces as "fatal: unable to read tree".
+    antidote_pin_checkout() {
+        local repo=$1 bundle=$2 pin head
+        [ -d "$repo/.git" ] || return 0
+        [ -f "$zsh_plugins_txt" ] || return 0
+        pin=$(sed -n "s|^${bundle}[[:space:]].*pin:\([0-9a-f]\{7,40\}\).*|\1|p" \
+              "$zsh_plugins_txt" | head -1)
+        [ -n "$pin" ] || return 0
+        head=$(git -C "$repo" rev-parse HEAD 2>/dev/null)
+        [ "$head" = "$pin" ] && return 0
+        git -C "$repo" checkout --quiet -- . 2>/dev/null
+        git -C "$repo" cat-file -e "${pin}^{commit}" 2>/dev/null \
+            || git -C "$repo" fetch --quiet origin 2>/dev/null
+        git -C "$repo" checkout --quiet --detach "$pin" 2>/dev/null \
+            || echo "antidote: could not pin $bundle to ${pin:0:7}; patch left unapplied" >&2
+    }
+
+    antidote_pin_checkout "$antidote_home/Aloxaf/fzf-tab" "Aloxaf/fzf-tab"
+    antidote_pin_checkout "$antidote_home/MichaelAquilina/zsh-you-should-use" \
+        "MichaelAquilina/zsh-you-should-use"
 
     # fzf-tab's active-group-style upstream supports only bold|underline|none.
     # Patch ftb-switch-group so the `bold` case emits bold + reverse video,
