@@ -134,14 +134,20 @@ if [ -n "$profile_after" ] && [ "$profile_before" != "$profile_after" ]; then
 fi
 {{- if index . "is_container" | default false }}
 
-# This workspace bind-mounts the host's /nix. The profile's normal gcroot lives
-# under $HOME (a separate volume the host's nix can't see), so pin a direct root
-# in the shared store; otherwise `nix-collect-garbage` on the host could reclaim
-# these tool paths out from under the container.
+# This workspace bind-mounts the host's /nix. Nix registers the profile's gcroot
+# as an *auto-root* pointing into $HOME — a separate volume the host's nix can't
+# see, so a host-side `nix-collect-garbage` reads it as stale, drops it, and
+# reclaims the tool paths out from under the container. Pin a direct root in the
+# shared store instead.
+#
+# Name it per workspace: $USER is `coder` in every Coder workspace, so a shared
+# name means each apply clobbers the previous workspace's pin and leaves that
+# profile unprotected. `id -un` rather than $USER because set -u makes an unset
+# $USER (docker exec, cron) a hard failure here.
 if [ -n "$profile_after" ]; then
-    gcdir="/nix/var/nix/gcroots/per-user/$USER"
+    gcdir="/nix/var/nix/gcroots/per-user/$(id -un)"
     mkdir -p "$gcdir" 2>/dev/null \
-        && ln -sfn "$profile_after" "$gcdir/dotfiles-profile" \
+        && ln -sfn "$profile_after" "$gcdir/dotfiles-profile-{{ .chezmoi.hostname }}" \
         || echo "note: could not pin nix gcroot in shared store (host GC may reclaim tools)"
 fi
 {{- end }}
