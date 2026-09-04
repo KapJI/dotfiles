@@ -15,6 +15,11 @@
 # formula, not in nixpkgs). Requires node >=24 <27, which `nix: nodejs_24`
 # below satisfies on every nix host; .chezmoiignore gates the installer to
 # desktop + container, so headless servers stay node-free.
+# age(1). chezmoi embeds its own age implementation for .data/*.age, so the
+# standalone binary was not needed until now; it encrypts archives before they
+# leave a host.
+- nix: age
+
 - npm: agent-tty
 
 - nix: autoconf
