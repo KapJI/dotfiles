@@ -23,15 +23,6 @@ Library
 .claude/skills/agent-tty
 {{ end }}
 
-{{ if not (stat (joinPath .chezmoi.homeDir ".herdr/worktrees/capital-gains-calculator")) }}
-# Repo conventions for capital-gains-calculator, placed ABOVE the checkouts so
-# Claude's parent-directory discovery applies them to every herdr worktree,
-# including ones created later — without a CLAUDE.md ever entering the repo.
-# Only lands where herdr already has worktrees for that repo; on a fresh host the
-# directory appears once herdr creates one, so this arrives on the next apply.
-.herdr
-{{ end }}
-
 {{ if not (lookPath "codex") }}
 # codex's config.toml is codex-owned state; a modify_ script asserts three keys
 # in it (see dot_codex/) rather than managing the file. Skip where codex isn't
