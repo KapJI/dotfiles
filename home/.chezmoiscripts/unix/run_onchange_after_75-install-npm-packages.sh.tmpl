@@ -59,16 +59,22 @@ if [ -f "$browsers_json" ]; then
     # Build through an out-link so the store paths get a gcroot. In the
     # container /nix is a shared mount and the host's nix cannot see roots
     # under $HOME, so prefer the store's own per-user gcroot dir.
-    link_dir="/nix/var/nix/gcroots/per-user/$USER"
+    #
+    # Suffixed by hostname because every Coder workspace runs as the same user
+    # against one shared store: a bare name lets whichever workspace applies
+    # last overwrite the others' out-link, unrooting their browsers for the
+    # next host GC. `id -un` because $USER is unset under docker exec and cron.
+    link_dir="/nix/var/nix/gcroots/per-user/$(id -un)"
     mkdir -p "$link_dir" 2>/dev/null || link_dir="$HOME/.cache/agent-tty"
     mkdir -p "$link_dir"
+    browsers_link="$link_dir/playwright-browsers-{{ .chezmoi.hostname }}"
 
     # Non-fatal: a build that fails offline must not fail the whole apply, and
     # it only costs screenshots -- snapshots, waits and the dashboard run on
     # the native libghostty-vt engine either way.
-    if nix build --out-link "$link_dir/playwright-browsers" \
+    if nix build --out-link "$browsers_link" \
         "path:$HOME/.config/nix-profile#playwright-browsers"; then
-        nix_browsers=$(readlink -f "$link_dir/playwright-browsers")
+        nix_browsers=$(readlink -f "$browsers_link")
 
         # agent-tty is playwright's only consumer on these hosts, so the cache
         # is ours to rebuild; a symlink farm costs nothing to recreate. This
