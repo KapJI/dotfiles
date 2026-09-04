@@ -117,7 +117,4 @@ bin
 # itself (from the agent API, no age key involved).
 !.chezmoiscripts/unix/04-coder-gitssh-key.sh
 .ssh/**
-# nvim's lazy.nvim rewrites lazy-lock.json in place when plugins install/update
-# in the workspace; let it own the lock here so apply doesn't fight that drift.
-.config/nvim/lazy-lock.json
 {{ end }}
