@@ -25,6 +25,11 @@ Shared documentation guidance: @~/.codex/AGENTS.md
   treating a larger one (merging) as covered by some general instruction.
 - Pushing to your own feature branch when asked, and labelling PRs the user owns,
   need no further check.
+- **Never commit planning/design docs as part of a PR's own diff** — a doc written
+  to direct the work (scope decisions, round-by-round history, "material to
+  retain/move out" notes) is working material, not a deliverable, even when it
+  reads like formal documentation. Keep it outside the repo, or as an untracked
+  file, unless the user explicitly asks for it to be committed.
 
 ## Writing for GitHub
 
