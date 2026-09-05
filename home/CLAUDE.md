@@ -168,6 +168,31 @@ chezmoi cd && git show
 
 To bump one plugin, edit its SHA by hand and `chezmoi apply`. `ohmyzsh` spans several lines but is one clone — all its lines must share the same SHA (antidote errors on a pin conflict within a bundle). antidote itself bumps by editing the SHA in `.chezmoiexternal.toml`.
 
+### SSH agent in remote sessions
+
+`SSH_AUTH_SOCK` is exported as a **persistent path**, `~/.ssh/ssh_auth_sock`
+(`config.d/sockets.zsh`). Long-lived tmux/herdr panes hold that path, so
+re-pointing the symlink is what restores *their* agent after a reconnect - they
+never re-source anything.
+
+Something must re-point it on each new connection. With tmux the login shell does
+it before you attach; `herdr --remote` runs `zsh -c herdr ...` over ssh and never
+starts a login shell, so the relink lives in **`dot_zshenv.tmpl`**, which zsh
+sources for non-interactive remote commands too. It must stay silent: stdout from
+`.zshenv` corrupts `scp`/`sftp`.
+
+Coder workspaces need one more piece, in the (encrypted) `~/.ssh/config`: a
+`Host *.coder coder.*` block setting `ForwardAgent yes`. The generated
+`~/.ssh/coder.conf` supplies the `ProxyCommand` but never sets `ForwardAgent`,
+and `coder config-ssh` rewrites that file wholesale, so it cannot live there. It
+sits *after* the `Include` - a `Host` block before it would scope the whole
+generated file to one pattern.
+
+Debugging "no agent in the workspace": check `readlink ~/.ssh/ssh_auth_sock`
+first. Coder mints a fresh `/tmp/auth-agent*/listener.sock` per connection and
+deletes it on disconnect, so a dangling link means the connection that last set
+it has closed.
+
 ### Neovim plugins
 
 `lazy-lock.json` is **not** chezmoi-managed, unlike `flake.lock` and the antidote pins. lazy.nvim rewrites it on every `:Lazy update` / `:Lazy sync`, so tracking it meant re-adding a machine-generated file by hand forever. Each host keeps its own lock, and `:Lazy restore` still rolls that host back to it.
