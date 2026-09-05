@@ -19,23 +19,6 @@ else
     # Update symlink for all tmux tabs
     if [ -S "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/ssh_auth_sock" ]; then
         ln -sf $SSH_AUTH_SOCK "$HOME/.ssh/ssh_auth_sock"
-    elif [ ! -S "$HOME/.ssh/ssh_auth_sock" ]; then
-        # Nothing live inherited *and* the stable link is dead: adopt the newest
-        # live forwarded socket instead of exporting a dangling path.
-        #
-        # This is the herdr case. With tmux you ssh in first, so an interactive
-        # login refreshes the link before you attach; `herdr --remote` attaches
-        # over ssh without a login shell, so nothing ever refreshes it. A new tab
-        # then inherits the stale link, the -S test above fails, and it would
-        # re-export the same dead path. Coder compounds it by minting a fresh
-        # /tmp/auth-agent*/listener.sock per connection and deleting it on
-        # disconnect, so the link routinely names a closed connection while
-        # another is live.
-        _agent_socks=(/tmp/auth-agent*/listener.sock(=om[1]N) /tmp/ssh-*/agent.*(=om[1]N))
-        if [ -n "$_agent_socks[1]" ]; then
-            ln -sf "$_agent_socks[1]" "$HOME/.ssh/ssh_auth_sock"
-        fi
-        unset _agent_socks
     fi
     export SSH_AUTH_SOCK="$HOME/.ssh/ssh_auth_sock"
 

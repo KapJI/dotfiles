@@ -16,6 +16,13 @@ ZDOTDIR=$HOME/.config/zsh
 # Must stay silent: anything written to stdout from .zshenv corrupts scp/sftp.
 if [ -S "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/ssh_auth_sock" ]; then
     [ -d "$HOME/.ssh" ] && ln -sf "$SSH_AUTH_SOCK" "$HOME/.ssh/ssh_auth_sock" 2>/dev/null
+elif [ ! -S "$HOME/.ssh/ssh_auth_sock" ]; then
+    # Nothing live inherited and the link is dead. Happens when two connections
+    # overlap and the one the link named closes first, leaving the other live.
+    # Only scans /tmp in that case, so the common path stays a single stat.
+    _sock=(/tmp/auth-agent*/listener.sock(=om[1]N) /tmp/ssh-*/agent.*(=om[1]N))
+    [ -n "$_sock[1]" ] && ln -sf "$_sock[1]" "$HOME/.ssh/ssh_auth_sock" 2>/dev/null
+    unset _sock
 fi
 {{- end }}
 
