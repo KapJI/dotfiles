@@ -1,5 +1,23 @@
 {{- if ne .osid "windows" -}}
 ZDOTDIR=$HOME/.config/zsh
+{{ if ne .chezmoi.os "darwin" }}
+# Re-point the stable agent path at this connection's forwarded socket.
+#
+# Deliberately here and not in config.d/sockets.zsh: .zshrc runs only for
+# interactive shells, and `herdr --remote` attaches by running `zsh -c herdr ...`
+# over ssh, so no login shell ever runs on reconnect. With tmux you ssh in first
+# and that login refreshes the link before you attach - this reproduces it.
+#
+# Existing panes hold $HOME/.ssh/ssh_auth_sock, so re-pointing it is what makes
+# *their* agent work again; they never re-source anything. Coder mints a new
+# /tmp/auth-agent*/listener.sock per connection and deletes it on disconnect,
+# which is why the link goes stale in the first place.
+#
+# Must stay silent: anything written to stdout from .zshenv corrupts scp/sftp.
+if [ -S "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/ssh_auth_sock" ]; then
+    [ -d "$HOME/.ssh" ] && ln -sf "$SSH_AUTH_SOCK" "$HOME/.ssh/ssh_auth_sock" 2>/dev/null
+fi
+{{- end }}
 
 if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
