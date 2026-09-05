@@ -26,7 +26,11 @@ else
     fi
 
     PAM_SUDO=/etc/pam.d/sudo
-    if ! sudo grep -q pam_ssh_agent_auth.so "$PAM_SUDO"; then
+    # Match our own line, not merely any pam_ssh_agent_auth line. A hand-rolled
+    # entry pointing at a different key file would otherwise satisfy this guard,
+    # leaving the managed key file installed but unreferenced - config that looks
+    # applied, works by accident, and breaks silently when the stray line goes.
+    if ! sudo grep -q "pam_ssh_agent_auth.so file=$SUDO_KEYS" "$PAM_SUDO"; then
         # Insert before the first @include so it's evaluated before common-auth.
         sudo sed -i '0,/^@include/{s|^@include|auth sufficient pam_ssh_agent_auth.so file=/etc/security/authorized_keys_sudo\n&|}' "$PAM_SUDO"
     fi
