@@ -1,13 +1,16 @@
-{{ if and (has .osid (list "linux-debian" "linux-ubuntu")) .is_desktop -}}
+{{ if and (has .osid (list "linux-debian" "linux-ubuntu")) (ne .chezmoi.username "root") -}}
 #!/usr/bin/env bash
 set -euo pipefail
 
+{{ if .is_desktop -}}
 # 1. Wire pam_fprintd into common-auth so polkit / sudo / lock screen accept the
-#    fingerprint reader as an alternative to the password.
+#    fingerprint reader as an alternative to the password. Desktop only - there
+#    is no fingerprint reader on a server.
 if dpkg -s libpam-fprintd &>/dev/null \
         && ! grep -q pam_fprintd.so /etc/pam.d/common-auth; then
     sudo pam-auth-update --enable fprintd
 fi
+{{ end }}
 
 # 2. Authorize sudo via the 1Password SSH agent. pam_ssh_agent_auth.so is checked
 #    before common-auth in /etc/pam.d/sudo; if the active SSH agent holds a key

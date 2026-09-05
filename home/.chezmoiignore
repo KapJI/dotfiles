@@ -83,9 +83,11 @@ bin
 .ssh/pubkeys/**
 !.ssh/pubkeys
 !.ssh/pubkeys/github_key.pub
-{{ if .is_desktop }}
-# Linux desktop also needs sudo_key.pub for pam_ssh_agent_auth (see
-# linux/after_50-configure-pam-auth.sh).
+{{ if and (eq .chezmoi.os "linux") (ne .chezmoi.username "root") }}
+# Any Linux host where sudo is actually used needs sudo_key.pub for
+# pam_ssh_agent_auth (see linux/after_50-configure-pam-auth.sh). Gated on the
+# login user rather than is_desktop: servers reached as root never invoke sudo,
+# while a non-root server login (the coder VM) benefits exactly as a desktop does.
 !.ssh/pubkeys/sudo_key.pub
 {{ end }}
 {{ end }}

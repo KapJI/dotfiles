@@ -195,7 +195,7 @@
 
 - deb: pinentry-tty
 
-- deb-desktop: libpam-ssh-agent-auth
+- deb: libpam-ssh-agent-auth
 
 - nix: poppler
 
