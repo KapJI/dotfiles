@@ -16,11 +16,34 @@ elif [ -S "$HOME/.1password/agent.sock" ]; then
     # (wezterm's own agent, ssh-forwarded sockets) is overridden.
     export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
 else
+{{- if index . "is_container" | default false }}
+    # Coder workspace: the agent is forwarded (see ~/.ssh/config) but not wired
+    # in. This host exists to run coding agents, and every key they touch would
+    # be a real 1Password key, prompting on the laptop, for work that does not
+    # need one - git here signs and pushes with the Coder key instead (see
+    # dot_gitconfig.tmpl). ssh exports the forwarded socket into every session
+    # it opens, so being off by default means actively dropping it.
+    #
+    # Opt in for one shell with `ssh-agent-on`, back out with `ssh-agent-off`;
+    # children of that shell inherit whatever it had when they started, nothing
+    # else does. `on` exports the stable symlink rather than this connection's
+    # socket, so the shell survives a reconnect - .zshenv re-points the link
+    # every time, including after the connection that set it closed.
+    unset SSH_AUTH_SOCK
+    ssh-agent-on() {
+        export SSH_AUTH_SOCK="$HOME/.ssh/ssh_auth_sock"
+        ssh-add -l
+    }
+    ssh-agent-off() {
+        unset SSH_AUTH_SOCK
+    }
+{{- else }}
     # Update symlink for all tmux tabs
     if [ -S "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/ssh_auth_sock" ]; then
         ln -sf $SSH_AUTH_SOCK "$HOME/.ssh/ssh_auth_sock"
     fi
     export SSH_AUTH_SOCK="$HOME/.ssh/ssh_auth_sock"
+{{- end }}
 
     # Symlinks for remote VSCode
     if [ -S "$VSCODE_IPC_HOOK_CLI" ] && [ "$VSCODE_IPC_HOOK_CLI" != "$HOME/.vscode_sock" ]; then

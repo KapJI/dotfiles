@@ -188,10 +188,21 @@ and `coder config-ssh` rewrites that file wholesale, so it cannot live there. It
 sits *after* the `Include` - a `Host` block before it would scope the whole
 generated file to one pattern.
 
-Debugging "no agent in the workspace": check `readlink ~/.ssh/ssh_auth_sock`
-first. Coder mints a fresh `/tmp/auth-agent*/listener.sock` per connection and
-deletes it on disconnect, so a dangling link means the connection that last set
-it has closed.
+**In a workspace the agent is off by default and opt-in per shell.** The
+container branch of `config.d/sockets.zsh` unsets `SSH_AUTH_SOCK` instead of
+exporting it, so the coding agents running there reach no 1Password key for work
+that does not need one (git in a workspace signs and pushes with the Coder key,
+`dot_gitconfig.tmpl`). Run `ssh-agent-on` to wire it into that shell and its
+children and `ssh-agent-off` to drop it again; nothing else is affected, and a
+new pane starts off either way. Forwarding
+still has to be on for that to work - otherwise there is no socket in the
+workspace to point at, and `herdr --remote` accepts no ssh flags to turn it on
+per attach.
+
+Debugging "no agent in the workspace": run `ssh-agent-on` first, then check
+`readlink ~/.ssh/ssh_auth_sock`. Coder mints a fresh
+`/tmp/auth-agent*/listener.sock` per connection and deletes it on disconnect, so
+a dangling link means the connection that last set it has closed.
 
 ### Neovim plugins
 
