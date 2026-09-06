@@ -67,6 +67,7 @@ All packages are defined in a single central manifest: `.data/packages.yaml`. Ea
   nix-server: ...        # Nix, included only when is_desktop=false (Linux server)
   llm-agents: omp        # numtide/llm-agents.nix flake (AI coding agents)
   brew-cask: ...         # macOS GUI apps
+  brew-cask-greedy: ...  # macOS GUI app, upgraded even at `version :latest`
   brew-tap: ...          # Homebrew taps
   brew-appstore: ...     # mas (Mac App Store)
   brew-vscode: ...       # VS Code extensions
@@ -89,6 +90,11 @@ All packages are defined in a single central manifest: `.data/packages.yaml`. Ea
 Default routing:
 - **CLI tools** → `nix:` (covers macOS + Linux). Pinned via committed `flake.lock` for cross-host reproducibility.
 - **macOS GUI apps** → `brew-cask:`. Mac App Store apps → `brew-appstore:`.
+  Use `brew-cask-greedy:` only for a cask whose version is `:latest` (rolling
+  nightlies): Homebrew cannot compare those, so `brew bundle` considers them
+  up-to-date forever and the app freezes at the version first installed.
+  `greedy: true` in the Brewfile re-downloads the rolling asset instead. Check
+  with `brew outdated --cask --greedy` (plain `--cask` will not show them).
 - **Linux GUI apps / system libraries** → `deb:` / `deb-desktop:` (apt is intentionally retained for these).
 - **Windows** → `winget:` (preferred) / `scoop:` (fallback).
 - **AI coding agents** → `llm-agents:` — the `numtide/llm-agents.nix` flake, rebuilt daily and

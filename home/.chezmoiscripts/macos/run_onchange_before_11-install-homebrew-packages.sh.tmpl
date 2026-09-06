@@ -6,6 +6,7 @@
 {{ $taps := list -}}
 {{ $brews := list -}}
 {{ $casks := list -}}
+{{ $casks_greedy := list -}}
 {{ $appstore := list -}}
 {{ $vscode := list -}}
 {{ range $packages -}}
@@ -17,6 +18,9 @@
     {{ end -}}
     {{ if hasKey . "brew-cask" -}}
         {{ $casks = append $casks (get . "brew-cask") -}}
+    {{ end -}}
+    {{ if hasKey . "brew-cask-greedy" -}}
+        {{ $casks_greedy = append $casks_greedy (get . "brew-cask-greedy") -}}
     {{ end -}}
     {{ if hasKey . "brew-appstore" -}}
         {{ $appstore = append $appstore (get . "brew-appstore") -}}
@@ -49,6 +53,9 @@ brew "{{ . }}"
 {{ end -}}
 {{ range $casks -}}
 cask "{{ . }}"
+{{ end -}}
+{{ range $casks_greedy -}}
+cask "{{ . }}", greedy: true
 {{ end -}}
 {{ range $appstore -}}
 mas "{{ .name }}", id: {{ .id }}

@@ -327,7 +327,11 @@
   deb-desktop: vlc
   winget: VideoLAN.VLC
 
-- brew-cask: wezterm@nightly
+# brew-cask-greedy, not brew-cask: the nightly cask is `version :latest`, so
+# Homebrew can never version-compare it and plain `brew bundle` treats it as
+# up-to-date forever — the build freezes at whatever was first installed. greedy
+# re-downloads the rolling nightly asset instead.
+- brew-cask-greedy: wezterm@nightly
   deb-desktop: wezterm-nightly
   winget: wez.wezterm
 
