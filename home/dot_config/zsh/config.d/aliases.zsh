@@ -44,6 +44,24 @@ reload() {
         # and the pane-id title suffix for the rest of the pane's life.
         HERDR_ENV HERDR_PANE_ID HERDR_TAB_ID HERDR_WORKSPACE_ID
         HERDR_SOCKET_PATH HERDR_BIN_PATH
+        # Coder workspace session identity (the HERDR_*/WEZTERM_* twin): the
+        # agent injects these into every session it opens and no rc file
+        # repopulates them, so env -i strands the shell for good. Losing them
+        # leaves git with *no* credential path at all - GIT_SSH_COMMAND wraps
+        # `coder gitssh`, which needs CODER_AGENT_URL + CODER_AGENT_TOKEN to
+        # reach the agent API for the key - so `chezmoi update` fails with
+        # "Permission denied (publickey)" in a reloaded pane and nowhere else.
+        # CHEZMOI_IS_CONTAINER and GIT_AUTHOR_EMAIL matter for a different
+        # reason: .chezmoi.toml.tmpl reads them, and without them a later
+        # `chezmoi init` computes is_container=false and an empty git_email,
+        # which un-ignores the installer scripts and encrypted secrets that a
+        # workspace must skip. Unset off-Coder, so the loop skips them free.
+        CODER CODER_AGENT_URL CODER_AGENT_TOKEN CODER_AGENT_AUTH
+        CODER_WORKSPACE_ID CODER_WORKSPACE_NAME CODER_WORKSPACE_AGENT_NAME
+        CODER_WORKSPACE_OWNER_NAME CODER_SCRIPT_BIN_DIR CODER_SCRIPT_DATA_DIR
+        CHEZMOI_IS_CONTAINER
+        GIT_SSH_COMMAND GIT_ASKPASS
+        GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
     )
     local -a env_args=() v
     for v in $preserve; do
