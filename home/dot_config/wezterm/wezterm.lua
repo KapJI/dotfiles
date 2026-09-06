@@ -52,6 +52,15 @@ config.use_fancy_tab_bar    = true
 config.max_fps              = 120
 config.animation_fps        = 120
 
+-- BlinkingBar above is animated: wezterm fades the cursor in and out at
+-- animation_fps, so the whole window repaints 120x/s forever — with idle
+-- tabs, on a 6K 120Hz panel. Measured 17.5% -> 4.3% wezterm CPU (and ~19
+-- points off device GPU) with these two. Constant keeps the blink, it just
+-- snaps on/off instead of fading, so max_fps/animation_fps stay 120 for
+-- scrolling and everything else.
+config.cursor_blink_ease_in  = 'Constant'
+config.cursor_blink_ease_out = 'Constant'
+
 config.color_scheme         = 'Arthur'
 
 -- ── Tab bar styling ──────────────────────────────────────────────────────
