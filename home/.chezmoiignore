@@ -122,10 +122,12 @@ bin
 {{ end }}
 
 {{ if ne .chezmoi.hostname "Voron24" }}
-# Voron24-only. The klipper-backup freshness exporter feeds node_exporter's
-# textfile collector by diffing the printer's live config against its backup
-# repo, and the git include that stops that repo pulling with rebase. Both are
-# meaningless on any host without ~/config_backup.
+# Voron24-only. Two node_exporter textfile producers - klipper-backup freshness
+# (live config diffed against its backup repo) and the VideoCore throttle /
+# under-voltage bits, which node_exporter cannot read - plus the git include
+# that stops the backup repo pulling with rebase. None of it means anything on
+# a host with no printer and no ~/config_backup.
 bin/klipper-backup-textfile.sh
+bin/rpi-throttle-textfile.sh
 .gitconfig-klipper-backup
 {{ end }}
