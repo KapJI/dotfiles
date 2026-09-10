@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+"""Export 3x-ui / xray stats for node_exporter's textfile collector.
+
+Reads the panel's sqlite db directly (read-only) rather than the HTTP API, so it
+needs no session token and cannot disturb the panel. All metric names are
+prefixed xray_ to stay unique across .prom files - a duplicate name in any file
+makes node_exporter discard *every* textfile metric.
+"""
+import sqlite3, subprocess, time, os, tempfile
+
+DB  = '/etc/x-ui/x-ui.db'
+OUT = '/var/lib/prometheus/node-exporter/xray.prom'
+ONLINE_WINDOW = 300  # seconds since last_online to count a client as online
+
+def esc(v):
+    return str(v).replace('\\', '\\\\').replace('"', '\\"')
+
+def norm_ts(v):
+    if not v:
+        return 0
+    return v / 1000.0 if v > 1e12 else float(v)   # panel stores ms in some versions
+
+out, now = [], time.time()
+def block(name, help_, typ, samples):
+    if not samples:
+        return
+    out.append(f'# HELP {name} {help_}')
+    out.append(f'# TYPE {name} {typ}')
+    out.extend(samples)
+
+try:
+    c = sqlite3.connect(f'file:{DB}?mode=ro', uri=True)
+    rows = list(c.execute(
+        "select email, enable, up, down, expiry_time, total, last_online from client_traffics"))
+
+    up_s, down_s, en_s, lo_s, exp_s = [], [], [], [], []
+    online = enabled = 0
+    for email, enable, up, down, expiry, total, last_online in rows:
+        lbl = f'{{email="{esc(email)}"}}'
+        up_s.append(f'xray_client_up_bytes_total{lbl} {up or 0}')
+        down_s.append(f'xray_client_down_bytes_total{lbl} {down or 0}')
+        en_s.append(f'xray_client_enabled{lbl} {1 if enable else 0}')
+        ts = norm_ts(last_online)
+        lo_s.append(f'xray_client_last_online_seconds{lbl} {ts:.0f}')
+        exp_s.append(f'xray_client_expiry_seconds{lbl} {norm_ts(expiry):.0f}')
+        if enable: enabled += 1
+        if ts and (now - ts) <= ONLINE_WINDOW: online += 1
+
+    block('xray_client_up_bytes_total',   'Bytes uploaded by a client (cumulative).',   'counter', up_s)
+    block('xray_client_down_bytes_total', 'Bytes downloaded by a client (cumulative).', 'counter', down_s)
+    block('xray_client_enabled',          'Whether a client is enabled.',               'gauge',   en_s)
+    block('xray_client_last_online_seconds', 'Unix time a client was last seen.',       'gauge',   lo_s)
+    block('xray_client_expiry_seconds',   'Unix time a client expires (0 = never).',    'gauge',   exp_s)
+
+    block('xray_clients_total',   'Configured clients.',                     'gauge', [f'xray_clients_total {len(rows)}'])
+    block('xray_clients_enabled', 'Enabled clients.',                        'gauge', [f'xray_clients_enabled {enabled}'])
+    block('xray_clients_online',  f'Clients seen in the last {ONLINE_WINDOW}s.', 'gauge', [f'xray_clients_online {online}'])
+
+    ib_up, ib_down, ib_en = [], [], []
+    for remark, tag, proto, port, enable, up, down in c.execute(
+            "select remark, tag, protocol, port, enable, up, down from inbounds"):
+        lbl = f'{{inbound="{esc(remark)}",protocol="{esc(proto)}",port="{port}"}}'
+        ib_up.append(f'xray_inbound_up_bytes_total{lbl} {up or 0}')
+        ib_down.append(f'xray_inbound_down_bytes_total{lbl} {down or 0}')
+        ib_en.append(f'xray_inbound_enabled{lbl} {1 if enable else 0}')
+    block('xray_inbound_up_bytes_total',   'Bytes uploaded via an inbound.',   'counter', ib_up)
+    block('xray_inbound_down_bytes_total', 'Bytes downloaded via an inbound.', 'counter', ib_down)
+    block('xray_inbound_enabled',          'Whether an inbound is enabled.',   'gauge',   ib_en)
+
+    try:
+        n_ips = list(c.execute("select count(*) from inbound_client_ips"))[0][0]
+        block('xray_client_ip_records', 'Rows in inbound_client_ips.', 'gauge',
+              [f'xray_client_ip_records {n_ips}'])
+    except sqlite3.Error:
+        pass
+
+    err = 0
+except Exception:
+    err = 1
+
+# established connections per listening xray port, straight from the kernel
+try:
+    ss = subprocess.run(['ss', '-tnH', 'state', 'established'],
+                        capture_output=True, text=True, timeout=10).stdout
+    ports = {}
+    for line in ss.splitlines():
+        f = line.split()
+        if len(f) >= 4 and ':' in f[2]:
+            p = f[2].rsplit(':', 1)[-1]
+            if p in ('8443', '2050', '2096'):
+                ports[p] = ports.get(p, 0) + 1
+    block('xray_established_connections', 'Established TCP connections to a panel/xray port.', 'gauge',
+          [f'xray_established_connections{{port="{p}"}} {n}' for p, n in sorted(ports.items())] or
+          [f'xray_established_connections{{port="8443"}} 0'])
+except Exception:
+    err = 1
+
+block('xray_scrape_error', 'Whether this collector hit an error.', 'gauge', [f'xray_scrape_error {err}'])
+
+os.makedirs(os.path.dirname(OUT), exist_ok=True)
+fd, tmp = tempfile.mkstemp(dir=os.path.dirname(OUT))
+with os.fdopen(fd, 'w') as f:
+    f.write("\n".join(out) + "\n")
+os.chmod(tmp, 0o644)
+os.replace(tmp, OUT)

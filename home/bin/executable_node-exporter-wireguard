@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+"""Export WireGuard / AmneziaWG peer stats for node_exporter's textfile collector.
+
+Covers both tunnels on this host:
+  wg0  - kernel WireGuard, read with `wg show`
+  awg0 - AmneziaWG 3.1 userspace, inside the `awg` container
+
+Peers are identified on the wire by public key, which is useless on a dashboard,
+so names are recovered from the comment above each [Peer] block in the configs
+("# client: NAME" for awg0, a free-form comment for wg0). Unnamed peers fall
+back to a truncated key.
+
+Metric names are prefixed wg_ to stay unique across .prom files - a duplicate
+name in any file makes node_exporter discard *every* textfile metric.
+"""
+import os, re, subprocess, tempfile, time
+
+OUT = '/var/lib/prometheus/node-exporter/wireguard.prom'
+CONNECTED_WINDOW = 180          # handshake this recent => "connected"
+IFACES = [
+    # (iface, argv to dump, config path)
+    ('wg0',  ['wg', 'show', 'wg0', 'dump'], '/etc/wireguard/wg0.conf'),
+    ('awg0', ['docker', 'exec', 'awg', 'awg', 'show', 'awg0', 'dump'], '/opt/awg/awg0.conf'),
+]
+
+def esc(v):
+    return str(v).replace('\\', '\\\\').replace('"', '\\"').replace('\n', ' ')
+
+def peer_names(path):
+    """map public key -> friendly name, from the comment preceding each [Peer]"""
+    names, pending = {}, []
+    try:
+        lines = open(path).read().splitlines()
+    except OSError:
+        return names
+    for ln in lines:
+        s = ln.strip()
+        if s.startswith('[Peer]'):
+            cur = pending[-1] if pending else None
+            pending = []
+            names['__next__'] = cur
+        elif s.startswith('#'):
+            t = s.lstrip('#').strip()
+            t = re.sub(r'^client:\s*', '', t)
+            if t and not t.startswith('_') and not re.match(r'^(PublicKey|AllowedIPs|PostUp|PostDown|PrivateKey)', t):
+                pending.append(t)
+        else:
+            m = re.match(r'PublicKey\s*=\s*(\S+)', s)
+            if m and '__next__' in names:
+                names[m.group(1)] = names.pop('__next__')
+    names.pop('__next__', None)
+    return names
+
+out, now = [], int(time.time())
+def block(name, help_, typ, samples):
+    if samples:
+        out.append(f'# HELP {name} {help_}')
+        out.append(f'# TYPE {name} {typ}')
+        out.extend(samples)
+
+up_s, total_s, conn_s, port_s = [], [], [], []
+rx_s, tx_s, hs_s = [], [], []
+
+for iface, argv, conf in IFACES:
+    try:
+        dump = subprocess.run(argv, capture_output=True, text=True, timeout=15)
+        ok = dump.returncode == 0
+        lines = dump.stdout.strip().splitlines() if ok else []
+    except Exception:
+        ok, lines = False, []
+    up_s.append(f'wg_up{{interface="{iface}"}} {1 if ok else 0}')
+    if not ok or not lines:
+        total_s.append(f'wg_peers_total{{interface="{iface}"}} 0')
+        conn_s.append(f'wg_peers_connected{{interface="{iface}"}} 0')
+        continue
+
+    names = peer_names(conf)
+    head = lines[0].split('\t')
+    if len(head) >= 3:
+        try: port_s.append(f'wg_listen_port{{interface="{iface}"}} {int(head[2])}')
+        except ValueError: pass
+
+    total = connected = 0
+    for l in lines[1:]:
+        f = l.split('\t')
+        if len(f) < 8:
+            continue
+        pub, _psk, _ep, _aips, hs, rx, tx, _ka = f[:8]
+        name = names.get(pub) or (pub[:10] + '...')
+        lbl = f'{{interface="{esc(iface)}",peer="{esc(name)}"}}'
+        total += 1
+        hs_i = int(hs or 0)
+        if hs_i and (now - hs_i) <= CONNECTED_WINDOW:
+            connected += 1
+        rx_s.append(f'wg_peer_rx_bytes_total{lbl} {int(rx or 0)}')
+        tx_s.append(f'wg_peer_tx_bytes_total{lbl} {int(tx or 0)}')
+        hs_s.append(f'wg_peer_last_handshake_seconds{lbl} {hs_i}')
+    total_s.append(f'wg_peers_total{{interface="{iface}"}} {total}')
+    conn_s.append(f'wg_peers_connected{{interface="{iface}"}} {connected}')
+
+block('wg_up', 'Whether the tunnel interface could be queried.', 'gauge', up_s)
+block('wg_peers_total', 'Configured peers on the interface.', 'gauge', total_s)
+block('wg_peers_connected', f'Peers with a handshake in the last {CONNECTED_WINDOW}s.', 'gauge', conn_s)
+block('wg_listen_port', 'UDP port the interface listens on.', 'gauge', port_s)
+block('wg_peer_rx_bytes_total', 'Bytes received from a peer.', 'counter', rx_s)
+block('wg_peer_tx_bytes_total', 'Bytes sent to a peer.', 'counter', tx_s)
+block('wg_peer_last_handshake_seconds', 'Unix time of the last handshake (0 = never).', 'gauge', hs_s)
+
+os.makedirs(os.path.dirname(OUT), exist_ok=True)
+fd, tmp = tempfile.mkstemp(dir=os.path.dirname(OUT))
+with os.fdopen(fd, 'w') as f:
+    f.write("\n".join(out) + "\n")
+os.chmod(tmp, 0o644)
+os.replace(tmp, OUT)

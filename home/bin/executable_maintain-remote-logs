@@ -1,0 +1,20 @@
+#!/bin/sh
+set -eu
+
+log_root=/var/log/remote
+
+if [ ! -d "$log_root" ]; then
+    exit 0
+fi
+
+# Delete expired logs first so a maintenance run does not waste time
+# compressing files that have already exceeded the retention period.
+/usr/bin/find "$log_root" -mindepth 2 -maxdepth 2 -type f \
+    \( -name '*.log' -o -name '*.log.gz' \) -mtime +30 -delete
+
+# Rsyslog writes one file per host and day.  Leave the current and previous
+# day uncompressed so Alloy can finish ingesting them, then compress older
+# completed files.  gzip preserves the source modification time.
+/usr/bin/find "$log_root" -mindepth 2 -maxdepth 2 -type f \
+    -name '*.log' -mtime +1 -print0 \
+    | /usr/bin/xargs -0 -r /usr/bin/gzip -6 --

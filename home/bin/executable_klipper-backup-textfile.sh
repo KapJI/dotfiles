@@ -1,5 +1,5 @@
 #!/bin/sh
-# Export klipper-backup freshness (Voron24 only; see .chezmoiignore).
+# Export klipper-backup freshness for the node_exporter textfile collector.
 #
 # The useful signal is NOT the wall-clock age of the last commit: this host is
 # powered off between prints, so after a fortnight off any age-based rule fires

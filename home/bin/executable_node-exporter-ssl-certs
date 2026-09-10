@@ -1,0 +1,47 @@
+#!/bin/sh
+# TLS expiry for node_exporter's textfile collector.
+#
+# No blackbox_exporter required: these certs are local files. openssl also
+# reads what is *actually served*, which catches the failure a disk-only check
+# misses - renewed on disk but the reload hook never fired, so the old cert is
+# still being presented.
+set -u
+OUT=/var/lib/prometheus/node-exporter/ssl_certs.prom
+TMP="${OUT}.$$"
+[ -r /etc/default/node-exporter-ssl-certs ] && . /etc/default/node-exporter-ssl-certs
+SERVED="${SERVED_ENDPOINTS:-}"
+
+certs() { ls /etc/letsencrypt/live/*/fullchain.pem /root/cert/*/fullchain.pem 2>/dev/null; }
+endtime() { openssl x509 -enddate -noout 2>/dev/null | cut -d= -f2; }
+
+{
+  echo '# HELP ssl_cert_not_after_seconds Unix time a certificate on disk expires.'
+  echo '# TYPE ssl_cert_not_after_seconds gauge'
+  for f in $(certs); do
+    end=$(endtime < "$f"); [ -n "$end" ] || continue
+    ep=$(date -d "$end" +%s 2>/dev/null) || continue
+    cn=$(openssl x509 -subject -noout -in "$f" 2>/dev/null | sed -n 's/.*CN *= *\([^,]*\).*/\1/p')
+    printf 'ssl_cert_not_after_seconds{path="%s",cn="%s"} %s\n' "$f" "${cn:-unknown}" "$ep"
+  done
+
+  echo '# HELP ssl_served_probe_success 1 if the TLS handshake to the endpoint succeeded.'
+  echo '# TYPE ssl_served_probe_success gauge'
+  for e in $SERVED; do
+    hp=${e%:*}; sni=${e##*:}
+    end=$(echo | openssl s_client -connect "$hp" -servername "$sni" 2>/dev/null | endtime)
+    [ -n "$end" ] && v=1 || v=0
+    printf 'ssl_served_probe_success{endpoint="%s"} %s\n' "$sni" "$v"
+  done
+
+  echo '# HELP ssl_served_not_after_seconds Unix time the served certificate expires.'
+  echo '# TYPE ssl_served_not_after_seconds gauge'
+  for e in $SERVED; do
+    hp=${e%:*}; sni=${e##*:}
+    end=$(echo | openssl s_client -connect "$hp" -servername "$sni" 2>/dev/null | endtime)
+    [ -n "$end" ] || continue
+    ep=$(date -d "$end" +%s 2>/dev/null) || continue
+    printf 'ssl_served_not_after_seconds{endpoint="%s"} %s\n' "$sni" "$ep"
+  done
+} > "$TMP"
+mv "$TMP" "$OUT"
+chmod 644 "$OUT"

@@ -9,13 +9,12 @@
 # label and the alert leads with it, showing a kernel transition only when there
 # actually is one.
 #
-# ONE copy for every host. This was previously four: three byte-similar
-# untracked scripts in /usr/local/bin on vps, vps_vpn and voron that differed
-# only in the output path, plus a fourth in the coder-templates checkout that
-# was the only one carrying the pkgs label - so three hosts reported a reason
-# the alert could not name. Set TEXTFILE_DIR to place the .prom explicitly
-# (coder's alloy bind-mount needs this); otherwise the first well-known
-# collector directory that exists wins.
+# ONE copy for every host. This was previously four near-identical untracked
+# scripts that differed only in output path, of which just one carried the pkgs
+# label - so most hosts reported a reason the alert could not name. Set
+# TEXTFILE_DIR to place the .prom explicitly (needed where the collector reads
+# from a bind-mounted checkout); otherwise the first well-known collector
+# directory that exists wins.
 set -eu
 
 for d in ${TEXTFILE_DIR:-} /var/lib/prometheus/node-exporter /var/lib/node_exporter/textfile; do

@@ -121,20 +121,19 @@ bin
 .ssh/**
 {{ end }}
 
-{{ if ne .chezmoi.hostname "Voron24" }}
-# Voron24-only. Two node_exporter textfile producers - klipper-backup freshness
-# (live config diffed against its backup repo) and the VideoCore throttle /
-# under-voltage bits, which node_exporter cannot read - plus the git include
-# that stops the backup repo pulling with rebase. None of it means anything on
-# a host with no printer and no ~/config_backup.
+{{ if or (ne .chezmoi.os "linux") .is_desktop }}
+# node_exporter textfile producers, and the git include one of them needs.
+# Deployed to every headless Linux host rather than gated per machine: dropping
+# a file into ~/bin costs nothing, and which of them actually runs is decided
+# by that host's own cron entry or systemd unit. Kept off macOS, Windows and
+# Linux desktops, none of which ship metrics.
 bin/klipper-backup-textfile.sh
 bin/rpi-throttle-textfile.sh
-.gitconfig-klipper-backup
-{{ end }}
-
-{{ if ne .chezmoi.os "linux" }}
-# Linux-only. /var/run/reboot-required is a Debian/Ubuntu mechanism, and the
-# textfile collector directories it writes into exist only on the hosts that
-# ship metrics.
 bin/node-exporter-reboot-required
+bin/node-exporter-ssl-certs
+bin/node-exporter-wireguard
+bin/node-exporter-xray
+bin/check-certs-expiry.sh
+bin/maintain-remote-logs
+.gitconfig-klipper-backup
 {{ end }}
