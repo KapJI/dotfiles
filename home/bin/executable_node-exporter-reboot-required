@@ -1,0 +1,56 @@
+#!/bin/sh
+# Exports whether a reboot is pending, labelled with the package(s) that asked
+# for it and with the running/pending kernel.
+#
+# /var/run/reboot-required is set by ANY package needing a reboot - libc6, dbus,
+# systemd - not just kernel upgrades, so running and pending are frequently the
+# SAME version and a kernel-only message reads as nonsense ("running X ->
+# pending X"). reboot-required.pkgs names the real reason, so it rides as a
+# label and the alert leads with it, showing a kernel transition only when there
+# actually is one.
+#
+# ONE copy for every host. This was previously four: three byte-similar
+# untracked scripts in /usr/local/bin on vps, vps_vpn and voron that differed
+# only in the output path, plus a fourth in the coder-templates checkout that
+# was the only one carrying the pkgs label - so three hosts reported a reason
+# the alert could not name. Set TEXTFILE_DIR to place the .prom explicitly
+# (coder's alloy bind-mount needs this); otherwise the first well-known
+# collector directory that exists wins.
+set -eu
+
+for d in ${TEXTFILE_DIR:-} /var/lib/prometheus/node-exporter /var/lib/node_exporter/textfile; do
+    [ -d "$d" ] || continue
+    OUT="$d/reboot.prom"
+    break
+done
+[ -n "${OUT:-}" ] || { echo "no textfile collector directory found" >&2; exit 1; }
+TMP="${OUT}.$$"
+
+running=$(uname -r)
+pending=$(ls -1 /boot/vmlinuz-* 2>/dev/null | sed 's|.*/vmlinuz-||' | grep -v '\.old$' | sort -V | tail -1)
+
+if [ -f /var/run/reboot-required ]; then
+    # tr -cd keeps the value safe to paste into a Prometheus label unquoted.
+    pkgs=$(sort -u /var/run/reboot-required.pkgs 2>/dev/null \
+        | tr '\n' ',' | tr -cd 'a-zA-Z0-9.,:+_-' | sed 's/,$//')
+    [ -n "$pkgs" ] || pkgs=unknown
+else
+    pkgs=none
+fi
+
+{
+    echo '# HELP host_reboot_required Host needs a reboot; pkgs names what asked for it.'
+    echo '# TYPE host_reboot_required gauge'
+    if [ -f /var/run/reboot-required ]; then
+        printf 'host_reboot_required{running="%s",pending="%s",pkgs="%s"} 1\n' \
+            "$running" "${pending:-unknown}" "$pkgs"
+        echo '# HELP host_reboot_required_since_seconds Unix time the reboot flag appeared.'
+        echo '# TYPE host_reboot_required_since_seconds gauge'
+        printf 'host_reboot_required_since_seconds{running="%s",pending="%s",pkgs="%s"} %s\n' \
+            "$running" "${pending:-unknown}" "$pkgs" "$(stat -c %Y /var/run/reboot-required)"
+    else
+        printf 'host_reboot_required{running="%s",pending="%s",pkgs="%s"} 0\n' \
+            "$running" "${pending:-unknown}" "$pkgs"
+    fi
+} > "$TMP"
+mv "$TMP" "$OUT"

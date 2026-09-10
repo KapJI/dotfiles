@@ -131,3 +131,10 @@ bin/klipper-backup-textfile.sh
 bin/rpi-throttle-textfile.sh
 .gitconfig-klipper-backup
 {{ end }}
+
+{{ if ne .chezmoi.os "linux" }}
+# Linux-only. /var/run/reboot-required is a Debian/Ubuntu mechanism, and the
+# textfile collector directories it writes into exist only on the hosts that
+# ship metrics.
+bin/node-exporter-reboot-required
+{{ end }}
