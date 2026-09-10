@@ -120,3 +120,12 @@ bin
 !.chezmoiscripts/unix/04-coder-gitssh-key.sh
 .ssh/**
 {{ end }}
+
+{{ if ne .chezmoi.hostname "Voron24" }}
+# Voron24-only. The klipper-backup freshness exporter feeds node_exporter's
+# textfile collector by diffing the printer's live config against its backup
+# repo, and the git include that stops that repo pulling with rebase. Both are
+# meaningless on any host without ~/config_backup.
+bin/klipper-backup-textfile.sh
+.gitconfig-klipper-backup
+{{ end }}

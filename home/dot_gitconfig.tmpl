@@ -57,6 +57,13 @@
     ui = auto
 [pull]
     rebase = true
+
+# Voron24's klipper-backup repo is the one place that must NOT rebase on pull:
+# the tool empties its working tree as its last action, so the tree is dirty at
+# the start of every run. Scoped by gitdir, and git silently ignores an include
+# whose file is absent, so this is inert on every other host.
+[includeIf "gitdir:~/config_backup/"]
+    path = ~/.gitconfig-klipper-backup
 [gpg]
     format = ssh
 [gpg "ssh"]

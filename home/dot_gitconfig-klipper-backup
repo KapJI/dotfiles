@@ -1,0 +1,9 @@
+# Included by ~/.gitconfig only for ~/config_backup (see the includeIf there).
+#
+# klipper-backup's last action is to delete everything in that repo except
+# .git, so that the next run's `git add .` records any files that disappeared
+# from the source. The working tree is therefore ALWAYS dirty at the start of a
+# run, and the global `pull.rebase = true` makes its `git pull` abort with
+# "cannot pull with rebase: You have unstaged changes" every single time.
+[pull]
+	rebase = false
