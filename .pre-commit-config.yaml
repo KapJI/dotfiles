@@ -1,4 +1,9 @@
 repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
@@ -6,6 +11,13 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
+      # This repo is public. detect-private-key catches a PEM/OpenSSH private
+      # key pasted in by mistake; the size cap catches a keyring, a database or
+      # an archive dragged in whole. Neither can be undone once pushed.
+      - id: detect-private-key
+      - id: check-added-large-files
+        args: [--maxkb=512]
+      - id: check-merge-conflict
 
   # Lua tooling for the Neovim config. system hooks reuse the nix-installed
   # binaries (from .data/packages.yaml) so pre-commit and the editor share
