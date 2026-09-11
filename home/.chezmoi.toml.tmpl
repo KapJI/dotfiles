@@ -8,7 +8,6 @@ encryption = "age"
     args = ["-d", "{{`{{ .Destination }}`}}", "{{`{{ .Source }}", "{{ .Target }}`}}"]
 
 [data]
-    full_name = "Ruslan Sayfutdinov"
     {{- /* Ephemeral container (Coder workspace / CI): the workspace exports
            CHEZMOI_IS_CONTAINER; CODER_AGENT_TOKEN is a fallback for any Coder
            workspace. In a container we skip the interactive prompts and the
@@ -16,14 +15,21 @@ encryption = "age"
            scripts, encrypted secrets, and commit signing are skipped elsewhere
            (see .chezmoiignore, dot_gitconfig). */ -}}
     {{- $is_container := or (ne (env "CHEZMOI_IS_CONTAINER") "") (ne (env "CODER_AGENT_TOKEN") "") -}}
+    {{- $full_name := env "GIT_AUTHOR_NAME" -}}
     {{- $git_email := env "GIT_AUTHOR_EMAIL" -}}
     {{- if not $is_container -}}
+    {{-   $full_name = promptStringOnce . "full_name" "Full name for Git" -}}
     {{-   $git_email = promptStringOnce . "git_email" "Email address for Git" -}}
     {{- end }}
+    full_name = "{{ $full_name }}"
     git_email = "{{ $git_email }}"
+    {{- /* The commit-signing key is the first SSH key on the GitHub account
+           this repo was cloned from, so a fork signs with its owner's key. */ -}}
     {{- $git_signingkey := "" -}}
     {{- if not $is_container -}}
-    {{-   $git_signingkey = (gitHubKeys "KapJI" | first).Key -}}
+    {{-   $origin := output "git" "-C" .chezmoi.sourceDir "remote" "get-url" "origin" | trim | trimSuffix ".git" -}}
+    {{-   $github_user := regexReplaceAll `^.*[:/]([^/]+)/[^/]+$` $origin "${1}" -}}
+    {{-   $git_signingkey = (gitHubKeys $github_user | first).Key -}}
     {{- end }}
     git_signingkey = "{{ $git_signingkey }}"
     {{- $osid := .chezmoi.os -}}

@@ -14,7 +14,7 @@ cp -f "{{ joinPath .chezmoi.sourceDir "dot_config/nix-profile/flake.lock" }}" \
 
 cat > "$HOME/.config/nix-profile/flake.nix" <<'NIXEOF'
 {
-  description = "Ruslan dotfiles CLI tools";
+  description = "dotfiles CLI tools";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
