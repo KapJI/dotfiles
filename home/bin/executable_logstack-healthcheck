@@ -1,0 +1,45 @@
+#!/bin/sh
+# Verifies the logstack stack end to end and exports the result as metrics.
+#
+# Exists because of a silent outage on 2026-09-02: recreating the compose
+# network brought loki back with no "loki" network alias, so Grafana could not
+# resolve it and every panel failed - while Loki itself was healthy and every
+# container showed "Up". Nothing surfaced it until a human opened a dashboard.
+# Checking from INSIDE the grafana container is the point: that is the path
+# that broke, and it is not the path a host-side curl exercises.
+set -u
+OUT=/var/lib/prometheus/node-exporter/logstack.prom
+TMP="${OUT}.$$"
+ok() { printf 'logstack_check{component="%s"} %s\n' "$1" "$2"; }
+
+{
+  echo '# HELP logstack_check 1 if this logstack dependency is reachable, 0 if not.'
+  echo '# TYPE logstack_check gauge'
+
+  for c in logstack-loki-1 logstack-grafana-1 logstack-alloy-1 victoriametrics; do
+    [ "$(docker inspect "$c" --format '{{.State.Status}}' 2>/dev/null)" = running ] \
+      && ok "container_$c" 1 || ok "container_$c" 0
+  done
+
+  # DNS + HTTP as Grafana itself sees them.
+  docker exec logstack-grafana-1 getent hosts loki >/dev/null 2>&1 \
+    && ok grafana_resolves_loki 1 || ok grafana_resolves_loki 0
+  docker exec logstack-grafana-1 wget -qO- --timeout=8 \
+      http://loki:3100/loki/api/v1/labels >/dev/null 2>&1 \
+    && ok grafana_to_loki_http 1 || ok grafana_to_loki_http 0
+  docker exec logstack-grafana-1 wget -qO- --timeout=8 \
+      'http://victoriametrics:8428/api/v1/query?query=up' >/dev/null 2>&1 \
+    && ok grafana_to_vm_http 1 || ok grafana_to_vm_http 0
+
+  # Both hosts still being scraped.
+  for i in vps vps_vpn; do
+    n=$(curl -s --max-time 10 "http://127.0.0.1:8428/api/v1/query?query=up%7Binstance%3D%22$i%22%7D" 2>/dev/null \
+        | grep -c '"value"')
+    [ "${n:-0}" -ge 1 ] && ok "scrape_$i" 1 || ok "scrape_$i" 0
+  done
+} > "$TMP"
+mv "$TMP" "$OUT"
+chmod 644 "$OUT"
+
+# Non-zero exit if anything is down, so it is also usable by hand.
+! grep -q ' 0$' "$OUT"

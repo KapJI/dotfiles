@@ -1,0 +1,10 @@
+#!/bin/sh
+# Forced command for the coder offsite key. Accepts a tar.zst on stdin.
+set -eu
+d=/root/backups/coder
+mkdir -p "$d"; chmod 700 "$d"
+f="$d/coder-control-plane-$(date +%Y%m%d-%H%M%S).tar.zst"
+cat > "$f"
+chmod 600 "$f"
+ls -1t "$d"/coder-control-plane-*.tar.zst 2>/dev/null | tail -n +15 | xargs -r rm -f
+echo "stored $(basename "$f") ($(stat -c %s "$f") bytes), $(ls -1 "$d"/*.tar.zst | wc -l) kept"

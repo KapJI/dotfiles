@@ -1,0 +1,106 @@
+#!/bin/sh
+# External watchdog: vps_vpn -> vps.
+#
+# Every Grafana alert rule runs ON vps. If vps, nginx, Alloy or Grafana dies,
+# the alerting dies with it and nothing pages. This host is on a different
+# provider in a different country, so it is the natural watcher. It talks to
+# Telegram directly, deliberately not through Grafana.
+#
+# Message format mirrors the Grafana telegram-alerts contact point (HTML parse
+# mode, same visual grammar) so both look the same in the chat.
+#
+#   vps-watchdog            normal check, run by the timer
+#   vps-watchdog --test     send a sample of both message shapes and exit
+set -u
+: "${GRAFANA_HEALTH_URL:?GRAFANA_HEALTH_URL missing - see /etc/vps-watchdog.env}"
+: "${TELEGRAM_CHAT_ID:?TELEGRAM_CHAT_ID missing - see /etc/vps-watchdog.env}"
+URL="$GRAFANA_HEALTH_URL"
+CHAT_ID="$TELEGRAM_CHAT_ID"
+TOKEN_FILE=/root/.telegram-bot-token
+STATE=/var/lib/vps-watchdog.state
+THRESHOLD=3     # consecutive failures before alerting: 3 x 5min = 15min
+RENOTIFY=24     # re-notify every 24 checks (2h) while still down
+
+# HTML parse mode: never interpolate anything containing < > or & here, or
+# Telegram rejects the message and the alert is lost rather than degraded.
+send() {
+    if [ ! -s "$TOKEN_FILE" ]; then
+        logger -t vps-watchdog "NO BOT TOKEN at $TOKEN_FILE - cannot notify"
+        return 1
+    fi
+    resp=$(curl -s --max-time 20 \
+        -X POST "https://api.telegram.org/bot$(cat "$TOKEN_FILE")/sendMessage" \
+        --data-urlencode "chat_id=${CHAT_ID}" \
+        --data-urlencode "parse_mode=HTML" \
+        --data-urlencode "disable_web_page_preview=true" \
+        --data-urlencode "text=$1")
+    case "$resp" in
+        *'"ok":true'*) return 0 ;;
+        *) logger -t vps-watchdog "telegram rejected the message: $(printf '%s' "$resp" | cut -c1-200)"
+           printf '%s\n' "$resp" >&2
+           return 1 ;;
+    esac
+}
+
+firing_msg() {   # $1 = minutes down, $2 = since timestamp
+    printf '%s\n%s\n\n%s\n%s\n%s\n%s\n\n%s' \
+      "🔴 <b>vps unreachable</b>" \
+      "<i>FIRING · Watchdog on vps_vpn</i>" \
+      "<b><code>vps</code></b>" \
+      "Grafana has been unreachable for ${1} minutes." \
+      "💡 <i>All Grafana alerting runs on vps, so no other alert can fire while this is down.</i>" \
+      "<i>since ${2}</i>" \
+      "<a href=\"${URL}\">Health endpoint</a>"
+}
+
+resolved_msg() { # $1 = since timestamp
+    printf '%s\n%s\n\n%s\n%s\n%s' \
+      "✅ <b>vps unreachable</b>" \
+      "<i>RESOLVED · Watchdog on vps_vpn</i>" \
+      "<b><code>vps</code></b>" \
+      "Grafana is responding again." \
+      "<i>was firing since ${1}</i>"
+}
+
+if [ "${1:-}" = "--test" ]; then
+    now=$(date -u '+%d %b %H:%M UTC')
+    send "$(firing_msg 15 "$now")"   && echo "  sent: FIRING sample"   || echo "  FAILED: firing sample"
+    send "$(resolved_msg "$now")"    && echo "  sent: RESOLVED sample" || echo "  FAILED: resolved sample"
+    exit 0
+fi
+
+# state file holds "<consecutive_failures> <first_failure_epoch>"
+fails=0; since_epoch=0
+if [ -r "$STATE" ]; then
+    read -r f s < "$STATE" 2>/dev/null || true
+    case "${f:-}" in ''|*[!0-9]*) f=0 ;; esac
+    case "${s:-}" in ''|*[!0-9]*) s=0 ;; esac
+    fails=$f; since_epoch=$s
+fi
+
+if curl -sf --max-time 15 "$URL" 2>/dev/null | grep -q '"database"'; then
+    if [ "$fails" -ge "$THRESHOLD" ]; then
+        since=$([ "$since_epoch" -gt 0 ] && date -u -d "@$since_epoch" '+%d %b %H:%M UTC' || echo unknown)
+        send "$(resolved_msg "$since")" \
+          && logger -t vps-watchdog "RECOVERED after ${fails} failed checks" \
+          || logger -t vps-watchdog "recovered but telegram notify FAILED"
+    fi
+    printf '0 0\n' > "$STATE"
+    exit 0
+fi
+
+fails=$((fails + 1))
+[ "$since_epoch" -gt 0 ] || since_epoch=$(date +%s)
+printf '%s %s\n' "$fails" "$since_epoch" > "$STATE"
+logger -t vps-watchdog "check failed (${fails}/${THRESHOLD})"
+
+if [ "$fails" -eq "$THRESHOLD" ] || \
+   { [ "$fails" -gt "$THRESHOLD" ] && [ $(( (fails - THRESHOLD) % RENOTIFY )) -eq 0 ]; }; then
+    since=$(date -u -d "@$since_epoch" '+%d %b %H:%M UTC')
+    if send "$(firing_msg "$((fails * 5))" "$since")"; then
+        logger -t vps-watchdog "ALERT SENT (${fails} failures)"
+    else
+        logger -t vps-watchdog "ALERT **NOT** SENT - telegram notify failed (${fails} failures)"
+    fi
+fi
+exit 1

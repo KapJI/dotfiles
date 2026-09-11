@@ -134,6 +134,7 @@ bin/node-exporter-ssl-certs
 bin/node-exporter-wireguard
 bin/node-exporter-xray
 bin/check-certs-expiry.sh
-bin/maintain-remote-logs
+bin/vps-watchdog
+bin/logstack-healthcheck
 .gitconfig-klipper-backup
 {{ end }}

@@ -1,0 +1,52 @@
+#!/bin/sh
+# Sync the helpers that cannot live in ~/bin.
+#
+# Three scripts are invoked from paths that must not move:
+#
+#   /usr/local/sbin/maintain-remote-logs    its unit sets ProtectHome=yes, so
+#                                           /root is invisible to the service
+#                                           and exec'ing ~/bin fails 203/EXEC
+#   /usr/local/bin/receive-coder-backup     authorized_keys forced commands,
+#   /usr/local/bin/receive-truenas-config   and that file is not managed here
+#
+# Tracking them in ~/bin *as well* would leave two copies where only the
+# untracked one ever runs: edit the source, apply, watch ~/bin update, and the
+# job keeps running the old code with no error. So they have no ~/ target at
+# all - they live in .chezmoitemplates and are written to their real paths here.
+#
+# This is a sync, not an installer: a path that does not already exist is left
+# alone, so no host acquires a helper it was never set up to run.
+#
+# Content hashes, so run_onchange fires when a script changes:
+#   maintain-remote-logs   {{ includeTemplate "system-scripts/maintain-remote-logs" | sha256sum }}
+#   receive-coder-backup   {{ includeTemplate "system-scripts/receive-coder-backup" | sha256sum }}
+#   receive-truenas-config {{ includeTemplate "system-scripts/receive-truenas-config" | sha256sum }}
+set -eu
+
+[ "$(id -u)" -eq 0 ] || exit 0   # these all live under root-owned system paths
+
+sync_one() {
+    dest=$1
+    [ -e "$dest" ] || return 0
+    tmp="$dest.chezmoi-new"
+    cat > "$tmp"
+    chmod 755 "$tmp"
+    if cmp -s "$tmp" "$dest"; then
+        rm -f "$tmp"
+    else
+        mv -f "$tmp" "$dest"
+        echo "system-scripts: updated $dest"
+    fi
+}
+
+sync_one /usr/local/sbin/maintain-remote-logs <<'CHEZMOI_SYSTEM_SCRIPT'
+{{ includeTemplate "system-scripts/maintain-remote-logs" -}}
+CHEZMOI_SYSTEM_SCRIPT
+
+sync_one /usr/local/bin/receive-coder-backup <<'CHEZMOI_SYSTEM_SCRIPT'
+{{ includeTemplate "system-scripts/receive-coder-backup" -}}
+CHEZMOI_SYSTEM_SCRIPT
+
+sync_one /usr/local/bin/receive-truenas-config <<'CHEZMOI_SYSTEM_SCRIPT'
+{{ includeTemplate "system-scripts/receive-truenas-config" -}}
+CHEZMOI_SYSTEM_SCRIPT

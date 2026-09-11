@@ -1,0 +1,13 @@
+#!/bin/sh
+# Forced command for the truenas backup key. Reads a config tar on stdin and
+# writes it timestamped; the key can do nothing else, so a compromise of the
+# TrueNAS host cannot become a shell on this one.
+set -eu
+d=/root/backups/truenas
+mkdir -p "$d"; chmod 700 "$d"
+f="$d/truenas-config-$(date +%Y%m%d-%H%M%S).tar.gz"
+cat > "$f"
+chmod 600 "$f"
+# keep the last 14
+ls -1t "$d"/truenas-config-*.tar.gz 2>/dev/null | tail -n +15 | xargs -r rm -f
+echo "stored $(basename "$f") ($(stat -c %s "$f") bytes), $(ls -1 "$d"/truenas-config-*.tar.gz | wc -l) kept"
