@@ -149,4 +149,36 @@ else:
     p.write_text(s)
 PY
     fi
+
+    # zephyr recompiles $ZSH_COMPDUMP in a disowned background job and takes no
+    # lock, while use-omz recompiles the same file guarded by a
+    # "$ZSH_COMPDUMP.lock" mkdir. So the two race inside a single shell, and
+    # every shell races every other one. zrecompile is NOT atomic despite
+    # zephyr's comment saying so: it renames the *old* .zwc aside and writes the
+    # new one in place, progressively, so a concurrent reader hits `zcompile -t`
+    # on a half-written file and dies with "invalid zwc file". Restarting herdrd
+    # respawns every pane at once, which is when this actually bites. Make
+    # zephyr take the lock use-omz already uses, so one recompile wins and the
+    # rest skip. Idempotent: the grep guard short-circuits once patched, and it
+    # is re-applied whenever antidote refetches zephyr or a pin bump resets the
+    # worktree.
+    zephyr_completion="$antidote_home/mattmc3/zephyr/plugins/completion/completion.plugin.zsh"
+    if [ -f "$zephyr_completion" ] && ! grep -qF 'ZSH_COMPDUMP}.lock' "$zephyr_completion"; then
+        python3 - "$zephyr_completion" <<'PY'
+import pathlib, sys
+p = pathlib.Path(sys.argv[1])
+s = p.read_text()
+old = '  zrecompile -q -p "$ZSH_COMPDUMP" &!'
+new = ('  { command mkdir "${ZSH_COMPDUMP}.lock" 2>/dev/null && '
+       '{ zrecompile -q -p "$ZSH_COMPDUMP"; '
+       'command rmdir "${ZSH_COMPDUMP}.lock" 2>/dev/null; } } &!')
+# Bail loudly rather than silently no-op if upstream reworded the call: an
+# unverified replace() would leave the race in place with nothing to notice.
+if old not in s:
+    print("warning: zephyr zrecompile patch is stale - call site not found; "
+          "compdump recompile left unlocked", file=sys.stderr)
+else:
+    p.write_text(s.replace(old, new))
+PY
+    fi
 fi

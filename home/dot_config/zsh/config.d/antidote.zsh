@@ -58,7 +58,12 @@ if [[ ! -e $zsh_plugins || $zsh_plugins_txt -nt $zsh_plugins ]]; then
         # are no longer loaded. Drop it so zephyr's run_compinit does a
         # full rebuild against the new fpath. (N) glob qualifier =
         # expand to nothing if no match, instead of zsh's default error.
-        rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*(N)
+        # -r because the glob also matches "$ZSH_COMPDUMP.lock", a
+        # *directory* that use-omz (and our patched zephyr) create around
+        # their recompile: plain rm -f errors on it, and a lock left behind
+        # by a shell killed mid-recompile would otherwise block every future
+        # recompile silently. Wiping the dump is exactly when to clear it.
+        rm -rf -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*(N)
     else
         rm -f -- "$zsh_plugins.tmp.$$"
         print -u2 "antidote: bundle regen failed; keeping previous $zsh_plugins"
@@ -82,7 +87,21 @@ if [[ -e $zsh_plugins ]]; then
     # STDOUT, so silence both streams, not just stderr.
     if [[ ! -e $zsh_plugins.zwc || $zsh_plugins -nt $zsh_plugins.zwc ]] \
             || ! zcompile -t -- $zsh_plugins.zwc >/dev/null 2>&1; then
-        zcompile -R -- $zsh_plugins.zwc $zsh_plugins
+        # Compile to a per-PID temp and rename, mirroring the bundle regen
+        # above. zcompile writes its output in place and progressively, so
+        # concurrent shells - every herdr pane respawning after a herdrd
+        # restart - collide: one wins and the rest die on the half-written
+        # file ("can't write zwc file"), while any shell reading it meanwhile
+        # sees a truncated .zwc. Per-PID temps mean no two shells ever write
+        # the same path, so there is nothing left to race.
+        # The temp MUST still end in .zwc: zcompile only writes *.zwc and
+        # silently appends the suffix otherwise, leaving the output at a name
+        # the rename would miss.
+        if zcompile -R -- $zsh_plugins.$$.zwc $zsh_plugins; then
+            mv -f -- $zsh_plugins.$$.zwc $zsh_plugins.zwc
+        else
+            rm -f -- $zsh_plugins.$$.zwc
+        fi
     fi
     source $zsh_plugins
 else
