@@ -41,7 +41,9 @@ Shared documentation guidance: @~/.codex/AGENTS.md
   plain `-` not an em dash, `"` not smart quotes, `...` not an ellipsis character.
   This does not apply to documentation files, where house style may use them.
 - **Backtick every code identifier** in PR titles, bodies, and comments — file
-  names, classes, functions, logger names, flags.
+  names, classes, functions, logger names, flags. Exception: never backtick a
+  GitHub issue/PR reference (`#1234`) — wrapping it in backticks breaks
+  GitHub's automatic linking. Write it bare: `Fixes #1234`, not `` `#1234` ``.
 - **No hard line-wraps** inside a paragraph or bullet: write each as one line and
   let GitHub flow it — a wrapped continuation starting with `-` renders as a
   broken list. No stray blank lines.
