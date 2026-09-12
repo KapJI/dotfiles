@@ -74,9 +74,19 @@ if [ -f "$HOME/.config/zsh/antidote/antidote.zsh" ]; then
             || echo "antidote: could not pin $bundle to ${pin:0:7}; patch left unapplied" >&2
     }
 
-    antidote_pin_checkout "$antidote_home/Aloxaf/fzf-tab" "Aloxaf/fzf-tab"
-    antidote_pin_checkout "$antidote_home/MichaelAquilina/zsh-you-should-use" \
-        "MichaelAquilina/zsh-you-should-use"
+    # Every pinned bundle, not just the two patched below. `bump-locks` names a
+    # commit no local clone has seen, and antidote's regen fails outright on it
+    # ("pin commit ... not found" -> "bundle regen failed; keeping previous"),
+    # so shells started between the new .zsh_plugins.txt landing and something
+    # fetching run on the stale bundle. antidote does eventually fetch the SHA
+    # itself, but only after erroring, and a herdrd restart respawns every pane
+    # at once - turning a narrow window into a wall of identical errors. Doing
+    # it here closes the window with the same apply that delivers the new pins.
+    # ohmyzsh spans several lines but is one clone, hence sort -u.
+    sed -n 's|^\([^#[:space:]][^[:space:]]*/[^[:space:]]*\)[[:space:]].*pin:[0-9a-f]\{7,40\}.*|\1|p' \
+        "$zsh_plugins_txt" 2>/dev/null | sort -u | while IFS= read -r bundle; do
+        antidote_pin_checkout "$antidote_home/$bundle" "$bundle"
+    done
 
     # fzf-tab's active-group-style upstream supports only bold|underline|none.
     # Patch ftb-switch-group so the `bold` case emits bold + reverse video,
