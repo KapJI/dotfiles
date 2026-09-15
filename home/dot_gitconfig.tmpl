@@ -57,13 +57,6 @@
     ui = auto
 [pull]
     rebase = true
-
-# The klipper-backup repo is the one place that must NOT rebase on pull: the
-# tool empties its working tree as its last action, so the tree is dirty at the
-# start of every run. Scoped by gitdir, and git silently ignores an include
-# whose file is absent, so this is inert wherever that repo does not exist.
-[includeIf "gitdir:~/config_backup/"]
-    path = ~/.gitconfig-klipper-backup
 [gpg]
     format = ssh
 [gpg "ssh"]
@@ -114,3 +107,12 @@
     map-styles = "bold purple => syntax #33194d, bold cyan => syntax #4d2673"
 [delta "interactive"]
     keep-plus-minus-markers = false
+
+# Overrides for the klipper-backup repo on Voron24: no rebase on pull, no commit
+# signing (see that file). Keep this block LAST. Git applies config in order and
+# an include takes effect where it is written, so it can only override keys set
+# above it - placed before [commit] it could not turn signing off. Scoped by
+# gitdir, and git silently ignores an include whose file is absent, so this is
+# inert wherever that repo does not exist.
+[includeIf "gitdir:~/config_backup/"]
+    path = ~/.gitconfig-klipper-backup
