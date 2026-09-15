@@ -7,3 +7,12 @@
 # "cannot pull with rebase: You have unstaged changes" every single time.
 [pull]
 	rebase = false
+#
+# Its commits are unsigned on purpose. The global config signs with an SSH key
+# that only an agent can use, and klipper-backup runs from cron with no agent, so
+# every scheduled run with something to commit died with "Couldn't get agent
+# socket?" / "failed to write commit object" - silently, since an unchanged tree
+# never tries to commit. Unsigned backup commits were preferred over keeping a
+# signing key on the printer's SD card.
+[commit]
+	gpgsign = false
