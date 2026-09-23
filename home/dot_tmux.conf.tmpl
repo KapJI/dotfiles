@@ -142,13 +142,13 @@ bind S setw synchronize-panes \; display-message "synchronize-panes #{?synchroni
 # Copy mode
 bind v copy-mode
 
-# Mouse drag: keep tmux's default forwarding to mouse-aware programs
+# Mouse drag: tmux's default, spelled out. Forward to mouse-aware programs
 # (send-keys -M when the pane is already in copy-mode or the app turned on
-# mouse tracking, #{mouse_any_flag}) but drop the default's copy-mode -M
-# else-branch, so a plain drag at the shell prompt does NOT fall into copy
-# mode. The previous blanket `unbind` removed the forwarding too, so drags
-# never reached mouse apps (nvim mouse, htop, less, fzf).
-bind -T root MouseDrag1Pane if -F '#{||:#{pane_in_mode},#{mouse_any_flag}}' 'send-keys -M'
+# mouse tracking, #{mouse_any_flag}), otherwise take the copy-mode -M branch so
+# a plain drag enters copy mode with the selection already started. Do not
+# replace this with a blanket `unbind`: that drops the forwarding too, and
+# drags stop reaching mouse apps (nvim mouse, htop, less, fzf).
+bind -T root MouseDrag1Pane if -F '#{||:#{pane_in_mode},#{mouse_any_flag}}' 'send-keys -M' 'copy-mode -M'
 
 # Announce tmux to the outer terminal (e.g. wezterm) via OSC user-var so
 # Alt-hjkl gets forwarded to us through SSH/et. Symmetric to smart-splits.nvim's
@@ -187,7 +187,15 @@ bind -T copy-mode-vi End  send -X end-of-line
 
 # Do not cancel copy mode after copy
 bind -T copy-mode-vi y send -X copy-selection
-bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection
+
+# Releasing the mouse always copies; whether it also leaves copy mode depends on
+# where the view is. At the bottom of the history (#{scroll_position} 0) a drag
+# is an ordinary terminal selection, so cancel and drop straight back to the
+# shell. After scrolling up, cancelling would snap the view back to the bottom -
+# away from the text just selected - so copy and stay put instead.
+bind -T copy-mode-vi MouseDragEnd1Pane if -F '#{==:#{scroll_position},0}' \
+    'send -X copy-selection-and-cancel' \
+    'send -X copy-selection'
 
 # Copy last command output — Alt-Y. At a bare wezterm prompt (no tmux) the
 # equivalent copy is done in wezterm.lua via OSC 133 semantic zones; this
