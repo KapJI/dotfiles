@@ -39,7 +39,7 @@ out=$model
 [ -n "$effort" ] && out="$out · $effort"
 if [ -n "$pct" ]; then out=$(printf '%s · Context: %.0f%%' "$out" "$pct"); else out="$out · Context: n/a"; fi
 if [ -n "$left" ]; then
-    out=$(printf '%s · 5h limit left: %.0f%%' "$out" "$left")
+    out=$(printf '%s · 5h limit %.0f%% left' "$out" "$left")
     [ -n "$resets" ] && out="$out (resets $resets)"
 fi
 printf '%s' "$out"
