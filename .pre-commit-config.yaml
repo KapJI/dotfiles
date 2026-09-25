@@ -8,6 +8,10 @@ repos:
     rev: v6.0.0
     hooks:
       - id: check-json
+        # chezmoi names a `modify_` script after the target it rewrites, so the
+        # status-line script has to be called modify_settings.json even though
+        # it is bash, not JSON.
+        exclude: ^home/.*/modify_[^/]*\.json$
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace

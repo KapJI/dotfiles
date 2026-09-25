@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+# Assert the status line, without owning the file.
+#
+# ~/.claude/settings.json is Claude Code's own state: model, effort, permissions,
+# enabled plugins and marketplaces, hooks, TUI prefs - all written by the program
+# itself, which is why the file is otherwise unmanaged (the same reasoning as
+# dot_codex/modify_private_config.toml.tmpl). A `modify_` script receives the
+# current target on stdin and returns the new contents on stdout, so it can set
+# this one key everywhere and pass every other key through untouched.
+#
+# jq reproduces Claude's own formatting exactly - 2-space indent, key order
+# preserved, trailing newline - so on a host that already has this status line
+# the output is byte-identical and the apply is a no-op rather than a tug of war
+# with Claude's next write.
+#
+# Fails open, deliberately. This script's stdout REPLACES settings.json, so any
+# error that produced no output would truncate a file full of state that lives
+# nowhere else. Missing jq or unparseable JSON therefore echoes the input back
+# unchanged rather than exiting non-zero.
+
+set -euo pipefail
+
+# Builtin read, not $(cat <<...): see the fail-open note above - nothing
+# external may run before the jq guard, or a broken PATH truncates the file.
+IFS= read -r -d '' STATUS_LINE_COMMAND <<'CMD' || true
+input=$(cat)
+{ read -r model; read -r effort; read -r pct; read -r limit; } <<JSON
+$(printf '%s' "$input" | jq -r '.model.display_name,
+    (.effort.level // ""),
+    (.context_window.used_percentage // ""),
+    (.rate_limits.five_hour.used_percentage // "")')
+JSON
+out=$model
+[ -n "$effort" ] && out="$out · $effort"
+if [ -n "$pct" ]; then out=$(printf '%s · Context: %.0f%%' "$out" "$pct"); else out="$out · Context: n/a"; fi
+[ -n "$limit" ] && out=$(printf '%s · 5h: %.0f%%' "$out" "$limit")
+printf '%s' "$out"
+CMD
+STATUS_LINE_COMMAND=${STATUS_LINE_COMMAND%$'\n'}
+
+# `read -d ''` slurps stdin verbatim, trailing newline included, and returns 1 at
+# EOF - hence the `|| true`. A `$(cat)` would strip the trailing newline (making
+# every apply rewrite the file) and, worse, would need an external command on the
+# path this script takes when the environment is broken.
+IFS= read -r -d '' settings || true
+[[ -n $settings ]] || settings='{}'
+
+if ! command -v jq >/dev/null 2>&1 || ! jq -e . >/dev/null 2>&1 <<<"$settings"; then
+    printf '%s' "$settings"
+    exit 0
+fi
+
+jq --arg cmd "$STATUS_LINE_COMMAND" \
+    '.statusLine = {"type": "command", "command": $cmd}' <<<"$settings"
