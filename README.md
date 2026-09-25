@@ -120,7 +120,7 @@ Coding agents (Claude Code, Codex, omp) are installed like any other package, an
 | [`home/.chezmoiexternal.toml`](home/.chezmoiexternal.toml) | themes, fonts, tmux plugins and binaries fetched on apply |
 | [`home/dot_config/`](home/dot_config) | zsh, Neovim, WezTerm, yazi, lazygit and the rest |
 | [`home/bin/`](home/bin) | user scripts and the exporters |
-| [`home/CLAUDE.md`](home/CLAUDE.md) | the long-form architecture notes, written for AI agents and just as useful for humans |
+| [`home/AGENTS.md`](home/AGENTS.md) | the long-form architecture notes, written for AI agents and just as useful for humans |
 | [`docs/screenshots/`](docs/screenshots) | the images above and the script that stages them |
 | [`tests/`](tests) | the shell and Neovim test suites |
 | [`blink/`](blink) | the Blink Shell theme |
