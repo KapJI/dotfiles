@@ -25,16 +25,23 @@ set -euo pipefail
 # external may run before the jq guard, or a broken PATH truncates the file.
 IFS= read -r -d '' STATUS_LINE_COMMAND <<'CMD' || true
 input=$(cat)
-{ read -r model; read -r effort; read -r pct; read -r limit; } <<JSON
+{ read -r model; read -r effort; read -r pct; read -r left; read -r resets; } <<JSON
 $(printf '%s' "$input" | jq -r '.model.display_name,
     (.effort.level // ""),
     (.context_window.used_percentage // ""),
-    (.rate_limits.five_hour.used_percentage // "")')
+    (if .rate_limits.five_hour.used_percentage == null then ""
+     else (100 - .rate_limits.five_hour.used_percentage) | if . < 0 then 0 else . end
+     end),
+    (if .rate_limits.five_hour.resets_at == null then ""
+     else (.rate_limits.five_hour.resets_at | strflocaltime("%H:%M")) end)')
 JSON
 out=$model
 [ -n "$effort" ] && out="$out · $effort"
 if [ -n "$pct" ]; then out=$(printf '%s · Context: %.0f%%' "$out" "$pct"); else out="$out · Context: n/a"; fi
-[ -n "$limit" ] && out=$(printf '%s · 5h: %.0f%%' "$out" "$limit")
+if [ -n "$left" ]; then
+    out=$(printf '%s · 5h limit left: %.0f%%' "$out" "$left")
+    [ -n "$resets" ] && out="$out (resets $resets)"
+fi
 printf '%s' "$out"
 CMD
 STATUS_LINE_COMMAND=${STATUS_LINE_COMMAND%$'\n'}
