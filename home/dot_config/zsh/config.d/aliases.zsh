@@ -85,6 +85,11 @@ alias ls="eza --icons=always --group --all"
 alias lt="eza --icons=always --tree --all"
 alias l="eza --icons=always -l --group --all"
 alias mosh="mosh -6"
+# herdr in the Coder workspace over Eternal Terminal, without tmux: et survives
+# the network, herdr's server keeps the session. NO_TMUX_ATTACH rides in on
+# etterminal's env (see tmux_attach.zsh); ClearAllForwardings keeps et's ssh
+# bootstrap from re-binding coder_direct's LocalForwards.
+alias herdr-coder='et coder_direct --ssh-option ClearAllForwardings=yes --terminal-path "env NO_TMUX_ATTACH=1 etterminal" -c herdr-attach'
 alias runp="lsof -i"
 alias sl="subl"
 alias sudo="sudo " # hack to make these aliases available for sudo
