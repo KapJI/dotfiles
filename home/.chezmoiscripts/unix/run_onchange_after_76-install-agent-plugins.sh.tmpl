@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
 # Install AI-agent plugins from packages.yaml (`claude-plugin:` / `codex-plugin:`
-# / `omp-plugin:` / `agent-marketplace:` keys) for whichever of claude, codex and
-# omp exist on this host. Without this, plugins live only in each agent's own
-# state dir — hand-installed per machine, never reaching a rebuilt container.
+# / `omp-plugin:` / `herdr-plugin:` / `agent-marketplace:` keys) for whichever
+# of claude, codex, omp and herdr exist on this host. Without this, plugins live
+# only in each agent's own state dir — hand-installed per machine, never
+# reaching a rebuilt container.
 #
 # An `after` script for the same reason as 75: the agents come from the nix
 # profile that unix/before_03-nix-profile-sync builds, so in the before phase
@@ -21,6 +22,7 @@
 {{- $codexMarkets := list -}}
 {{- $codexPlugins := list -}}
 {{- $ompPlugins := list -}}
+{{- $herdrPlugins := list -}}
 {{- range $packages -}}
     {{- $market := "" -}}
     {{- if hasKey . "agent-marketplace" -}}
@@ -36,6 +38,9 @@
     {{- end -}}
     {{- if hasKey . "omp-plugin" -}}
         {{- $ompPlugins = append $ompPlugins (get . "omp-plugin") -}}
+    {{- end -}}
+    {{- if hasKey . "herdr-plugin" -}}
+        {{- $herdrPlugins = append $herdrPlugins (get . "herdr-plugin") -}}
     {{- end -}}
 {{- end }}
 
@@ -95,5 +100,33 @@ else
     omp install {{ . | quote }} >/dev/null 2>&1 \
         || echo "omp: {{ . }} already installed or unavailable"
 {{- end }}
+fi
+{{ end }}
+
+{{- if $herdrPlugins }}
+if command -v herdr >/dev/null 2>&1; then
+    # Subshell: GIT_SSH_COMMAND must not leak into anything added after this.
+    (
+    # `plugin install` clones over ssh (and the gitconfig rewrites https to
+    # ssh anyway). A Coder workspace has no agent by default, so clone with the
+    # git key Coder provisions for exactly this.
+    if [ -z "${GIT_SSH_COMMAND:-}" ] && [ -f "$HOME/.ssh/coder_gitssh_key" ]; then
+        export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/coder_gitssh_key -o IdentitiesOnly=yes"
+    fi
+    # Pinned, so skip what is already at its commit instead of re-cloning and
+    # re-downloading the binary every week. A new pin installs over the old
+    # one in place; no uninstall needed.
+    installed=$(herdr plugin list 2>/dev/null || true)
+{{- range $herdrPlugins }}
+{{- $spec := splitList "@" . }}
+    case $installed in
+        *"[github:{{ index $spec 0 }}@{{ index $spec 1 }}]"*) ;;
+        *) herdr plugin install {{ index $spec 0 | quote }} --ref {{ index $spec 1 | quote }} --yes >/dev/null 2>&1 \
+            || echo "herdr: {{ . }} failed to install" ;;
+    esac
+{{- end }}
+    )
+else
+    echo "herdr not on PATH; skipping its plugins"
 fi
 {{ end }}

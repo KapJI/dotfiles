@@ -376,6 +376,8 @@
 #                                   agent-marketplace:.
 #   omp-plugin:                     npm spec or `git:` ref — omp has no
 #                                   marketplace, it installs the package direct.
+#   herdr-plugin:                   "<owner>/<repo>@<commit>", pinned like
+#                                   flake.lock; bump the sha to upgrade.
 
 # Audit and maintain CLAUDE.md files. Claude-only by nature — there is no
 # codex/omp analogue of CLAUDE.md to manage.
@@ -434,3 +436,7 @@
   codex-plugin: superpowers@claude-plugins-official
   omp-plugin: "git:github.com/obra/superpowers"
   agent-marketplace: anthropics/claude-plugins-official
+
+# Code-review pane for herdr: diff beside the agent, comment on lines, send
+# the notes back. Toggled by prefix+d (dot_config/herdr/config.toml).
+- herdr-plugin: persiyanov/herdr-reviewr@cd618b48dc1f4d2cc092f3f26827ac72fb44773e
