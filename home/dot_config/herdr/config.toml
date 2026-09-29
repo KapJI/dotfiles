@@ -7,3 +7,10 @@ show_agent_labels_on_pane_borders = true
 agent_panel_sort = "priority"
 status_indicators = "symbols"
 window_title = "🐑 {workspace}"
+
+# reviewr is installed in the Coder workspace only; elsewhere this is a no-op
+# key, resolved at press time rather than at config load.
+[[keys.command]]
+key = "prefix+d"
+type = "plugin_action"
+command = "persiyanov.reviewr.toggle"
