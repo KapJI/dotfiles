@@ -8,8 +8,8 @@ agent_panel_sort = "priority"
 status_indicators = "symbols"
 window_title = "🐑 {workspace}"
 
-# reviewr is installed in the Coder workspace only; elsewhere this is a no-op
-# key, resolved at press time rather than at config load.
+# `herdr --remote` drops custom commands unless attached with
+# `--remote-keybindings server`.
 [[keys.command]]
 key = "prefix+d"
 type = "plugin_action"
