@@ -65,7 +65,17 @@ cat > "$HOME/.config/nix-profile/flake.nix" <<'NIXEOF'
       ];
 
       mkProfile = system: extras:
-        let pkgs = nixpkgs.legacyPackages.${system};
+        let pkgs = nixpkgs.legacyPackages.${system}.extend (final: prev: {
+              # abseil 20260817 needs C++20 (std::partial_ordering) but ET
+              # 7.0.0 pins CMAKE_CXX_STANDARD 17, so nixpkgs' build fails.
+              # Drop this once upstream moves off 17 (--replace-fail says when).
+              eternal-terminal = prev.eternal-terminal.overrideAttrs (o: {
+                postPatch = (o.postPatch or "") + ''
+                  substituteInPlace CMakeLists.txt \
+                    --replace-fail "CMAKE_CXX_STANDARD 17" "CMAKE_CXX_STANDARD 20"
+                '';
+              });
+            });
         in pkgs.buildEnv {
           name = "dotfiles-profile";
           paths = (defaultPaths pkgs system) ++ (extras pkgs system);
