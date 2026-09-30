@@ -29,6 +29,12 @@
 # before the first [section] header or they would silently land inside whatever
 # table precedes them. Hence the insert-before-first-header logic below rather
 # than a plain append.
+#
+# It also sets [features] daemon_auto_start = false. Since 0.159 codex routes
+# every session through a shared background app-server, which refuses to start
+# from a CLI with no codex-package.json beside it, and the nix build ships none:
+# plain `codex` dies with "this CLI has no complete local package". Drop this
+# once llm-agents.nix packages that manifest.
 
 set -euo pipefail
 
@@ -41,6 +47,11 @@ BEGIN {
     marker = "# Managed by chezmoi: makes `codex --approve-for-me` the default."
 }
 { line[NR] = $0 }
+/^[[:space:]]*\[/ { table = $0; gsub(/[[:space:]]/, "", table) }
+table == "[features]" && /^[[:space:]]*daemon_auto_start[[:space:]]*=/ {
+    line[NR] = "daemon_auto_start = false"; seen_daemon = 1
+}
+table == "[features]" && /^[[:space:]]*\[features\]/ { features_header = NR }
 END {
     # Where does the root table end? At the first [table] / [[array]] header.
     first_header = 0
@@ -67,9 +78,11 @@ END {
         # Emit whatever is absent just before the root table closes.
         if (missing && first_header && i == first_header) emit(line[i - 1])
         print line[i]
+        if (i == features_header && !seen_daemon) print "daemon_auto_start = false"
     }
     # No headers at all (or an empty file): everything is root table, append.
     if (missing && !first_header) emit(line[NR])
+    if (!features_header) print "\n[features]\ndaemon_auto_start = false"
 }
 
 # prev is the line we are inserting after, so a blank separator is only added
