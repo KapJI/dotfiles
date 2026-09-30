@@ -93,6 +93,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-et": {
+      "locked": {
+        "lastModified": 1790055231,
+        "narHash": "sha256-QpXotokGh5eeMG1Njiuh27oP0rK6t5+cMp7ymXSs7mc=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "b6c98e9e6633ee64753b594ff4a5febf0367fc00",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "b6c98e9e6633ee64753b594ff4a5febf0367fc00",
+        "type": "github"
+      }
+    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1790689126,
@@ -112,7 +128,8 @@
     "root": {
       "inputs": {
         "llm-agents": "llm-agents",
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs_2",
+        "nixpkgs-et": "nixpkgs-et"
       }
     },
     "systems": {
