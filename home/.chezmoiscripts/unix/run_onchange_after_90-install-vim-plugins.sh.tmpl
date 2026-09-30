@@ -11,6 +11,14 @@
 # nvim launch. gcc for the compile comes from build-essential on the system PATH.
 export PATH="$HOME/.local/bin:$PATH"
 
+# gitcommit's 3.3 MB parser.c needs >3.7 GB to compile at the default -O2: on a
+# 2 GB host that swapped for 12 minutes until the OOM killer took cc1. -O1
+# peaks near 570 MB. Only low-RAM Linux hosts pay the slower parser for it;
+# tree-sitter's `build` passes CFLAGS through to cc.
+if [ -r /proc/meminfo ] && [ "$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)" -lt 4000000 ]; then
+  export CFLAGS="${CFLAGS:+$CFLAGS }-O1"
+fi
+
 # Update nvim plugins + refresh treesitter parsers. Re-runs weekly.
 # Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 
