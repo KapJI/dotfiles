@@ -73,6 +73,10 @@ cat > "$HOME/.config/nix-profile/flake.nix" <<'NIXEOF'
                 postPatch = (o.postPatch or "") + ''
                   substituteInPlace CMakeLists.txt \
                     --replace-fail "CMAKE_CXX_STANDARD 17" "CMAKE_CXX_STANDARD 20"
+                  # std::result_of is gone in C++20; libstdc++ still ships
+                  # it, but macOS libc++ does not.
+                  substituteInPlace external_imported/ThreadPool/ThreadPool.h \
+                    --replace-fail "std::result_of<F(Args...)>" "std::invoke_result<F, Args...>"
                 '';
               });
             });
