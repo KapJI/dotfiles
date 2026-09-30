@@ -1,7 +1,7 @@
 # Global instructions
 
 Host-wide rules that hold in any repo. Project-specific conventions belong in that
-project's own CLAUDE.md or its memory, not here — see the note at the bottom.
+project's own AGENTS.md (or CLAUDE.md) or its memory, not here — see the note at the bottom.
 
 Shared documentation guidance: @~/.codex/AGENTS.md
 
@@ -62,6 +62,9 @@ Shared documentation guidance: @~/.codex/AGENTS.md
 
 ---
 
-Claude also auto-discovers CLAUDE.md in parent directories, so per-project rules can
-live in a file above the checkout — outside the repo, never committed — and apply to
-every worktree beneath it. That is where repo-specific conventions go.
+Claude also reads AGENTS.md and CLAUDE.md in parent directories, so per-project rules
+can live in a file above the checkout — outside the repo, never committed — and apply
+to every worktree beneath it. That is where repo-specific conventions go. By default an
+AGENTS.md loads only while no CLAUDE.md (or CLAUDE.local.md) sits in or above the
+working directory, so in a repo that uses AGENTS.md, name that parent file AGENTS.md
+too, and do not add a CLAUDE.md anywhere on its path.
