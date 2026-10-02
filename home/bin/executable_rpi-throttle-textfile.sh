@@ -33,6 +33,14 @@ bit() { echo $(( (val >> $1) & 1 )); }
     echo "rpi_throttle_flag{flag=\"freq_capped\",window=\"since_boot\"} $(bit 17)"
     echo "rpi_throttle_flag{flag=\"throttled\",window=\"since_boot\"} $(bit 18)"
     echo "rpi_throttle_flag{flag=\"soft_temp_limit\",window=\"since_boot\"} $(bit 19)"
+
+    # Pi 5 RTC backup battery, microvolts in sysfs. A primary lithium cell sits
+    # near 3.0 V for years, then falls off; skipped if the RTC does not report it.
+    if uv=$(cat /sys/class/rtc/rtc0/battery_voltage 2>/dev/null); then
+        echo "# HELP rpi_rtc_battery_volts Pi 5 RTC backup battery voltage."
+        echo "# TYPE rpi_rtc_battery_volts gauge"
+        echo "rpi_rtc_battery_volts $(awk -v u="$uv" 'BEGIN { printf "%.3f", u / 1e6 }')"
+    fi
 } > "$TMP"
 
 # Atomic: the collector must never read a half-written file.
