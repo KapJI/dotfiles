@@ -68,11 +68,11 @@ name with `SendMessage` (find them with `ListAgents`):
 | Name | Repo | Owns |
 |---|---|---|
 | `chezmoi` | `~/.local/share/chezmoi` | dotfiles, packages, nix flake, shell/editor config |
-| `hass-config` | `~/Project/github/hass-config` | Home Assistant |
+| `hass-config` | `~/Project/github/hass-config`, `KapJI/hass-config-ufa` | both Home Assistant instances: London (`ssh ha`) and Ufa (`ssh ufa_ha`), incl. Zigbee2MQTT, dashboards, HA backups |
 | `router-config` | `~/Project/github/router-config` | the three OpenWrt routers |
-| `vps-config` | `~/Project/github/vps-config` | vps + vps_vpn, incl. Grafana, Prometheus, alerting |
-| `klipper-config` | `~/Project/github/klipper-config` | 3D printer host |
-| `truenas-config` | `~/Project/github/truenas-config` | TrueNAS host |
+| `vps-config` | `~/Project/github/vps-config` | `vps` + `vps_vpn`: nginx, DoH, HA reverse tunnels, x-ui/AmneziaWG; Grafana, VictoriaMetrics, Loki - alert rules and dashboards for every host's metrics (producers stay with their host's owner; chezmoi-managed scripts on these hosts are `chezmoi`'s) |
+| `klipper-config` | `~/Project/github/klipper-config` | Voron 2.4 printer and its Pi 5 host `voron`: Klipper/Moonraker/KlipperScreen config (live copy is `~/klipper_config` on the Pi), MCU firmware, the Pi's OS and services incl. its alloy/rsyslog shipping. Not its dotfiles (`chezmoi`) or its alert rules (`vps-config`) |
+| `truenas-config` | `~/Project/github/truenas-config` | TrueNAS host `truenas`: pools, shares, apps (incl. Nginx Proxy Manager, AdGuard), VM definitions and sizing (`haos`, `coder`), disks, BIOS |
 
 - Work that belongs to another agent's domain is delegated, not done: do not
   edit, commit to, or run changes against another agent's repo or hosts.
