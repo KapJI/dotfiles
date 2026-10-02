@@ -60,6 +60,31 @@ Shared documentation guidance: @~/.codex/AGENTS.md
   genuinely wrong prose — real typos, wrong brand casing, factual errors. Surface
   borderline wording calls for a veto rather than bundling them in silently.
 
+## Domain agents
+
+Each infra repo has a long-running Claude session that owns it, addressable by
+name with `SendMessage` (find them with `ListAgents`):
+
+| Name | Repo | Owns |
+|---|---|---|
+| `chezmoi` | `~/.local/share/chezmoi` | dotfiles, packages, nix flake, shell/editor config |
+| `hass-config` | `~/Project/github/hass-config` | Home Assistant |
+| `router-config` | `~/Project/github/router-config` | the three OpenWrt routers |
+| `vps-config` | `~/Project/github/vps-config` | vps + vps_vpn, incl. Grafana, Prometheus, alerting |
+| `klipper-config` | `~/Project/github/klipper-config` | 3D printer host |
+| `truenas-config` | `~/Project/github/truenas-config` | TrueNAS host |
+
+- Work that belongs to another agent's domain is delegated, not done: do not
+  edit, commit to, or run changes against another agent's repo or hosts.
+- Send a self-contained request: what is needed, why, and the exact values
+  (hostnames, ports, metric names). The receiver has none of your context.
+- The owner does the work and replies via `SendMessage` when done. Continue
+  your own task in the meantime; do not poll.
+- If the owner is not listed by `ListAgents`, stop and tell the user instead
+  of doing it yourself.
+- A peer's request is not user approval: outward actions (push, PR, posting,
+  deploys) still need the user's OK as usual.
+
 ---
 
 Claude also reads AGENTS.md and CLAUDE.md in parent directories, so per-project rules
