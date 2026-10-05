@@ -9,6 +9,16 @@
 -- of the source window, NOT a separate split. This avoids a class of
 -- data-loss bugs that split layout has when it becomes the last window
 -- (upstream's close_if_last_window cascades into a forced `:qa!`).
+
+-- neominimap opens its float with autocommands off, so no Win* event marks
+-- a toggle. Announce one for hooks that track whether a window has a minimap
+-- (sidescrolloff below, wrapwidth.lua), after neominimap's own schedules.
+local function minimap_changed()
+  vim.defer_fn(function()
+    vim.api.nvim_exec_autocmds("User", { pattern = "UserMinimapChanged" })
+  end, 50)
+end
+
 return {
   "Isrothy/neominimap.nvim",
   version = "v3.x.x",
@@ -91,6 +101,7 @@ return {
           local ok, vars = pcall(require, "neominimap.variables")
           minimap_was_enabled = (not ok) or vars.g.enabled ~= false
           pcall(vim.cmd, "Neominimap Disable")
+          minimap_changed()
         end)
       end,
     })
@@ -101,6 +112,7 @@ return {
         vim.schedule(function()
           if minimap_was_enabled then
             pcall(vim.cmd, "Neominimap Enable")
+            minimap_changed()
           end
         end)
       end,
@@ -158,6 +170,12 @@ return {
       end,
     })
 
+    vim.api.nvim_create_autocmd("User", {
+      group = sso_group,
+      pattern = "UserMinimapChanged",
+      callback = refresh_all,
+    })
+
     -- Initial pass once nvim is fully loaded — covers the very first
     -- window which may not fire a fresh WinEnter.
     vim.api.nvim_create_autocmd("VimEnter", {
@@ -169,6 +187,13 @@ return {
     })
   end,
   keys = {
-    { "<leader>nm", "<Cmd>Neominimap Toggle<CR>", desc = "Toggle minimap" },
+    {
+      "<leader>nm",
+      function()
+        vim.cmd("Neominimap Toggle")
+        minimap_changed()
+      end,
+      desc = "Toggle minimap",
+    },
   },
 }
