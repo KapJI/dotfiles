@@ -8,6 +8,12 @@ agent_panel_sort = "priority"
 status_indicators = "symbols"
 window_title = "🐑 {workspace}"
 
+# Unset, herdr opens panes in $SHELL and falls back to /bin/sh. `herdr-attach`
+# enters the workspace through `docker exec`, which sets no $SHELL, so a server
+# it has to start itself (the boot-time one crashed) would run every pane in sh.
+[terminal]
+default_shell = "zsh"
+
 # `herdr --remote` drops custom commands unless attached with
 # `--remote-keybindings server`.
 [[keys.command]]
