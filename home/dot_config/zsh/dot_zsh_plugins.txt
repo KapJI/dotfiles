@@ -42,7 +42,7 @@ MichaelAquilina/zsh-you-should-use pin:5f3d129864ee4505043d88c3486224f1d75b692e
 
 # Queues compdef calls; the real compinit runs at the first prompt
 # (post_zshrc), after antidote.zsh's run_compinit patch has landed.
-mattmc3/zephyr path:plugins/completion pin:a35e422da0e29b119fc55b5bad514d3ff901c5cb
+mattmc3/zephyr path:plugins/completion pin:a141b00c021e24499765a1b9429c692d60d72ed9
 
 # Hooks _main_complete (autoloaded from fpath at source time), so it
 # tolerates the deferred compinit — see the header note.
@@ -52,11 +52,11 @@ Aloxaf/fzf-tab pin:24105b15714bfec37989ed5c5b6e60f572253019
 # to url-quote-magic, which would overwrite fsh's self-insert wrap
 # if fsh loaded first.
 getantidote/use-omz pin:317648f75d2643abcd7cf580062a8999b11473d7
-ohmyzsh/ohmyzsh path:lib pin:4d4cfc287e9d887b81242c0e431b5f49f9cec5c1
-ohmyzsh/ohmyzsh path:plugins/colored-man-pages pin:4d4cfc287e9d887b81242c0e431b5f49f9cec5c1
-ohmyzsh/ohmyzsh path:plugins/dirhistory pin:4d4cfc287e9d887b81242c0e431b5f49f9cec5c1
-ohmyzsh/ohmyzsh path:plugins/extract pin:4d4cfc287e9d887b81242c0e431b5f49f9cec5c1
-ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z pin:4d4cfc287e9d887b81242c0e431b5f49f9cec5c1
+ohmyzsh/ohmyzsh path:lib pin:60c9a7a839b790cd905d0fd4419435124fd1bdc0
+ohmyzsh/ohmyzsh path:plugins/colored-man-pages pin:60c9a7a839b790cd905d0fd4419435124fd1bdc0
+ohmyzsh/ohmyzsh path:plugins/dirhistory pin:60c9a7a839b790cd905d0fd4419435124fd1bdc0
+ohmyzsh/ohmyzsh path:plugins/extract pin:60c9a7a839b790cd905d0fd4419435124fd1bdc0
+ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z pin:60c9a7a839b790cd905d0fd4419435124fd1bdc0
 # safe-paste intentionally omitted: on zsh >=5.1 it only re-binds
 # bracketed-paste-magic (already done by lib/misc.zsh above) and runs a
 # buggy `set zle_bracketed_paste` that clobbers $@ instead of setting an
