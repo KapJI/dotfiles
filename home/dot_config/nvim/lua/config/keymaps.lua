@@ -74,6 +74,15 @@ keyset("n", "<C-u>", "<C-u>zz", { desc = "Scroll up half page" })
 
 -- Diagnostic navigation (global, not per-buffer)
 keyset("n", "<leader>ce", vim.diagnostic.open_float, { desc = "Diagnostic float" })
+-- Set per namespace too: a namespace's own setting (markdownlint's, in
+-- nvim-lint.lua) would otherwise win over the global one.
+keyset("n", "<leader>cv", function()
+  local on = not vim.diagnostic.config().virtual_text
+  vim.diagnostic.config({ virtual_text = on })
+  for ns in pairs(vim.diagnostic.get_namespaces()) do
+    vim.diagnostic.config({ virtual_text = on }, ns)
+  end
+end, { desc = "Toggle inline diagnostics" })
 
 -- Emacs-style readline keys missing from default vim cmdline.
 -- Vim already provides: <C-e> eol, <C-w> del-word-back, <C-u> del-to-start,

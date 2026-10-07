@@ -24,6 +24,12 @@ return {
         -- zsh   = { "shellcheck" },
       }
 
+      -- markdownlint findings are prose style, too noisy inline (MD013
+      -- trips on every soft-wrapped paragraph). Keep them as signs and in
+      -- the statusline count; read one with the diagnostic float.
+      -- <leader>cv (keymaps.lua) turns it back on along with everything else.
+      vim.diagnostic.config({ virtual_text = false }, lint.get_namespace("markdownlint-cli2"))
+
       -- Trigger lints on open, save, and when leaving insert mode (so you
       -- see diagnostics quickly without spamming linters on every
       -- keystroke).
