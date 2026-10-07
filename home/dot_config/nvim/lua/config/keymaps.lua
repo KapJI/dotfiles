@@ -75,9 +75,22 @@ keyset("n", "<C-u>", "<C-u>zz", { desc = "Scroll up half page" })
 -- Diagnostic navigation (global, not per-buffer)
 keyset("n", "<leader>ce", vim.diagnostic.open_float, { desc = "Diagnostic float" })
 -- Set per namespace too: a namespace's own setting (markdownlint's, in
--- nvim-lint.lua) would otherwise win over the global one.
+-- nvim-lint.lua) would otherwise win over the global one. The direction
+-- follows this buffer: if any of its diagnostics are hidden, show all.
 keyset("n", "<leader>cv", function()
-  local on = not vim.diagnostic.config().virtual_text
+  local global = vim.diagnostic.config().virtual_text
+  local on = not global
+  for _, d in ipairs(vim.diagnostic.get(0)) do
+    local shown = vim.diagnostic.config(nil, d.namespace).virtual_text
+    if shown == nil then -- no setting of its own: inherits the global one
+      shown = global
+    end
+    if not shown then
+      on = true
+      break
+    end
+    on = false
+  end
   vim.diagnostic.config({ virtual_text = on })
   for ns in pairs(vim.diagnostic.get_namespaces()) do
     vim.diagnostic.config({ virtual_text = on }, ns)
