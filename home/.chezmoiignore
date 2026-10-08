@@ -119,6 +119,12 @@ bin
 # Exception: agent plugins. The whole point of declaring them is that a rebuilt
 # workspace comes back with the same plugin set as the laptop.
 !.chezmoiscripts/unix/76-install-agent-plugins.sh
+# Exception: the antidote cache upkeep. It patches plugins inside their git
+# worktrees, and a patched clone cannot follow a pin bump by itself: antidote's
+# checkout aborts on the modified file and every new shell prints "bundle regen
+# failed". The home volume persists, so a workspace needs the script that moves
+# those clones onto their new pins as much as any other host.
+!.chezmoiscripts/unix/80-antidote-update.sh
 # Exception: the login-shell switch. The image ships bash, and `ssh <workspace>
 # <cmd>` runs the login shell — bash gets no nix profile here, zsh does (see
 # dot_zshenv.tmpl's is_container branch), so remote tooling needs zsh.
