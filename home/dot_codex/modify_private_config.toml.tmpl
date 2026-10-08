@@ -15,15 +15,15 @@
 #     sandbox_mode="workspace-write"
 # approval_policy and sandbox_mode are confirmed settable — `codex doctor`
 # reflects them back as "approval policy OnRequest" and a restricted sandbox.
+# approvals_reviewer is not reflected back, but is confirmed another way: as of
+# 0.161 codex reports every key it does not recognise ("`foo` is ignored.") and
+# refuses to load the config when this key has an invalid value. Neither
+# happens with "auto_review".
 #
 # sandbox_mode is danger-full-access in a container: codex's Linux sandbox is
 # bubblewrap, which needs unprivileged user namespaces, and Ubuntu's
 # kernel.apparmor_restrict_unprivileged_userns=1 denies those to a container —
 # not fixable from inside one. The container is the isolation boundary instead.
-# approvals_reviewer is NOT confirmed: codex silently ignores unknown config
-# keys (a deliberately bogus key still reports "config.toml parse ok") and
-# exposes no resolved-config dump. If it is wrong the setting simply does
-# nothing and approvals stay on-request — it fails closed, not open.
 #
 # TOML ordering matters: bare keys belong to the root table, so they must come
 # before the first [section] header or they would silently land inside whatever
