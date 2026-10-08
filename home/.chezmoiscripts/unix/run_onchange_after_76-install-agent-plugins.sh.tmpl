@@ -48,12 +48,6 @@ set -e
 
 . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
 
-# Coder's claude-code / codex modules install into ~/.local/bin, which a
-# non-interactive shell does not have on PATH. Look there too so a workspace
-# gets its plugins even though its agents are not the nix-profile ones.
-PATH="$HOME/.local/bin:$PATH"
-export PATH
-
 {{ if $claudePlugins }}
 if command -v claude >/dev/null 2>&1; then
 {{- range (uniq $claudeMarkets) }}
