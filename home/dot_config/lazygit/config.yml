@@ -32,8 +32,8 @@ gui:
       - "#f38ba8"
     defaultFgColor:
       - "#cdd6f4"
-  authorColors:
-    "*": "#b4befe"
+    authorColors:
+      "*": "#b4befe"
 # Edit files picked in lazygit in the running Neovim (was provided by
 # snacks's `configure`; restated here since we disabled it).
 os:
