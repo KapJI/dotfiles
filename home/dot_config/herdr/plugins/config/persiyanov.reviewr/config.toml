@@ -1,0 +1,3 @@
+# reviewr's own config: herdr's config.toml never reaches the plugin.
+# Stay hidden in a new worktree workspace until toggled (prefix+d).
+auto_open = false
