@@ -37,7 +37,7 @@
 # powerlevel9k.zsh-theme (a compat shim that just re-sources this file).
 romkatv/powerlevel10k path:powerlevel10k.zsh-theme pin:d05a1b00f9a61f9578bf9dc19b8451942dde8734
 
-zsh-users/zsh-completions path:src kind:fpath pin:b5e8e0a22deb05a807bb8655aef809a29f3cffed
+zsh-users/zsh-completions path:src kind:fpath pin:6661b4b68173784ba31ef10ce4b5cb1c9ecfdcac
 MichaelAquilina/zsh-you-should-use pin:5f3d129864ee4505043d88c3486224f1d75b692e
 
 # Queues compdef calls; the real compinit runs at the first prompt
@@ -52,11 +52,11 @@ Aloxaf/fzf-tab pin:24105b15714bfec37989ed5c5b6e60f572253019
 # to url-quote-magic, which would overwrite fsh's self-insert wrap
 # if fsh loaded first.
 getantidote/use-omz pin:317648f75d2643abcd7cf580062a8999b11473d7
-ohmyzsh/ohmyzsh path:lib pin:42a4ccb1b14dbeffe81259105a5243b4f4cb618e
-ohmyzsh/ohmyzsh path:plugins/colored-man-pages pin:42a4ccb1b14dbeffe81259105a5243b4f4cb618e
-ohmyzsh/ohmyzsh path:plugins/dirhistory pin:42a4ccb1b14dbeffe81259105a5243b4f4cb618e
-ohmyzsh/ohmyzsh path:plugins/extract pin:42a4ccb1b14dbeffe81259105a5243b4f4cb618e
-ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z pin:42a4ccb1b14dbeffe81259105a5243b4f4cb618e
+ohmyzsh/ohmyzsh path:lib pin:083c339e0622bfc144b66ebf1a2e8dbe7d2ada0d
+ohmyzsh/ohmyzsh path:plugins/colored-man-pages pin:083c339e0622bfc144b66ebf1a2e8dbe7d2ada0d
+ohmyzsh/ohmyzsh path:plugins/dirhistory pin:083c339e0622bfc144b66ebf1a2e8dbe7d2ada0d
+ohmyzsh/ohmyzsh path:plugins/extract pin:083c339e0622bfc144b66ebf1a2e8dbe7d2ada0d
+ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z pin:083c339e0622bfc144b66ebf1a2e8dbe7d2ada0d
 # safe-paste intentionally omitted: on zsh >=5.1 it only re-binds
 # bracketed-paste-magic (already done by lib/misc.zsh above) and runs a
 # buggy `set zle_bracketed_paste` that clobbers $@ instead of setting an
