@@ -119,7 +119,8 @@ config.colors               = {
 -- when the foreground app is neither tmux nor nvim.
 --
 -- Detection:
---   - IS_NVIM user-var (set by smart-splits via OSC) — works through SSH/et
+--   - IS_NVIM user-var (set via OSC by smart-splits' wezterm backend, which
+--     only activates for nvim running directly in a wezterm pane — see below)
 --   - IS_TMUX user-var (set by tmux client-attached hook via OSC) — same
 --   - foreground process name == "tmux" / "nvim" — local case (no OSC)
 --
@@ -162,6 +163,36 @@ local function split_nav(action, key)
         end),
     }
 end
+
+-- nvim → wezterm handoff. smart-splits v3's wezterm backend never shells out
+-- to `wezterm cli`: at nvim's edge it writes a SMART_SPLITS_REQ user-var
+-- ({"action":"move"|"resize","dir":"left",...}) and expects the GUI side to
+-- act on it. This handler stands in for upstream's GUI plugin, which would
+-- also take over the Alt-hjkl bindings above and break the tmux forwarding.
+-- Mirrors backend-wezterm at the commit pinned in nvim's smart-splits.lua.
+--
+-- The backend's detect() also requires SMART_SPLITS_WEZTERM in the pane's
+-- environment, as proof that something here listens. Panes opened before
+-- this config loaded lack it, and nvim in them stops at its own edge.
+config.set_environment_variables = { SMART_SPLITS_WEZTERM = '1' }
+
+local request_dirs = { left = 'Left', down = 'Down', up = 'Up', right = 'Right' }
+
+wezterm.on('user-var-changed', function(win, pane, name, value)
+    if name ~= 'SMART_SPLITS_REQ' then return end
+    local ok, req = pcall(wezterm.json_parse, value)
+    local dir = ok and type(req) == 'table' and request_dirs[req.dir]
+    if not dir then
+        wezterm.log_warn('smart-splits: malformed SMART_SPLITS_REQ: ' .. tostring(value))
+        return
+    end
+    if req.action == 'resize' then
+        win:perform_action({ AdjustPaneSize = { dir, req.amount or 3 } }, pane)
+    else
+        -- No wezterm pane that way: stop, same as a direct Alt-hjkl press.
+        win:perform_action({ ActivatePaneDirection = dir }, pane)
+    end
+end)
 
 -- ── Alt-Y: copy the previous command AND its output ──────────────────────
 -- At a bare wezterm prompt (no tmux) copy the last command line plus its

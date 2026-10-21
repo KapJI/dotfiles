@@ -5,16 +5,35 @@
 --   Alt+Shift+HJKL        — resize toward that edge (3 cells per press)
 --   <leader>w + HJKL      — swap nvim split contents (nvim-only feature)
 return {
-  "mrjones2014/smart-splits.nvim",
+  "smart-splits-nvim/smart-splits.nvim",
+  -- Must not lazy-load: the backend announces nvim to the multiplexer
+  -- (wezterm's IS_NVIM user-var) only once the plugin loads.
   lazy = false,
+  dependencies = {
+    "smart-splits-nvim/backend-tmux",
+    {
+      -- Upstream marks it unstable with breaking changes "without warning",
+      -- and its request format is mirrored by hand in wezterm.lua's
+      -- SMART_SPLITS_REQ handler. Bump both together.
+      "smart-splits-nvim/backend-wezterm",
+      commit = "ae840db696791f638c190c3e0534d2ddfcd5e6a7",
+    },
+  },
   opts = {
-    -- Cycle when reaching screen edges instead of doing nothing.
-    at_edge = "wrap",
-    cursor_follows_swapped_bufs = true,
-    -- Default resize step in cells.
-    default_amount = 3,
-    -- Multiplexer integrations are auto-detected via $TMUX / $WEZTERM_PANE.
-    multiplexer_integration = nil, -- nil = auto
+    -- v3 ships no multiplexer support and detects nothing by itself. First
+    -- backend that detects wins, so the inner one (tmux) goes first. herdr
+    -- has no v3 backend: in a herdr pane, moves stop at nvim's edge. herdr
+    -- panes inherit the outer wezterm's env, so the wezterm backend would
+    -- detect there and steer wezterm's panes instead; keep it out.
+    -- move.at_edge = "wrap" and resize.amount = 3 are the v3 defaults.
+    mux = {
+      backend = vim.env.HERDR_ENV and { "smart-splits-backend-tmux" }
+        or { "smart-splits-backend-tmux", "smart-splits-backend-wezterm" },
+      -- Plain movement outside both (herdr, ssh to a bare shell) is expected,
+      -- not worth a warning on every start. A broken backend still errors.
+      warn_if_unusable = false,
+    },
+    swap = { move_cursor = true },
   },
   keys = {
     -- Navigation — same keys as the old vim-tmux-navigator setup.
