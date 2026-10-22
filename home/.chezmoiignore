@@ -126,6 +126,11 @@ bin
 {{ end }}
 {{ end }}
 
+{{ if not (index . "is_container" | default false) }}
+# Supervises the CGT dispatcher workers, which only the Coder workspace runs.
+bin/cgt-dispatcher-supervise
+{{ end }}
+
 {{ if (index . "is_container" | default false) }}
 # Ephemeral Coder/CI container: skip installer scripts (apt/desktop repos +
 # age-key decryption) and all SSH material (the encrypted ssh config would need

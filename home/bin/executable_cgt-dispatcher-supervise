@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# Keep the CGT dispatcher workers alive outside any Claude or herdr session:
+# telegram_listener.py (long-running, restarted whenever it exits) and
+# questions.py (one sync every 10s). The Coder template's `coder_script` starts
+# this detached on every workspace start; running it again is harmless.
+#
+# One Telegram poller only: the flock is inherited by both workers, so it stays
+# held while either is alive, even if this script itself is killed. A second
+# copy finds it taken and exits. Workers started any other way do not take it,
+# so stop those before the first launch.
+
+set -u
+
+dir=${CGT_DISPATCHER_DIR:-$HOME/.local/state/cgt-agents/dispatcher}
+cd "$dir" || exit 1
+exec 9>>supervisor.lock
+flock -n 9 || exit 0
+
+# A coder_script runs in a bare shell; python3 comes from the nix profile.
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
+
+log() { printf '%s %s\n' "$(date -Is)" "$*" >>supervisor.log; }
+log "supervisor started (pid $$)"
+
+while :; do
+    python3 telegram_listener.py >>telegram-listener.log 2>&1
+    log "telegram_listener.py exited ($?), restarting in 5s"
+    sleep 5
+done &
+
+while sleep 10; do
+    python3 questions.py >/dev/null 2>>questions-sync.err
+done
