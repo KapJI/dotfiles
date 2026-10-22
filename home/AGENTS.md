@@ -216,6 +216,18 @@ a dangling link means the connection that last set it has closed.
 
 Plugins roll forward on their own: `unix/run_onchange_after_90-install-vim-plugins.sh.tmpl` runs `Lazy! sync` (install + update + clean) weekly. The trade is deliberate — no cross-host pinning, and a bad upstream update arrives unannounced. Undo one with `:Lazy restore`, or pin that plugin's `commit`/`version` in its spec under `lua/plugins/`.
 
+### Agent startup instructions
+
+Claude, Codex and omp start from the shared rules in
+`~/github/agent-workflow/instructions/global.md` plus the host rules in
+`.chezmoitemplates/agent-host-rules.md` (domain agents, project routing). The
+agent-workflow repo owns the shared rules and skills; edit them there, not here.
+
+- `dot_claude/CLAUDE.md.tmpl` imports `global.md` with `@`, so Claude always reads the current file.
+- `dot_codex/AGENTS.md.tmpl` copies `global.md` in at apply time, because Codex has no include. omp reads the same file through the `~/.agents/AGENTS.md` link. **After changing `global.md`, run `chezmoi apply ~/.codex/AGENTS.md`**, or Codex and omp keep the old copy.
+- Skills are links, not copies: `~/.agents/skills` (Codex and omp) and `~/.claude/skills/<name>` point into the checkout's `skills/`. A new shared skill needs its own `dot_claude/skills/symlink_<name>.tmpl` and an entry in the `.chezmoiignore` block that skips them where the checkout is absent.
+- On a host without the checkout, `.chezmoiignore` skips all of these and `chezmoi apply` prints a warning naming the clone to make. Existing instruction files stay as they are, so their approval rules remain loaded; the apply itself still succeeds.
+
 ### Encryption
 
 Sensitive files (SSH keys, age key) are encrypted with `age`. The encrypted key is stored at `.data/key.txt.age`. The unix script `10-decrypt-private-key.sh` decrypts private keys on apply.

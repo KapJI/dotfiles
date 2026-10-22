@@ -4,13 +4,10 @@
 Host-wide rules that hold in any repo. chezmoi generates this file: the shared rules
 below are copied from `~/github/agent-workflow/instructions/global.md`, and the skills
 they name are installed in `~/.agents/skills`, a link to `~/github/agent-workflow/skills/`.
+After changing `global.md`, refresh this copy (omp reads it too) with
+`chezmoi apply ~/.codex/AGENTS.md`.
 Project-specific conventions belong in that project's own AGENTS.md, not here.
 
-{{ if stat $shared -}}
 {{ include $shared | trim }}
-{{- else -}}
-The shared rules are missing: `~/github/agent-workflow` is not checked out on this
-host. Tell the user before any GitHub action instead of guessing the rules.
-{{- end }}
 
 {{ template "agent-host-rules.md" . }}

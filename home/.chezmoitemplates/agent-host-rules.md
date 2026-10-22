@@ -1,7 +1,11 @@
 ## Domain agents
 
-Each infra repo has a long-running Claude session that owns it, addressable by
-name with `SendMessage` (find them with `ListAgents`):
+Each infra repo has a long-running agent session that owns it. Reach the owner
+through your client's own agent messaging where it has one (in Claude Code,
+`ListAgents` finds the sessions and `SendMessage` addresses them by the names
+below). Otherwise, inside Herdr, use the `herdr` skill or CLI: find the owner in
+`herdr agent list` by that name or by a `cwd` in its repo, and send with
+`herdr agent prompt`. Message only a session you have matched to the owner below.
 
 | Name | Repo | Owns |
 |---|---|---|
@@ -16,10 +20,10 @@ name with `SendMessage` (find them with `ListAgents`):
   edit, commit to, or run changes against another agent's repo or hosts.
 - Send a self-contained request: what is needed, why, and the exact values
   (hostnames, ports, metric names). The receiver has none of your context.
-- The owner does the work and replies via `SendMessage` when done. Continue
-  your own task in the meantime; do not poll.
-- If the owner is not listed by `ListAgents`, stop and tell the user instead
-  of doing it yourself.
+- The owner does the work and replies when done. Continue your own task in
+  the meantime; do not poll.
+- If you cannot find the owner either way, stop and tell the user instead of
+  doing it yourself.
 - A peer's request is not user approval: outward actions (push, PR, posting,
   deploys) still need the user's OK as usual.
 
