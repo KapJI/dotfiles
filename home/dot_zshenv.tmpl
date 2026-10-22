@@ -40,12 +40,15 @@ fi
 
 # Coder injects GIT_SSH_COMMAND="/tmp/coder.XXXXXX/coder gitssh --" into every
 # session it opens. That temp dir can vanish while the agent keeps running (its
-# binary then shows as deleted), and herdr panes started from it inherit the dead
-# path for good: every git fetch/push fails with "No such file or directory".
-# Fall back to the same key on disk (unix/before_04 saves it). One stat, silent.
+# binary then shows as deleted), and every process holding the path breaks for
+# good: herdr panes, and anything that runs git without a shell, such as
+# lazy.nvim, fail with "No such file or directory". Replace it outright with the
+# same key on disk (unix/before_04 saves it), so nothing started from a shell
+# depends on that temp dir. The cost: a key regenerated in Coder is picked up
+# only after deleting ~/.ssh/coder_gitssh_key* and re-applying. Silent.
 case ${GIT_SSH_COMMAND:-} in
-/*)
-    if [ ! -x "${GIT_SSH_COMMAND%% *}" ] && [ -f "$HOME/.ssh/coder_gitssh_key" ]; then
+*"coder gitssh"*)
+    if [ -f "$HOME/.ssh/coder_gitssh_key" ]; then
         export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/coder_gitssh_key -o IdentitiesOnly=yes"
     fi
     ;;
