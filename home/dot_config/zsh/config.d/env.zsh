@@ -21,3 +21,8 @@ export LG_CONFIG_FILE="$HOME/.config/lazygit/config.yml"
 
 # Increase Claude Code max output tokens (default 32000 is too low)
 export CLAUDE_CODE_MAX_OUTPUT_TOKENS=64000
+
+# Restore Claude Code's own default CA store. The llm-agents nix wrapper sets
+# `system` alone (only when unset), and on macOS that rejects api.anthropic.com
+# with UNABLE_TO_GET_ISSUER_CERT_LOCALLY; the bundled Mozilla set covers it.
+export CLAUDE_CODE_CERT_STORE=bundled,system
