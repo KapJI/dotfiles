@@ -160,6 +160,19 @@
     refreshPeriod = {{ $default_refresh }}
 {{ end }}
 
+{{ if and (index . "is_container" | default false) (eq .chezmoi.os "linux") (eq .chezmoi.arch "amd64") }}
+# OpenShell CLI for the herdr workspace, which drives the domain-agent
+# sandboxes on the coder VM. Pinned to the gateway's version (coder-templates
+# infra/openshell), not latest: bump both together, URL and checksum here.
+# nixpkgs is stuck at 0.0.116, which predates the 0.1 gateway.
+[".local/bin/openshell"]
+    type = "archive-file"
+    url = "https://github.com/NVIDIA/OpenShell/releases/download/v0.1.5/openshell-x86_64-unknown-linux-musl.tar.gz"
+    path = "openshell"
+    executable = true
+    checksum.sha256 = "ca1ad6e6fbb4a6cd407e95763391b8ecff02912e7d9c467e7ca22696fe80af69"
+{{ end }}
+
 ["{{ printf ".local/bin/tree-sitter%s" $binary_suffix }}"]
     type = "file"
     decompress = "gzip"
