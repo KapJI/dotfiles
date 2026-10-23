@@ -129,6 +129,8 @@ bin
 {{ if not (index . "is_container" | default false) }}
 # Supervises the CGT dispatcher workers, which only the Coder workspace runs.
 bin/cgt-dispatcher-supervise
+# Opens the OpenShell domain-agent sandboxes in herdr, from the herdr workspace.
+bin/infra-agents
 {{ end }}
 
 {{ if (index . "is_container" | default false) }}

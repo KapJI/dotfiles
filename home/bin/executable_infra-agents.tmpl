@@ -1,0 +1,70 @@
+{{- $aw := includeTemplate "github-checkout" (dict "home" .chezmoi.homeDir "repo" "agent-workflow") -}}
+#!/bin/bash
+# Open the domain-agent sandboxes (OpenShell, on the coder VM) in one herdr
+# workspace, "infra", one pane each, after refreshing their global
+# instructions. Run from a herdr pane in the Coder workspace.
+#
+#   infra-agents                    refresh all, then open or focus "infra"
+#   infra-agents refresh [name...]  refresh only
+#
+# Refresh copies this workspace's chezmoi-rendered ~/.claude/CLAUDE.md, which
+# imports ~/{{ $aw }}/instructions/global.md, and that checkout's
+# skills to the same paths under each sandbox's home (/sandbox), read-only, so
+# the import and skill links resolve unchanged. The set is replaced whole, so a
+# skill removed upstream disappears. Claude reads CLAUDE.md at session start:
+# a running agent applies a refresh only after it restarts.
+#
+# The sandboxes themselves are created on the VM by coder-templates
+# infra/openshell/agents/create.sh; this only attaches to them.
+set -euo pipefail
+
+aw={{ $aw | quote }}
+
+refresh() {
+    local stage s n
+    stage=$(mktemp -d)
+    trap 'rm -rf "$stage"' RETURN
+    tar -ch -C "$HOME" .claude/CLAUDE.md "$aw/instructions" "$aw/skills" | tar -x -C "$stage"
+    mkdir -p "$stage/.claude/skills"
+    for s in "$stage/$aw"/skills/*/; do
+        ln -s "../../$aw/skills/$(basename "$s")" "$stage/.claude/skills/"
+    done
+    for n in "$@"; do
+        echo "infra-agents: refresh $n"
+        tar -C "$stage" -c . | openshell sandbox exec -n "$n" --no-tty -- sh -c '
+            set -e
+            chmod -R u+w "/sandbox/$1" /sandbox/.claude/CLAUDE.md 2>/dev/null || true
+            rm -rf "/sandbox/$1" /sandbox/.claude/CLAUDE.md /sandbox/.claude/skills
+            tar -x --no-overwrite-dir -C /sandbox
+            chmod -R a-w "/sandbox/$1" /sandbox/.claude/CLAUDE.md' sh "$aw"
+    done
+}
+
+mapfile -t agents < <(openshell sandbox list | awk 'NR > 1 { print $1 }')
+
+if [[ ${1:-} == refresh ]]; then
+    shift
+    refresh "${@:-${agents[@]}}"
+    exit
+fi
+refresh "${agents[@]}"
+
+ws=$(herdr workspace list | jq -r '.result.workspaces[] | select(.label == "infra") | .workspace_id' | head -1)
+if [[ -n $ws ]]; then
+    herdr workspace focus "$ws" >/dev/null
+    exit
+fi
+
+# ponytail: one row of right splits, fine for a few agents; switch to a grid
+# when there are more than three.
+pane=$(herdr workspace create --label infra --cwd "$HOME" --focus | jq -r .result.root_pane.pane_id)
+for i in "${!agents[@]}"; do
+    a=${agents[$i]}
+    if ((i > 0)); then
+        pane=$(herdr pane split "$pane" --direction right --cwd "$HOME" --no-focus | jq -r .result.pane.pane_id)
+    fi
+    herdr pane rename "$pane" "$a" >/dev/null
+    # HERDR_AGENT: the openshell wrapper hides the claude process from herdr's
+    # agent detection; this tells it what runs in the pane.
+    herdr pane run "$pane" "HERDR_AGENT=claude openshell sandbox connect $a" >/dev/null
+done
