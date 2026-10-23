@@ -4,8 +4,10 @@
 # workspace per agent named after it, after refreshing their global
 # instructions. Run from a herdr pane in the Coder workspace.
 #
-#   infra-agents                    refresh all, then open any missing workspaces
+#   infra-agents                    refresh all, then open or reattach their workspaces
 #   infra-agents refresh [name...]  refresh only
+#   infra-agents update [name...]   install this workspace's Claude Code version
+#                                   in the sandboxes, restarting those it changed
 #
 # Refresh copies this workspace's chezmoi-rendered ~/.claude/CLAUDE.md, which
 # imports ~/{{ $aw }}/instructions/global.md, and that checkout's
@@ -40,25 +42,75 @@ refresh() {
     done
 }
 
-mapfile -t agents < <(openshell sandbox list | awk 'NR > 1 { print $1 }')
-
-if [[ ${1:-} == refresh ]]; then
-    shift
-    refresh "${@:-${agents[@]}}"
-    exit
-fi
-refresh "${agents[@]}"
+# Updates follow the workspace's own claude, pinned by the dotfiles' flake.lock,
+# so `bump-locks` moves the sandboxes too. `claude install` puts it in
+# /sandbox/.local, which the sandbox's main command prefers over the image's
+# copy (create.sh); killing the main process makes the restart policy start the
+# new version. That ends the herdr pane's connection, so restarted agents are
+# reattached once their old connection has gone.
+update() {
+    local ver n restarted=()
+    ver=$(claude --version | awk '{ print $1 }')
+    for n in "$@"; do
+        if openshell sandbox exec -n "$n" --no-tty -- sh -c \
+            '[ "$(/sandbox/.local/bin/claude --version 2>/dev/null | cut -d" " -f1)" = "$1" ]' sh "$ver"; then
+            echo "infra-agents: $n already has claude $ver"
+            continue
+        fi
+        echo "infra-agents: $n -> claude $ver"
+        # `sandbox exec` does not pass the image's ENV, so restate it: without
+        # CLAUDE_CONFIG_DIR the installer writes a stray /sandbox/.claude.json.
+        openshell sandbox exec -n "$n" --no-tty -- sh -c '
+            set -e
+            export CLAUDE_CONFIG_DIR=/sandbox/.claude DISABLE_AUTOUPDATER=1
+            claude install "$1" >/dev/null
+            /sandbox/.local/bin/claude --version | grep -q "^$1 "
+            pkill -f "^[^ ]*claude --remote-control"' sh "$ver"
+        restarted+=("$n")
+    done
+    if ((${#restarted[@]})); then
+        sleep 5
+        attach "${restarted[@]}"
+    fi
+}
 
 # One herdr workspace per agent, labelled with its name, so each gets its own
-# sidebar entry and status. Only sandboxes without one get a new workspace.
-mapfile -t labels < <(herdr workspace list | jq -r '.result.workspaces[].label')
-for a in "${agents[@]}"; do
-    if printf '%s\n' "${labels[@]}" | grep -qxF "$a"; then
-        continue
-    fi
-    echo "infra-agents: open $a"
-    pane=$(herdr workspace create --label "$a" --cwd "$HOME" --no-focus | jq -r .result.root_pane.pane_id)
-    # HERDR_AGENT: the openshell wrapper hides the claude process from herdr's
-    # agent detection; this tells it what runs in the pane.
-    herdr pane run "$pane" "HERDR_AGENT=claude openshell sandbox connect $a" >/dev/null
-done
+# sidebar entry and status. A missing workspace is created; an existing one
+# with no live agent (its connection ended: an update restart, a sandbox
+# recreate, a herdr restart) is reattached in its first pane.
+attach() {
+    local a ws pane
+    for a in "$@"; do
+        ws=$(herdr workspace list | jq -r --arg a "$a" '.result.workspaces[] | select(.label == $a) | .workspace_id' | head -1)
+        if [[ -z $ws ]]; then
+            echo "infra-agents: open $a"
+            pane=$(herdr workspace create --label "$a" --cwd "$HOME" --no-focus | jq -r .result.root_pane.pane_id)
+        elif herdr agent list | jq -e --arg w "$ws" 'any(.result.agents[]; .workspace_id == $w)' >/dev/null; then
+            continue
+        else
+            echo "infra-agents: reattach $a"
+            pane=$(herdr pane list --workspace "$ws" | jq -r '.result.panes[0].pane_id')
+        fi
+        # HERDR_AGENT: the openshell wrapper hides the claude process from
+        # herdr's agent detection; this tells it what runs in the pane.
+        herdr pane run "$pane" "HERDR_AGENT=claude openshell sandbox connect $a" >/dev/null
+    done
+}
+
+mapfile -t agents < <(openshell sandbox list | awk 'NR > 1 { print $1 }')
+
+case ${1:-} in
+refresh | update)
+    cmd=$1
+    shift
+    "$cmd" "${@:-${agents[@]}}"
+    ;;
+"")
+    refresh "${agents[@]}"
+    attach "${agents[@]}"
+    ;;
+*)
+    echo "usage: infra-agents [refresh|update] [name...]" >&2
+    exit 2
+    ;;
+esac
