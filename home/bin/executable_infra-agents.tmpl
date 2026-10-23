@@ -21,6 +21,9 @@
 # (zshrc, p10k.zsh, zsh/; router-config owns it) to /sandbox/.zshrc,
 # .p10k.zsh and .zsh/, for `openshell sandbox exec -n <name> --tty -- zsh -l`.
 # Without that checkout the sandboxes keep whatever shell files they have.
+# Your git aliases come along: ~/.config/git/config (git's XDG config) and
+# ~/.config/zsh/config.d/git_aliases.zsh, as ~/.zsh/git_aliases.zsh, which the
+# routers' zshrc sources.
 #
 # The sandboxes themselves are created on the VM by coder-templates
 # infra/openshell/agents/create.sh; this only attaches to them.
@@ -30,7 +33,7 @@ aw={{ $aw | quote }}
 rc={{ $rc | quote }}
 
 refresh() {
-    local stage s n shell=0
+    local stage s n shell=0 gitcfg=0
     stage=$(mktemp -d)
     trap 'rm -rf "$stage"' RETURN
     tar -ch -C "$HOME" .claude/CLAUDE.md "$aw/instructions" "$aw/skills" | tar -x -C "$stage"
@@ -43,8 +46,14 @@ refresh() {
         cp "$HOME/$rc/shell/zshrc" "$stage/.zshrc"
         cp "$HOME/$rc/shell/p10k.zsh" "$stage/.p10k.zsh"
         cp -R "$HOME/$rc/shell/zsh" "$stage/.zsh"
+        cp "$HOME/.config/zsh/config.d/git_aliases.zsh" "$stage/.zsh/" 2>/dev/null || true
     else
         echo "infra-agents: no ~/$rc checkout, sandbox shell files left as they are" >&2
+    fi
+    if [[ -r $HOME/.config/git/config ]]; then
+        gitcfg=1
+        mkdir -p "$stage/.config/git"
+        cp "$HOME/.config/git/config" "$stage/.config/git/config"
     fi
     for n in "$@"; do
         echo "infra-agents: refresh $n"
@@ -52,10 +61,11 @@ refresh() {
             set -e
             paths="/sandbox/$1 /sandbox/.claude/CLAUDE.md"
             [ "$2" = 1 ] && paths="$paths /sandbox/.zshrc /sandbox/.p10k.zsh /sandbox/.zsh"
+            [ "$3" = 1 ] && paths="$paths /sandbox/.config/git/config"
             chmod -R u+w $paths 2>/dev/null || true
             rm -rf $paths /sandbox/.claude/skills
             tar -x --no-overwrite-dir -C /sandbox
-            chmod -R a-w $paths' sh "$aw" "$shell"
+            chmod -R a-w $paths' sh "$aw" "$shell" "$gitcfg"
     done
 }
 

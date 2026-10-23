@@ -18,41 +18,6 @@
 [url "git@github.com:"]
     insteadOf = https://github.com/
 {{- end }}
-[alias]
-    # sync with zsh
-    a = add
-    b = branch
-    c = commit
-    co = checkout
-    cl = clone
-    cam = commit --all --message
-    cm = commit --message
-    d = diff
-    ds = diff --staged
-    f = fetch
-    pl = pull
-    plra = pull --rebase --autostash
-    p = push
-    r = remote
-    rb = rebase
-    rs = restore
-    sh = show
-    st = status
-    sl = "log --graph --pretty=format:'commit: %C(bold red)%h%Creset %C(red)<%H>%Creset %C(bold magenta)%d %Creset%ndate: %C(bold yellow)%cd %Creset%C(yellow)%cr%Creset%nauthor: %C(bold blue)%an%Creset %C(blue)<%ae>%Creset%n%C(cyan)%s%n%Creset'"
-    prev = "checkout HEAD^1"
-    next = "!sh ~/bin/git-checkout-next.sh"
-    fixup = "!sh ~/bin/git-fixup.sh"
-    unstash = stash pop
-    cleanup = "!sh ~/bin/git-branch-cleanup.sh"
-    # hg compat
-    amend = commit --all --amend
-    histedit = rebase -i
-    shelve = stash
-    unshelve = stash pop
-    uncommit = reset --soft HEAD^
-    unamend = reset HEAD@{1}
-    undo = reset --keep HEAD@{1}
-    backout = revert
 [color]
     ui = auto
 [pull]
