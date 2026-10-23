@@ -160,9 +160,11 @@
     refreshPeriod = {{ $default_refresh }}
 {{ end }}
 
-{{ if and (index . "is_container" | default false) (eq .chezmoi.os "linux") (eq .chezmoi.arch "amd64") }}
+{{ if and (eq .chezmoi.os "linux") (eq .chezmoi.arch "amd64") (or (index . "is_container" | default false) (eq .chezmoi.hostname "coder-vm")) }}
 # OpenShell CLI for the herdr workspace, which drives the domain-agent
-# sandboxes on the coder VM. Pinned to the gateway's version (coder-templates
+# sandboxes, and for the coder VM itself, which runs the gateway and creates
+# the sandboxes (coder-templates infra/openshell/agents/create.sh). Pinned to
+# the gateway's version (coder-templates
 # infra/openshell), not latest: bump both together, URL and checksum here.
 # nixpkgs is stuck at 0.0.116, which predates the 0.1 gateway.
 [".local/bin/openshell"]
