@@ -33,8 +33,8 @@ Library
 .codex/AGENTS.md
 {{ end }}
 
-{{ if not (stat (joinPath .chezmoi.homeDir "github/agent-workflow/instructions/global.md")) }}
-{{- warnf "agent-workflow checkout missing: left the Claude/Codex/omp instruction files and shared skill links unchanged. Clone git@github.com:KapJI/agent-workflow.git to ~/github/agent-workflow, then run chezmoi apply." }}
+{{ if not (stat (joinPath .chezmoi.homeDir (includeTemplate "github-checkout" (dict "home" .chezmoi.homeDir "repo" "agent-workflow")) "instructions/global.md")) }}
+{{- warnf "agent-workflow checkout missing: left the Claude/Codex/omp instruction files and shared skill links unchanged. Clone git@github.com:KapJI/agent-workflow.git to ~/github/agent-workflow (or ~/Project/github/agent-workflow), then run chezmoi apply." }}
 # The agent startup files import or copy the shared rules from the
 # agent-workflow checkout, and the skill links point into it. Without it, leave
 # whatever instruction files exist alone (so their approval rules stay loaded)

@@ -28,8 +28,9 @@ below). Otherwise, inside Herdr, use the `herdr` skill or CLI: find the owner in
   deploys) still need the user's OK as usual.
 
 ## capital-gains-calculator
+{{- $cgc := includeTemplate "github-checkout" (dict "home" .chezmoi.homeDir "repo" "capital-gains-calculator") }}
 
-When working in the main checkout `~/github/capital-gains-calculator` or anywhere
+When working in the main checkout `~/{{ $cgc }}` or anywhere
 under `~/.herdr/worktrees/capital-gains-calculator`, read
 `~/.herdr/worktrees/capital-gains-calculator/AGENTS.md` completely before starting
 work, unless it is already loaded in this session. It is the single source of truth

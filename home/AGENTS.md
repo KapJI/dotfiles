@@ -222,6 +222,9 @@ Claude, Codex and omp start from the shared rules in
 `~/github/agent-workflow/instructions/global.md` plus the host rules in
 `.chezmoitemplates/agent-host-rules.md` (domain agents, project routing). The
 agent-workflow repo owns the shared rules and skills; edit them there, not here.
+`.chezmoitemplates/github-checkout` resolves the checkout (and the
+capital-gains-calculator one the host rules name): `~/github/<repo>`, or
+`~/Project/github/<repo>` where only that one exists.
 
 - `dot_claude/CLAUDE.md.tmpl` imports `global.md` with `@`, so Claude always reads the current file.
 - `dot_codex/AGENTS.md.tmpl` copies `global.md` in at apply time, because Codex has no include. omp reads the same file through the `~/.agents/AGENTS.md` link. **After changing `global.md`, run `chezmoi apply ~/.codex/AGENTS.md`**, or Codex and omp keep the old copy.

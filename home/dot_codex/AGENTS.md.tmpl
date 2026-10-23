@@ -1,9 +1,10 @@
-{{- $shared := joinPath .chezmoi.homeDir "github/agent-workflow/instructions/global.md" -}}
+{{- $aw := includeTemplate "github-checkout" (dict "home" .chezmoi.homeDir "repo" "agent-workflow") -}}
+{{- $shared := joinPath .chezmoi.homeDir $aw "instructions/global.md" -}}
 # Global instructions
 
 Host-wide rules that hold in any repo. chezmoi generates this file: the shared rules
-below are copied from `~/github/agent-workflow/instructions/global.md`, and the skills
-they name are installed in `~/.agents/skills`, a link to `~/github/agent-workflow/skills/`.
+below are copied from `~/{{ $aw }}/instructions/global.md`, and the skills
+they name are installed in `~/.agents/skills`, a link to `~/{{ $aw }}/skills/`.
 After changing `global.md`, refresh this copy (omp reads it too) with
 `chezmoi apply ~/.codex/AGENTS.md`.
 Project-specific conventions belong in that project's own AGENTS.md, not here.

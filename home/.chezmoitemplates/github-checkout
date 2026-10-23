@@ -1,0 +1,6 @@
+{{- /* A GitHub clone, relative to $HOME: ~/github/<repo>, or ~/Project/github/<repo> where only that one exists. Call with (dict "home" .chezmoi.homeDir "repo" "<name>"). */ -}}
+{{- $dir := joinPath "github" .repo -}}
+{{- if and (not (stat (joinPath .home $dir))) (stat (joinPath .home "Project" $dir)) -}}
+{{- $dir = joinPath "Project" $dir -}}
+{{- end -}}
+{{- $dir -}}

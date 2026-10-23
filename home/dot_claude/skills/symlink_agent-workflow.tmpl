@@ -1,1 +1,1 @@
-{{ .chezmoi.homeDir }}/github/agent-workflow/skills/agent-workflow
+{{ .chezmoi.homeDir }}/{{ includeTemplate "github-checkout" (dict "home" .chezmoi.homeDir "repo" "agent-workflow") }}/skills/agent-workflow
