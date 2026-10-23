@@ -66,6 +66,13 @@ zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 # Force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
 zstyle ':completion:*' menu no
 
+# Complete dotfiles without typing the leading "." (`touch ~/.config/zsh/<TAB>`
+# offers .zshrc). Completion-only: globbing on the command line is unchanged.
+# compinit resets _comp_options, and zephyr defers it to the first prompt
+# (nix_heal.zsh may rerun it later), so re-add globdots on each prompt.
+_comp_globdots() { (( ${_comp_options[(I)globdots]} )) || _comp_options+=(globdots) }
+add-zsh-hook precmd _comp_globdots
+
 # Hide "." and ".." for completion list. Show ".." only when it's explicitly given.
 zstyle -e ':completion:*' special-dirs '[[ ${PREFIX##*/} == ".." ]] && reply=(..)'
 
