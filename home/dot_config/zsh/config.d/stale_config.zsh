@@ -1,4 +1,4 @@
-# p10k segment `zsh_stale`: a yellow `reload` in the right prompt once any zsh
+# p10k segment `zsh_stale`: a purple `reload` badge in the right prompt once any zsh
 # config file is modified after this shell loaded it, in every open pane, until
 # `reload` (or a new shell) picks the change up. chezmoi only rewrites a file
 # whose content changed, so a newer mtime means a real change; hand edits and
@@ -17,5 +17,8 @@ prompt_zsh_stale() {
         $ZDOTDIR/{config.d,custom_completion}/**/*
     )
     changed=( ${^changed}(N.ms-$age) )
-    (( $#changed )) && p10k segment -f yellow -t reload
+    # Fixed xterm-256 purple + white (~6:1), not ANSI 0-15: those follow the
+    # terminal theme, and wezterm's Arthur maps magenta (5) to a light tan
+    # that bright white (15) is unreadable on. No neighbouring segment is purple.
+    (( $#changed )) && p10k segment -b 93 -f 231 -i $'' -t '%Breload%b'
 }
