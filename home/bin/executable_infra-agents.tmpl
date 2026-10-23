@@ -1,10 +1,10 @@
 {{- $aw := includeTemplate "github-checkout" (dict "home" .chezmoi.homeDir "repo" "agent-workflow") -}}
 #!/bin/bash
-# Open the domain-agent sandboxes (OpenShell, on the coder VM) in one herdr
-# workspace, "infra", one pane each, after refreshing their global
+# Open the domain-agent sandboxes (OpenShell, on the coder VM) in herdr, one
+# workspace per agent named after it, after refreshing their global
 # instructions. Run from a herdr pane in the Coder workspace.
 #
-#   infra-agents                    refresh all, then open or focus "infra"
+#   infra-agents                    refresh all, then open any missing workspaces
 #   infra-agents refresh [name...]  refresh only
 #
 # Refresh copies this workspace's chezmoi-rendered ~/.claude/CLAUDE.md, which
@@ -49,21 +49,15 @@ if [[ ${1:-} == refresh ]]; then
 fi
 refresh "${agents[@]}"
 
-ws=$(herdr workspace list | jq -r '.result.workspaces[] | select(.label == "infra") | .workspace_id' | head -1)
-if [[ -n $ws ]]; then
-    herdr workspace focus "$ws" >/dev/null
-    exit
-fi
-
-# ponytail: one row of right splits, fine for a few agents; switch to a grid
-# when there are more than three.
-pane=$(herdr workspace create --label infra --cwd "$HOME" --focus | jq -r .result.root_pane.pane_id)
-for i in "${!agents[@]}"; do
-    a=${agents[$i]}
-    if ((i > 0)); then
-        pane=$(herdr pane split "$pane" --direction right --cwd "$HOME" --no-focus | jq -r .result.pane.pane_id)
+# One herdr workspace per agent, labelled with its name, so each gets its own
+# sidebar entry and status. Only sandboxes without one get a new workspace.
+mapfile -t labels < <(herdr workspace list | jq -r '.result.workspaces[].label')
+for a in "${agents[@]}"; do
+    if printf '%s\n' "${labels[@]}" | grep -qxF "$a"; then
+        continue
     fi
-    herdr pane rename "$pane" "$a" >/dev/null
+    echo "infra-agents: open $a"
+    pane=$(herdr workspace create --label "$a" --cwd "$HOME" --no-focus | jq -r .result.root_pane.pane_id)
     # HERDR_AGENT: the openshell wrapper hides the claude process from herdr's
     # agent detection; this tells it what runs in the pane.
     herdr pane run "$pane" "HERDR_AGENT=claude openshell sandbox connect $a" >/dev/null
