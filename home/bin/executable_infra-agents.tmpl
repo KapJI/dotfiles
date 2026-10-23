@@ -1,4 +1,5 @@
 {{- $aw := includeTemplate "github-checkout" (dict "home" .chezmoi.homeDir "repo" "agent-workflow") -}}
+{{- $rc := includeTemplate "github-checkout" (dict "home" .chezmoi.homeDir "repo" "router-config") -}}
 #!/bin/bash
 # Open the domain-agent sandboxes (OpenShell, on the coder VM) in herdr, one
 # workspace per agent named after it, after refreshing their global
@@ -16,14 +17,20 @@
 # skill removed upstream disappears. Claude reads CLAUDE.md at session start:
 # a running agent applies a refresh only after it restarts.
 #
+# Refresh also copies the routers' zsh setup from ~/{{ $rc }}/shell
+# (zshrc, p10k.zsh, zsh/; router-config owns it) to /sandbox/.zshrc,
+# .p10k.zsh and .zsh/, for `openshell sandbox exec -n <name> --tty -- zsh -l`.
+# Without that checkout the sandboxes keep whatever shell files they have.
+#
 # The sandboxes themselves are created on the VM by coder-templates
 # infra/openshell/agents/create.sh; this only attaches to them.
 set -euo pipefail
 
 aw={{ $aw | quote }}
+rc={{ $rc | quote }}
 
 refresh() {
-    local stage s n
+    local stage s n shell=0
     stage=$(mktemp -d)
     trap 'rm -rf "$stage"' RETURN
     tar -ch -C "$HOME" .claude/CLAUDE.md "$aw/instructions" "$aw/skills" | tar -x -C "$stage"
@@ -31,14 +38,24 @@ refresh() {
     for s in "$stage/$aw"/skills/*/; do
         ln -s "../../$aw/skills/$(basename "$s")" "$stage/.claude/skills/"
     done
+    if [[ -d $HOME/$rc/shell ]]; then
+        shell=1
+        cp "$HOME/$rc/shell/zshrc" "$stage/.zshrc"
+        cp "$HOME/$rc/shell/p10k.zsh" "$stage/.p10k.zsh"
+        cp -R "$HOME/$rc/shell/zsh" "$stage/.zsh"
+    else
+        echo "infra-agents: no ~/$rc checkout, sandbox shell files left as they are" >&2
+    fi
     for n in "$@"; do
         echo "infra-agents: refresh $n"
         tar -C "$stage" -c . | openshell sandbox exec -n "$n" --no-tty -- sh -c '
             set -e
-            chmod -R u+w "/sandbox/$1" /sandbox/.claude/CLAUDE.md 2>/dev/null || true
-            rm -rf "/sandbox/$1" /sandbox/.claude/CLAUDE.md /sandbox/.claude/skills
+            paths="/sandbox/$1 /sandbox/.claude/CLAUDE.md"
+            [ "$2" = 1 ] && paths="$paths /sandbox/.zshrc /sandbox/.p10k.zsh /sandbox/.zsh"
+            chmod -R u+w $paths 2>/dev/null || true
+            rm -rf $paths /sandbox/.claude/skills
             tar -x --no-overwrite-dir -C /sandbox
-            chmod -R a-w "/sandbox/$1" /sandbox/.claude/CLAUDE.md' sh "$aw"
+            chmod -R a-w $paths' sh "$aw" "$shell"
     done
 }
 
@@ -64,8 +81,11 @@ update() {
             set -e
             export CLAUDE_CONFIG_DIR=/sandbox/.claude DISABLE_AUTOUPDATER=1
             claude install "$1" >/dev/null
-            /sandbox/.local/bin/claude --version | grep -q "^$1 "
-            pkill -f "^[^ ]*claude --remote-control"' sh "$ver"
+            /sandbox/.local/bin/claude --version | grep -q "^$1 "' sh "$ver"
+        # Killing the main process can take the exec relay down with it, so
+        # this call may report failure even though the restart happened.
+        openshell sandbox exec -n "$n" --no-tty -- \
+            pkill -f "^[^ ]*claude --remote-control" 2>/dev/null || true
         restarted+=("$n")
     done
     if ((${#restarted[@]})); then
