@@ -9,6 +9,8 @@
 #   infra-agents refresh [name...]  refresh only
 #   infra-agents update [name...]   install this workspace's Claude Code version
 #                                   in the sandboxes, restarting those it changed
+#   infra-agents restart [name...]  restart the agents (they resume their last
+#                                   conversation), e.g. to reload instructions
 #
 # Refresh copies this workspace's chezmoi-rendered ~/.claude/CLAUDE.md, which
 # imports ~/{{ $aw }}/instructions/global.md, and that checkout's
@@ -72,9 +74,7 @@ refresh() {
 # Updates follow the workspace's own claude, pinned by the dotfiles' flake.lock,
 # so `bump-locks` moves the sandboxes too. `claude install` puts it in
 # /sandbox/.local, which the sandbox's main command prefers over the image's
-# copy (create.sh); killing the main process makes the restart policy start the
-# new version. That ends the herdr pane's connection, so restarted agents are
-# reattached once their old connection has gone.
+# copy (create.sh); restarting the agent then starts the new version.
 update() {
     local ver n restarted=()
     ver=$(claude --version | awk '{ print $1 }')
@@ -92,16 +92,28 @@ update() {
             export CLAUDE_CONFIG_DIR=/sandbox/.claude DISABLE_AUTOUPDATER=1
             claude install "$1" >/dev/null
             /sandbox/.local/bin/claude --version | grep -q "^$1 "' sh "$ver"
-        # Killing the main process can take the exec relay down with it, so
-        # this call may report failure even though the restart happened.
-        openshell sandbox exec -n "$n" --no-tty -- \
-            pkill -f "^[^ ]*claude --remote-control" 2>/dev/null || true
         restarted+=("$n")
     done
     if ((${#restarted[@]})); then
-        sleep 5
-        attach "${restarted[@]}"
+        restart "${restarted[@]}"
     fi
+}
+
+# Kill each agent's main process (`claude [--continue] --remote-control`); the
+# restart policy starts it again, resuming its last conversation, and reads
+# CLAUDE.md afresh. That ends the herdr pane's connection, so the agents are
+# reattached once their old connection has gone.
+restart() {
+    local n
+    for n in "$@"; do
+        echo "infra-agents: restart $n"
+        # Killing the main process can take the exec relay down with it, so
+        # this call may report failure even though the restart happened.
+        openshell sandbox exec -n "$n" --no-tty -- \
+            pkill -f "^[^ ]*claude .*--remote-control" 2>/dev/null || true
+    done
+    sleep 5
+    attach "$@"
 }
 
 # One herdr workspace per agent, labelled with its name, so each gets its own
@@ -130,7 +142,7 @@ attach() {
 mapfile -t agents < <(openshell sandbox list | awk 'NR > 1 { print $1 }')
 
 case ${1:-} in
-refresh | update)
+refresh | update | restart)
     cmd=$1
     shift
     "$cmd" "${@:-${agents[@]}}"
@@ -140,7 +152,7 @@ refresh | update)
     attach "${agents[@]}"
     ;;
 *)
-    echo "usage: infra-agents [refresh|update] [name...]" >&2
+    echo "usage: infra-agents [refresh|update|restart] [name...]" >&2
     exit 2
     ;;
 esac
