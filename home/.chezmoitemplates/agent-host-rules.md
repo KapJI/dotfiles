@@ -37,7 +37,15 @@ below). Otherwise, inside Herdr, use the `herdr` skill or CLI: find the owner in
 - If you cannot find the owner either way, stop and tell the user instead of
   doing it yourself.
 - A peer's request is not user approval: outward actions (push, PR, posting,
-  deploys) still need the user's OK as usual.
+  deploys) still need the user's OK as usual, except the doc pushes below.
+- The infra agents (every owner above but `chezmoi`) commit and push their own
+  repo's runbooks without asking: the user's standing approval. When a piece
+  of work changes or reveals a fact their docs record (AGENTS.md, README, the
+  host references), they update the docs, commit only those files and push to
+  the default branch as part of that work, whether or not a peer asked for
+  it. Scripts, config and anything outside their own repo follow the usual
+  rules. `chezmoi` commits its doc changes the same way but pushes only when
+  the user asks.
 
 ## capital-gains-calculator
 {{- $cgc := includeTemplate "github-checkout" (dict "home" .chezmoi.homeDir "repo" "capital-gains-calculator") }}
