@@ -19,6 +19,15 @@ below). Otherwise, inside Herdr, use the `herdr` skill or CLI: find the owner in
 - A "sandbox on `coder`" owner runs in an OpenShell sandbox on the coder VM and
   is reachable only over Remote Control: your session must be connected to it
   (`/remote-control`) to see that owner in `ListAgents`.
+- The sandboxes depend on infrastructure their peers manage: the coder VM runs
+  on `truenas` (which also runs AdGuard, their first DNS server) and reaches
+  the internet through LondonRouter. Rebooting or reconfiguring any of those
+  (the NAS, the VM, the router's WAN, firewall, DNS or podkop) cuts every
+  sandboxed agent off from its API mid-task, including an agent making that
+  change from a sandbox. Tell the user first, and make such a change finish or
+  roll back on its own (a detached job with a timed rollback), since the agent
+  may not be there to do it. A vps reboot cuts the hops through vps `jump`
+  (the Ufa routers and HA box, the metrics gateway).
 - Work that belongs to another agent's domain is delegated, not done: do not
   edit, commit to, or run changes against another agent's repo or hosts.
 - Send a self-contained request: what is needed, why, and the exact values
