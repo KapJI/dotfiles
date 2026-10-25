@@ -129,6 +129,9 @@ bin
 {{ if not (index . "is_container" | default false) }}
 # Supervises the CGT dispatcher workers, which only the Coder workspace runs.
 bin/cgt-dispatcher-supervise
+# Telegram notifier for omp and the agent workflow; its telegram.env (the bot
+# credentials) stays unmanaged, next to it on the one host that sends.
+.config/omp-notify
 # Opens the OpenShell domain-agent sandboxes in herdr, from the herdr workspace.
 bin/infra-agents
 {{ end }}

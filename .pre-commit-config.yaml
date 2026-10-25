@@ -56,3 +56,12 @@ repos:
         language: system
         pass_filenames: false
         files: ^(home/dot_config/zsh/.*\.(zsh|tmpl)|home/dot_z[a-z]*(\.tmpl)?|home/\.chezmoiscripts/.*\.sh\.tmpl|home/dot_tmux\.conf\.tmpl|tests/shell/.*)$
+
+      # The Telegram notifier against a fake curl: receipt output, exit codes,
+      # nothing from the reply or the token leaking. Never sends a message.
+      - id: notify-tests
+        name: omp-notify notifier tests
+        entry: tests/notify/run.sh
+        language: system
+        pass_filenames: false
+        files: ^(home/dot_config/omp-notify/.*|tests/notify/.*)$
