@@ -127,7 +127,9 @@ bin
 {{ end }}
 
 {{ if not (index . "is_container" | default false) }}
-# Supervises the CGT dispatcher workers, which only the Coder workspace runs.
+# The agent-workflow services supervisor (Telegram listener + project
+# watchdogs) and the deprecated CGT name that forwards to it: workspace only.
+bin/agent-workflow-services
 bin/cgt-dispatcher-supervise
 # Telegram notifier for omp and the agent workflow; its telegram.env (the bot
 # credentials) stays unmanaged, next to it on the one host that sends.

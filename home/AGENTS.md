@@ -231,6 +231,17 @@ capital-gains-calculator one the host rules name): `~/github/<repo>`, or
 - Skills are links, not copies: `~/.agents/skills` (Codex and omp) and `~/.claude/skills/<name>` point into the checkout's `skills/`. A new shared skill needs its own `dot_claude/skills/symlink_<name>.tmpl` and an entry in the `.chezmoiignore` block that skips them where the checkout is absent.
 - On a host without the checkout, `.chezmoiignore` skips all of these and `chezmoi apply` prints a warning naming the clone to make. Existing instruction files stay as they are, so their approval rules remain loaded; the apply itself still succeeds.
 
+### Workspace services
+
+In the Coder workspace, `bin/agent-workflow-services` is the one entry point for
+the agent-workflow services supervisor (`workflow/services.py` in that checkout):
+the shared Telegram listener plus a watchdog per project in the runtime registry
+`~/.local/state/agent-workflow/services/registry.json`, which is not managed
+here. The Coder template starts it once at boot with the line in the script's
+header comment. Adding a project changes only the registry, never the template.
+`start` is idempotent. `bin/cgt-dispatcher-supervise` is a deprecated name that
+forwards to `start`; `tests/services/run.sh` covers both.
+
 ### Encryption
 
 Sensitive files (SSH keys, age key) are encrypted with `age`. The encrypted key is stored at `.data/key.txt.age`. The unix script `10-decrypt-private-key.sh` decrypts private keys on apply.

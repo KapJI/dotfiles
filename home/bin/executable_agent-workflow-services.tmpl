@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+# Entry point for the agent-workflow services supervisor: one process that owns
+# the shared Telegram listener and a stall watchdog per project in the registry
+# (see docs/services.md in the agent-workflow checkout). New projects go in the
+# registry, so the Coder template never changes for them.
+#
+#   agent-workflow-services start|run|status|stop [args...]
+#
+# Adds the default registry unless --registry is given. Works from the bare
+# shell a Coder startup_script runs in. The template starts it with:
+#
+#   if [ -x "$HOME/bin/agent-workflow-services" ]; then
+#     setsid -f "$HOME/bin/agent-workflow-services" start </dev/null >/dev/null 2>&1
+#   fi
+
+set -eu
+
+services="$HOME/{{ includeTemplate "github-checkout" (dict "home" .chezmoi.homeDir "repo" "agent-workflow") }}/workflow/services.py"
+registry="$HOME/.local/state/agent-workflow/services/registry.json"
+
+if [ $# -eq 0 ]; then
+    echo "usage: agent-workflow-services start|run|status|stop [args...]" >&2
+    exit 2
+fi
+if [ ! -f "$services" ]; then
+    echo "agent-workflow-services: $services not found; clone agent-workflow there" >&2
+    exit 1
+fi
+
+# A startup_script or cron shell has no nix profile on PATH.
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
+
+cmd=$1
+shift
+for arg in "$@"; do
+    case $arg in
+    --registry | --registry=*) exec python3 "$services" "$cmd" "$@" ;;
+    esac
+done
+exec python3 "$services" "$cmd" --registry "$registry" "$@"

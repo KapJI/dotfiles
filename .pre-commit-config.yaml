@@ -65,3 +65,12 @@ repos:
         language: system
         pass_filenames: false
         files: ^(home/dot_config/omp-notify/.*|tests/notify/.*)$
+
+      # The agent-workflow services launcher and the old CGT name that forwards
+      # to it, against a fake services.py in a bare env -i shell. Starts nothing.
+      - id: services-tests
+        name: agent-workflow services launcher tests
+        entry: tests/services/run.sh
+        language: system
+        pass_filenames: false
+        files: ^(home/bin/executable_(agent-workflow-services\.tmpl|cgt-dispatcher-supervise)|tests/services/.*)$
