@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-# Keep the CGT dispatcher workers alive outside any Claude or herdr session:
-# telegram_listener.py (long-running, restarted whenever it exits) and
-# questions.py (one sync every 10s). The Coder template's `coder_script` starts
-# this detached on every workspace start; running it again is harmless.
+# Keep the CGT dispatcher's telegram_listener.py alive outside any Claude or
+# herdr session, restarting it whenever it exits. The listener also syncs
+# questions in its poll loop. The Coder template's startup_script starts this
+# detached (setsid -f) on every workspace start; running it again is harmless.
 #
-# One Telegram poller only: the flock is inherited by both workers, so it stays
-# held while either is alive, even if this script itself is killed. A second
-# copy finds it taken and exits. Workers started any other way do not take it,
-# so stop those before the first launch.
+# One Telegram poller only: the flock is inherited by the listener, so it stays
+# held while the listener is alive, even if this script itself is killed. A
+# second copy finds it taken and exits. A listener started any other way does
+# not take it, so stop that one before the first launch.
 
 set -u
 
@@ -17,7 +17,7 @@ cd "$dir" || exit 1
 exec 9>>supervisor.lock
 flock -n 9 || exit 0
 
-# A coder_script runs in a bare shell; python3 comes from the nix profile.
+# The startup_script runs in a bare shell; python3 comes from the nix profile.
 . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
 
 log() { printf '%s %s\n' "$(date -Is)" "$*" >>supervisor.log; }
@@ -27,8 +27,4 @@ while :; do
     python3 telegram_listener.py >>telegram-listener.log 2>&1
     log "telegram_listener.py exited ($?), restarting in 5s"
     sleep 5
-done &
-
-while sleep 10; do
-    python3 questions.py >/dev/null 2>>questions-sync.err
 done
