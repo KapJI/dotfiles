@@ -104,7 +104,7 @@ update() {
 # CLAUDE.md afresh. That ends the herdr pane's connection, so the agents are
 # reattached once their old connection has gone.
 restart() {
-    local n
+    local n start=$SECONDS
     for n in "$@"; do
         echo "infra-agents: restart $n"
         # Killing the main process can take the exec relay down with it, so
@@ -112,7 +112,16 @@ restart() {
         openshell sandbox exec -n "$n" --no-tty -- \
             pkill -f "^[^ ]*claude .*--remote-control" 2>/dev/null || true
     done
-    sleep 5
+    # A pane attached before the new process is up just drops back to its
+    # shell, so wait (up to a minute each) for one younger than the kills.
+    for n in "$@"; do
+        for _ in $(seq 1 30); do
+            openshell sandbox exec -n "$n" --no-tty -- sh -c \
+                "pgrep -f '^[^ ]*claude .*--remote-control' | xargs -r ps -o etimes= -p |
+                    awk '\$1 <= $((SECONDS - start)) { f = 1 } END { exit !f }'" 2>/dev/null && break
+            sleep 2
+        done
+    done
     attach "$@"
 }
 
