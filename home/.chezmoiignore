@@ -57,6 +57,12 @@ Library
 .agents/AGENTS.md
 {{ end }}
 
+{{ if or (ne .chezmoi.os "linux") (not (lookPath "omp")) (not (stat (joinPath .chezmoi.homeDir (includeTemplate "github-checkout" (dict "home" .chezmoi.homeDir "repo" "agent-workflow")) "integrations/omp-input-state.ts"))) }}
+# The native input-state bridge supports Linux OMP only. Skip this sibling when
+# its shared asset or OMP is absent; leave Herdr's extension and settings alone.
+.omp/agent/extensions/agent-workflow-omp-input-state.ts
+{{ end }}
+
 {{ if or (not (lookPath "claude")) (eq .osid "windows") }}
 # ~/.claude/settings.json is Claude Code's own state; a modify_ script asserts
 # only statusLine in it and passes the rest through (see dot_claude/). Skipped
