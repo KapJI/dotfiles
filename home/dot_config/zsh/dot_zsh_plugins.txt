@@ -52,11 +52,11 @@ Aloxaf/fzf-tab pin:24105b15714bfec37989ed5c5b6e60f572253019
 # to url-quote-magic, which would overwrite fsh's self-insert wrap
 # if fsh loaded first.
 getantidote/use-omz pin:317648f75d2643abcd7cf580062a8999b11473d7
-ohmyzsh/ohmyzsh path:lib pin:b509b1c6ed0c1ba37de12cbd37f30b2b2f61193a
-ohmyzsh/ohmyzsh path:plugins/colored-man-pages pin:b509b1c6ed0c1ba37de12cbd37f30b2b2f61193a
-ohmyzsh/ohmyzsh path:plugins/dirhistory pin:b509b1c6ed0c1ba37de12cbd37f30b2b2f61193a
-ohmyzsh/ohmyzsh path:plugins/extract pin:b509b1c6ed0c1ba37de12cbd37f30b2b2f61193a
-ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z pin:b509b1c6ed0c1ba37de12cbd37f30b2b2f61193a
+ohmyzsh/ohmyzsh path:lib pin:cca3bdfbef8c52ef8939ce7911ff68852b949daa
+ohmyzsh/ohmyzsh path:plugins/colored-man-pages pin:cca3bdfbef8c52ef8939ce7911ff68852b949daa
+ohmyzsh/ohmyzsh path:plugins/dirhistory pin:cca3bdfbef8c52ef8939ce7911ff68852b949daa
+ohmyzsh/ohmyzsh path:plugins/extract pin:cca3bdfbef8c52ef8939ce7911ff68852b949daa
+ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z pin:cca3bdfbef8c52ef8939ce7911ff68852b949daa
 # safe-paste intentionally omitted: on zsh >=5.1 it only re-binds
 # bracketed-paste-magic (already done by lib/misc.zsh above) and runs a
 # buggy `set zle_bracketed_paste` that clobbers $@ instead of setting an
