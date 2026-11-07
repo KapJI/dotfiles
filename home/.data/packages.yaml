@@ -124,6 +124,8 @@
 - nix: go
   winget: GoLang.Go
 
+- nix: go-grip
+
 - nix: gping
   winget: orf.gping
 

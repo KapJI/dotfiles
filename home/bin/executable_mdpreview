@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# shellcheck source=/dev/null
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
+set -euo pipefail
+exec python3 "$HOME/.local/lib/mdpreview.py" "$@"

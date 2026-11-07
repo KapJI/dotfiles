@@ -73,6 +73,15 @@ cat > "$HOME/.config/nix-profile/flake.nix" <<'NIXEOF'
       mkProfile = system: extras:
         let pkgs = nixpkgs.legacyPackages.${system}.extend (final: prev: {
               inherit (nixpkgs-et.legacyPackages.${system}) eternal-terminal;
+              # go-grip 0.10.0 uses --host only in its printed URL, then binds
+              # every interface. Honor it for the loopback-only preview hub.
+              # Remove this patch when the pinned package includes the fix.
+              go-grip = prev.go-grip.overrideAttrs (old: {
+                postPatch = (old.postPatch or "") + ''
+                  substituteInPlace internal/server.go --replace-fail \
+                    'fmt.Sprintf(":%d", s.port)' 'fmt.Sprintf("%s:%d", s.host, s.port)'
+                '';
+              });
             });
         in pkgs.buildEnv {
           name = "dotfiles-profile";

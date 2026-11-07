@@ -96,6 +96,7 @@ Documents
 .iterm2
 .mysrc
 bin
+.local/lib/mdpreview.py
 {{ end }}
 
 {{ if .is_desktop }}

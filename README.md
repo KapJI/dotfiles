@@ -22,6 +22,7 @@ Each of these solves a recognizable problem and is self-contained enough to lift
 
 Smaller pieces:
 
+- [`mdpreview file.md`](home/bin/executable_mdpreview): add files to one background go-grip server with live reload and a shared index. Run the printed `coder port-forward` command on your Mac, then open a file URL or the index. Later calls reuse the same server and tunnel. The workspace name comes from `CODER_WORKSPACE_NAME` (otherwise replace the `WORKSPACE` placeholder). The server listens on loopback and skips occupied ports starting at 6419; `MDPREVIEW_PORT` changes the starting port for a new server. `mdpreview` prints the index; `mdpreview --stop` stops the server and keeps registrations for next time. State lives under `$XDG_CACHE_HOME/mdpreview` (normally `~/.cache/mdpreview`). For relative links and images, the server exposes each registered file's Git repository, or its containing directory outside Git; register files only from directories you intend to preview. Registered Markdown edits trigger reload within about a second; changes to other assets may need a manual refresh.
 - `git next` and `git prev` ([`git-checkout-next.sh`](home/bin/executable_git-checkout-next.sh)): walk first-parent history in either direction.
 - `git fixup <commit>` ([`git-fixup.sh`](home/bin/executable_git-fixup.sh)): fold the staged changes into an older commit with an autosquash rebase.
 - [`auto_title.zsh`](home/dot_config/zsh/config.d/auto_title.zsh): shorten the terminal title to unique path prefixes.

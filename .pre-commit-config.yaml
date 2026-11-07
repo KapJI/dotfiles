@@ -74,3 +74,10 @@ repos:
         language: system
         pass_filenames: false
         files: ^(home/bin/executable_(agent-workflow-services\.tmpl|cgt-dispatcher-supervise)|tests/services/.*)$
+
+      - id: mdpreview-tests
+        name: shared Markdown preview tests
+        entry: python3 tests/mdpreview/test_mdpreview.py
+        language: system
+        pass_filenames: false
+        files: ^(home/bin/executable_mdpreview|home/dot_local/lib/mdpreview\.py|tests/mdpreview/.*)$
