@@ -4,7 +4,7 @@
 # stdout, exit code and how many sends it attempted.
 set -u
 
-here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+here=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 script="$here/../../home/dot_config/omp-notify/executable_notify.sh"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
@@ -55,5 +55,6 @@ check "string id"                  1   '{"ok":true,"result":{"message_id":"4","f
 check "ok false"                   1   '{"ok":false,"result":{"message_id":4,"from":{"id":7},"chat":{"id":5}}}' "" 3 ""
 check "not json"                   1   'secret text' "" 3 ""
 
+python3 "$here/test_notify.py" || rc=1
 [ "$rc" = 0 ] && echo "notify: all checks passed"
 exit "$rc"

@@ -106,6 +106,8 @@ Coding agents (Claude Code, Codex, omp) are installed like any other package, an
 
 On Linux, when OMP and the shared `agent-workflow/integrations/omp-input-state.ts` asset are present, chezmoi links the native input-state bridge into `~/.omp/agent/extensions/`. It supports the OMP 18.16.0 default editor in Herdr and lets guarded messages check input state independently of footer colours. After installation, use `/restart` in an existing OMP session at a safe point, handling any draft first; `/reload-plugins` does not load the new extension. This mapping covers the default profile only; named profiles and custom config roots need their own installation. The symlink follows the shared checkout, so updates to that asset require review before loading. Herdr's managed extension and OMP settings remain unchanged.
 
+The [Telegram notifier](docs/telegram-notifier.md) keeps plain notifications as its default and supports a per-call Rich HTML file for shared workflow messages. Its capability probe reads no credentials and sends nothing; receipts and uncertain-delivery handling use the same contract for both formats.
+
 ## ✅ Tests
 
 - [`tests/shell/run.sh`](tests/shell/run.sh) renders the zsh files and the shell-script templates with the current host's chezmoi data, runs `zsh -n` and shellcheck on the result, and loads the rendered tmux config into a throwaway server. Branches gated to other hosts render empty and are not exercised, and a check is skipped with a note if its tool is missing.
