@@ -18,6 +18,13 @@ HELPER = Path(__file__).resolve().parents[2] / "home/dot_local/lib/mdpreview.py"
 HTTP = build_opener(ProxyHandler({}))
 
 
+def cwd_of(link):
+    try:
+        return Path(os.readlink(link))
+    except OSError:
+        return None
+
+
 class PreviewTest(unittest.TestCase):
     def test_shared_server_lifecycle_and_port_selection(self):
         self.assertIsNotNone(shutil.which("go-grip"), "sync the Nix profile before testing")
@@ -45,10 +52,13 @@ class PreviewTest(unittest.TestCase):
                 self.fail("no three consecutive test ports available")
             env["MDPREVIEW_PORT"] = str(base)
 
+            caller = (root / "caller").resolve()
+            caller.mkdir()
+
             def invoke(*args, **overrides):
                 return subprocess.run([sys.executable, str(HELPER), *map(str, args)],
                                       env={**env, **overrides}, capture_output=True,
-                                      text=True, timeout=20)
+                                      text=True, timeout=20, cwd=caller)
 
             def fetch(url):
                 with HTTP.open(url, timeout=3) as response:
@@ -82,6 +92,10 @@ class PreviewTest(unittest.TestCase):
                 if sys.platform.startswith("linux"):
                     with socket.socket() as other_interface:
                         other_interface.bind(("127.0.0.2", port))
+                    # The server outlives its caller, so it must not hold the
+                    # caller's directory (a worktree that may be deleted).
+                    held = [p for p in Path("/proc").glob("[0-9]*/cwd") if cwd_of(p) == caller]
+                    self.assertEqual(held, [])
 
                 added = invoke(second)
                 self.assertEqual(added.returncode, 0, added.stderr)

@@ -216,7 +216,8 @@ def main():
             with (CACHE / "server.log").open("w") as log:
                 started = subprocess.Popen(
                     [sys.executable, str(Path(__file__).resolve()), "_serve", str(server.fileno()), start],
-                    pass_fds=(server.fileno(),), start_new_session=True,
+                    # Own cwd: a caller's worktree may be deleted while we run.
+                    cwd=CACHE, pass_fds=(server.fileno(),), start_new_session=True,
                     stdin=subprocess.DEVNULL, stdout=log, stderr=log,
                 )
         deadline = time.monotonic() + 15
