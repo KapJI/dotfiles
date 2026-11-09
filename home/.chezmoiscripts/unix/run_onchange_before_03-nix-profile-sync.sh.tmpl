@@ -82,6 +82,19 @@ cat > "$HOME/.config/nix-profile/flake.nix" <<'NIXEOF'
                     'fmt.Sprintf(":%d", s.port)' 'fmt.Sprintf("%s:%d", s.host, s.port)'
                 '';
               });
+              # pre-commit's tests need the .NET SDK (also wired in through
+              # env.DOTNET_ROOT, tests or not), which on darwin is built from
+              # source with a Swift toolchain whenever Hydra has not cached it:
+              # hours of compiling. Without the tests and that env the package
+              # is plain Python and builds in seconds. dontUsePytestCheck: the
+              # pytest hook still reaches the build through a dependency and
+              # runs its phase despite doCheck = false.
+              pre-commit = prev.pre-commit.overridePythonAttrs {
+                doCheck = false;
+                dontUsePytestCheck = true;
+                nativeCheckInputs = [ ];
+                env = { };
+              };
             });
         in pkgs.buildEnv {
           name = "dotfiles-profile";
