@@ -35,7 +35,7 @@
 
 # path: the theme file directly — a bare entry makes antidote also source
 # powerlevel9k.zsh-theme (a compat shim that just re-sources this file).
-romkatv/powerlevel10k path:powerlevel10k.zsh-theme pin:7ddd1b2715c3844275214347a3572ac1fdd6dc39
+romkatv/powerlevel10k path:powerlevel10k.zsh-theme pin:433bb250037d1baf479adf06ce78b3a338c574a4
 
 zsh-users/zsh-completions path:src kind:fpath pin:989b23277ab33e8d5e82df6aed936e846db9d8b8
 MichaelAquilina/zsh-you-should-use pin:5f3d129864ee4505043d88c3486224f1d75b692e
@@ -52,11 +52,11 @@ Aloxaf/fzf-tab pin:24105b15714bfec37989ed5c5b6e60f572253019
 # to url-quote-magic, which would overwrite fsh's self-insert wrap
 # if fsh loaded first.
 getantidote/use-omz pin:317648f75d2643abcd7cf580062a8999b11473d7
-ohmyzsh/ohmyzsh path:lib pin:cca3bdfbef8c52ef8939ce7911ff68852b949daa
-ohmyzsh/ohmyzsh path:plugins/colored-man-pages pin:cca3bdfbef8c52ef8939ce7911ff68852b949daa
-ohmyzsh/ohmyzsh path:plugins/dirhistory pin:cca3bdfbef8c52ef8939ce7911ff68852b949daa
-ohmyzsh/ohmyzsh path:plugins/extract pin:cca3bdfbef8c52ef8939ce7911ff68852b949daa
-ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z pin:cca3bdfbef8c52ef8939ce7911ff68852b949daa
+ohmyzsh/ohmyzsh path:lib pin:6010fb6260f359e71d99ba25f05f9215809b3ed2
+ohmyzsh/ohmyzsh path:plugins/colored-man-pages pin:6010fb6260f359e71d99ba25f05f9215809b3ed2
+ohmyzsh/ohmyzsh path:plugins/dirhistory pin:6010fb6260f359e71d99ba25f05f9215809b3ed2
+ohmyzsh/ohmyzsh path:plugins/extract pin:6010fb6260f359e71d99ba25f05f9215809b3ed2
+ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z pin:6010fb6260f359e71d99ba25f05f9215809b3ed2
 # safe-paste intentionally omitted: on zsh >=5.1 it only re-binds
 # bracketed-paste-magic (already done by lib/misc.zsh above) and runs a
 # buggy `set zle_bracketed_paste` that clobbers $@ instead of setting an
