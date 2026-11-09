@@ -426,19 +426,6 @@
 - claude-plugin: pyright-lsp@claude-plugins-official
   agent-marketplace: anthropics/claude-plugins-official
 
-# Process skills: TDD, systematic debugging, verification before completion.
-# Codex ships its own copy via the bundled openai-curated marketplace, but only
-# where that marketplace exists — the Coder workspace's codex has just the
-# marketplaces we add, so relying on it left the container without superpowers
-# entirely. Declare it from claude-plugins-official (which resolves to the same
-# obra/superpowers upstream omp installs) so every host converges on one source,
-# and remove the openai-curated copy where it was pre-installed:
-#     codex plugin remove superpowers@openai-curated
-- claude-plugin: superpowers@claude-plugins-official
-  codex-plugin: superpowers@claude-plugins-official
-  omp-plugin: "git:github.com/obra/superpowers"
-  agent-marketplace: anthropics/claude-plugins-official
-
 # Code-review pane for herdr: diff beside the agent, comment on lines, send
 # the notes back. Toggled by prefix+d (dot_config/herdr/config.toml).
 - herdr-plugin: persiyanov/herdr-reviewr@cd618b48dc1f4d2cc092f3f26827ac72fb44773e

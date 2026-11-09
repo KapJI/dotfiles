@@ -13,7 +13,9 @@
 # Every step is non-fatal. A marketplace being unreachable, or one agent's
 # registry being down, must never fail the whole `chezmoi apply`.
 #
-# Run weekly (plugin installs always fetch latest).
+# Run weekly to pick up new plugin versions. claude and codex `install`/`add`
+# skip or reinstall what is already there, so each needs its marketplaces
+# refreshed first; claude also needs an explicit `update`. omp installs latest.
 # Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 
 {{- $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml -}}
@@ -54,11 +56,15 @@ if command -v claude >/dev/null 2>&1; then
     claude plugin marketplace add {{ . | quote }} >/dev/null 2>&1 \
         || echo "claude: marketplace {{ . }} already configured or unreachable"
 {{- end }}
+    claude plugin marketplace update >/dev/null 2>&1 \
+        || echo "claude: marketplace refresh failed"
     # --yes: accept the marketplace-declared install command; without it the
     # CLI waits for a confirmation nobody is here to give.
 {{- range $claudePlugins }}
     claude plugin install --yes {{ . | quote }} >/dev/null 2>&1 \
         || echo "claude: {{ . }} already installed or unavailable"
+    claude plugin update {{ . | quote }} >/dev/null 2>&1 \
+        || echo "claude: {{ . }} update failed"
 {{- end }}
 else
     echo "claude not on PATH; skipping its plugins"
@@ -68,9 +74,14 @@ fi
 {{- if $codexPlugins }}
 if command -v codex >/dev/null 2>&1; then
 {{- range (uniq $codexMarkets) }}
+    # Re-adding a configured marketplace succeeds. "already added from a
+    # different source" means an older codex left a snapshot with no recorded
+    # source, which never upgrades: `codex plugin marketplace remove <name>` once.
     codex plugin marketplace add {{ . | quote }} >/dev/null 2>&1 \
-        || echo "codex: marketplace {{ . }} already configured or unreachable"
+        || echo "codex: marketplace {{ . }} unreachable or stale (see this script)"
 {{- end }}
+    codex plugin marketplace upgrade >/dev/null 2>&1 \
+        || echo "codex: marketplace refresh failed"
 {{- range $codexPlugins }}
     codex plugin add {{ . | quote }} >/dev/null 2>&1 \
         || echo "codex: {{ . }} already installed or unavailable"
