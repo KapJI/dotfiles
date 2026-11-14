@@ -35,7 +35,7 @@
 
 # path: the theme file directly — a bare entry makes antidote also source
 # powerlevel9k.zsh-theme (a compat shim that just re-sources this file).
-romkatv/powerlevel10k path:powerlevel10k.zsh-theme pin:433bb250037d1baf479adf06ce78b3a338c574a4
+romkatv/powerlevel10k path:powerlevel10k.zsh-theme pin:64df59615df306c7a8bb37d0a5a1ebc46337dfb1
 
 zsh-users/zsh-completions path:src kind:fpath pin:989b23277ab33e8d5e82df6aed936e846db9d8b8
 MichaelAquilina/zsh-you-should-use pin:5f3d129864ee4505043d88c3486224f1d75b692e
