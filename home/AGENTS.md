@@ -239,8 +239,7 @@ the shared Telegram listener plus a watchdog per project in the runtime registry
 `~/.local/state/agent-workflow/services/registry.json`, which is not managed
 here. The Coder template starts it once at boot with the line in the script's
 header comment. Adding a project changes only the registry, never the template.
-`start` is idempotent. `bin/cgt-dispatcher-supervise` is a deprecated name that
-forwards to `start`; `tests/services/run.sh` covers both.
+`start` is idempotent; `tests/services/run.sh` covers the launcher.
 
 ### Encryption
 

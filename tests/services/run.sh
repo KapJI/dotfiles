@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
-# Checks for bin/agent-workflow-services and the deprecated cgt-dispatcher-supervise
-# forwarder, against a fake services.py in a throwaway HOME. Every run uses
+# Checks for bin/agent-workflow-services against a fake services.py in a
+# throwaway HOME. Every run uses
 # `env -i`, the bare environment a Coder startup_script provides, so the launcher
 # must find python3 through the nix profile itself. Nothing real is started.
 set -u
@@ -12,7 +12,6 @@ trap 'rm -rf "$fake"' EXIT
 
 mkdir -p "$fake/bin"
 chezmoi execute-template <"$src/executable_agent-workflow-services.tmpl" >"$fake/bin/agent-workflow-services"
-cp "$src/executable_cgt-dispatcher-supervise" "$fake/bin/cgt-dispatcher-supervise"
 chmod +x "$fake/bin/"*
 # The launcher reads $HOME/.nix-profile through the nix profile script; point the
 # fake HOME's at the real one so python3 resolves there and nowhere else.
@@ -56,7 +55,6 @@ check "explicit --registry wins"     0 "status --registry /x"             "$aws"
 check "explicit --registry= wins"    0 "status --registry=/x"             "$aws" status --registry=/x
 check "no subcommand is usage"       2 "-"                                "$aws"
 FAKE_EXIT=7 check "passes exit code" 7 "start --registry $reg"            "$aws" start
-check "old name forwards to start"   0 "start --registry $reg"            "$fake/bin/cgt-dispatcher-supervise"
 
 mv "$fake/$rel" "$fake/$rel.gone"
 check "missing services.py"          1 "-"                                "$aws" status

@@ -73,7 +73,7 @@ repos:
         entry: tests/services/run.sh
         language: system
         pass_filenames: false
-        files: ^(home/bin/executable_(agent-workflow-services\.tmpl|cgt-dispatcher-supervise)|tests/services/.*)$
+        files: ^(home/bin/executable_agent-workflow-services\.tmpl|tests/services/.*)$
 
       - id: mdpreview-tests
         name: shared Markdown preview tests
