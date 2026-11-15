@@ -1,8 +1,11 @@
 {{- /* An ephemeral container has no account signer (1Password's op-ssh-sign).
-       Instead: Coder's GIT_SSH_COMMAND=`coder gitssh` carries a key GitHub
-       already accepts, so rewrite github.com to SSH — HTTPS cannot work, the
-       Coder external-auth token is read-only and pushes over it 403.
-       unix/before_04 puts that same key on disk, and it signs too. */ -}}
+       Instead: the Coder git SSH key is one GitHub already accepts, so rewrite
+       github.com to SSH — HTTPS cannot work, the Coder external-auth token is
+       read-only and pushes over it 403. unix/before_04 puts that key on disk;
+       it signs, and core.sshCommand pushes with it. Coder's own
+       GIT_SSH_COMMAND=`coder gitssh` lives in a /tmp dir that changes every
+       boot and reaches only processes started from a Coder session, so a
+       rebooted herdr server's panes had no git auth at all. */ -}}
 {{- $isc := index . "is_container" | default false -}}
 {{- $ckey := joinPath .chezmoi.homeDir ".ssh/coder_gitssh_key.pub" -}}
 {{- $hasckey := and $isc (stat $ckey) -}}
@@ -37,6 +40,9 @@
     defaultBranch = main
 [core]
     pager = delta
+{{- if $hasckey }}
+    sshCommand = ssh -i {{ trimSuffix ".pub" $ckey }} -o IdentitiesOnly=yes
+{{- end }}
 {{- if eq .osid "windows" }}
     symlink = true
     sshCommand = C:/Windows/System32/OpenSSH/ssh.exe

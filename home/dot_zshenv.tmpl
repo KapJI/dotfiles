@@ -42,15 +42,14 @@ fi
 # session it opens. That temp dir can vanish while the agent keeps running (its
 # binary then shows as deleted), and every process holding the path breaks for
 # good: herdr panes, and anything that runs git without a shell, such as
-# lazy.nvim, fail with "No such file or directory". Replace it outright with the
-# same key on disk (unix/before_04 saves it), so nothing started from a shell
-# depends on that temp dir. The cost: a key regenerated in Coder is picked up
-# only after deleting ~/.ssh/coder_gitssh_key* and re-applying. Silent.
+# lazy.nvim, fail with "No such file or directory". The env var would override
+# core.sshCommand in ~/.gitconfig, which uses the same key on disk
+# (unix/before_04 saves it), so drop it and let that apply. The cost: a key
+# regenerated in Coder is picked up only after deleting
+# ~/.ssh/coder_gitssh_key* and re-applying. Silent.
 case ${GIT_SSH_COMMAND:-} in
 *"coder gitssh"*)
-    if [ -f "$HOME/.ssh/coder_gitssh_key" ]; then
-        export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/coder_gitssh_key -o IdentitiesOnly=yes"
-    fi
+    [ -f "$HOME/.ssh/coder_gitssh_key" ] && unset GIT_SSH_COMMAND
     ;;
 esac
 {{- end }}

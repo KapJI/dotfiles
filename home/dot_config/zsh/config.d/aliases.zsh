@@ -46,11 +46,8 @@ reload() {
         HERDR_SOCKET_PATH HERDR_BIN_PATH
         # Coder workspace session identity (the HERDR_*/WEZTERM_* twin): the
         # agent injects these into every session it opens and no rc file
-        # repopulates them, so env -i strands the shell for good. Losing them
-        # leaves git with *no* credential path at all - GIT_SSH_COMMAND wraps
-        # `coder gitssh`, which needs CODER_AGENT_URL + CODER_AGENT_TOKEN to
-        # reach the agent API for the key - so `chezmoi update` fails with
-        # "Permission denied (publickey)" in a reloaded pane and nowhere else.
+        # repopulates them, so env -i strands the shell for good. (git no
+        # longer needs them: core.sshCommand uses the Coder key on disk.)
         # CHEZMOI_IS_CONTAINER and GIT_AUTHOR_EMAIL matter for a different
         # reason: .chezmoi.toml.tmpl reads them, and without them a later
         # `chezmoi init` computes is_container=false and an empty git_email,

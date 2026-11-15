@@ -110,14 +110,8 @@ fi
 
 {{- if $herdrPlugins }}
 if command -v herdr >/dev/null 2>&1; then
-    # Subshell: GIT_SSH_COMMAND must not leak into anything added after this.
-    (
-    # `plugin install` clones over ssh (and the gitconfig rewrites https to
-    # ssh anyway). A Coder workspace has no agent by default, so clone with the
-    # git key Coder provisions for exactly this.
-    if [ -z "${GIT_SSH_COMMAND:-}" ] && [ -f "$HOME/.ssh/coder_gitssh_key" ]; then
-        export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/coder_gitssh_key -o IdentitiesOnly=yes"
-    fi
+    # `plugin install` clones with git over ssh, so in a Coder workspace it
+    # authenticates through core.sshCommand in dot_gitconfig.tmpl.
     # Pinned, so skip what is already at its commit instead of re-cloning and
     # re-downloading the binary every week. A new pin installs over the old
     # one in place; no uninstall needed.
@@ -130,7 +124,6 @@ if command -v herdr >/dev/null 2>&1; then
             || echo "herdr: {{ . }} failed to install" ;;
     esac
 {{- end }}
-    )
 else
     echo "herdr not on PATH; skipping its plugins"
 fi
