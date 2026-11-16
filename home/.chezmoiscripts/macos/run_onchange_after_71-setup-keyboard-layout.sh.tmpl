@@ -38,8 +38,8 @@ fi
 
 # 3. Make Мефодица the only enabled keyboard layout, keeping the three
 #    standard non-keyboard input methods (character palette, press-and-
-#    hold, dictation). Editing an exported copy of the HIToolbox prefs
-#    domain leaves every other key — selection, history — untouched.
+#    hold, dictation), and select it. Editing an exported copy of the
+#    HIToolbox prefs domain leaves every other key (history, fn key) untouched.
 echo "mefodica: enabling as the sole keyboard input source"
 tmp="$(mktemp -t hitoolbox)"
 trap 'rm -f "$tmp"' EXIT
@@ -63,6 +63,24 @@ plutil -replace AppleEnabledInputSources -xml '<array>
     <key>InputSourceKind</key><string>Non Keyboard Input Method</string>
   </dict>
 </array>' "$tmp"
+# ...and the selected one, so it is the active layout straight away.
+plutil -replace AppleSelectedInputSources -xml '<array>
+  <dict>
+    <key>Bundle ID</key><string>com.apple.PressAndHold</string>
+    <key>InputSourceKind</key><string>Non Keyboard Input Method</string>
+  </dict>
+  <dict>
+    <key>InputSourceKind</key><string>Keyboard Layout</string>
+    <key>KeyboardLayout ID</key><integer>19567</integer>
+    <key>KeyboardLayout Name</key><string>Мефодица</string>
+  </dict>
+  <dict>
+    <key>Bundle ID</key><string>com.apple.CharacterPaletteIM</string>
+    <key>InputSourceKind</key><string>Non Keyboard Input Method</string>
+  </dict>
+</array>' "$tmp"
+plutil -replace AppleCurrentKeyboardLayoutInputSourceID \
+    -string "com.artlebedev.keyboardlayout.mefodica.keylayout.Мефодица" "$tmp"
 if [ -s "$tmp" ]; then
     defaults import com.apple.HIToolbox "$tmp"
     echo "mefodica: input sources updated — log out and back in for the"
