@@ -164,6 +164,10 @@
 # uninstalled automatically, remove it manually if desired.
 - brew-cask: openlogi
 
+# Divvy-style grid placement (one hotkey, drag across the grid) that runs
+# natively on Apple Silicon; Divvy is Intel-only and unmaintained.
+- brew-cask: moom
+
 - brew-cask: notion
 
 - nix: gnumake
