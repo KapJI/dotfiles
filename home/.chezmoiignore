@@ -119,12 +119,26 @@ bin
 
 {{ $kapji := regexMatch `[:/]KapJI/[^/]+$` (output "git" "-C" .chezmoi.sourceDir "remote" "get-url" "origin" | trim) }}
 {{ if not $kapji }}
+# A fork (origin not under KapJI/) skips what only KapJI's secrets can produce,
+# so it applies cleanly as is. To use your own instead, change KapJI above.
 # These four render from keys named in KapJI's 1Password; a fork's agent has
-# none of them, so its apply would fail. github_key.pub is the fork's own.
+# none of them. github_key.pub is the fork's own.
 .ssh/pubkeys/personal_key.pub
 .ssh/pubkeys/sudo_key.pub
 .ssh/pubkeys/hetzner_key.pub
 .ssh/pubkeys/scaleway_key.pub
+# Encrypted to KapJI's age key, whose passphrase the decrypt script would ask
+# for (and abort the whole apply after five wrong tries).
+.ssh/config
+.chezmoiscripts/unix/10-decrypt-private-key.sh
+.chezmoiscripts/windows/10-decrypt-private-key.ps1
+# KapJI's personal setup: his keyboard layouts (Mefodica as the only one on
+# macOS, US + Russian on Windows) and his trackpad, shortcut, Dock and Finder
+# preferences.
+.chezmoiscripts/windows/12-set-keyboard-layouts.ps1
+.chezmoiscripts/macos/71-setup-keyboard-layout.sh
+.chezmoiscripts/macos/72-macos-defaults.sh
+.local/share/keyboard-layouts
 {{ end }}
 
 {{ if not (or (has .osid (list "darwin" "windows")) (eq .chezmoi.hostname "homeserver" )) }}

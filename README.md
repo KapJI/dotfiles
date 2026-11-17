@@ -134,8 +134,10 @@ The [Telegram notifier](docs/telegram-notifier.md) keeps plain notifications as 
 
 Please do not apply this repo as-is. It replaces the login shell, installs about 140 packages, enables Touch ID for sudo on macOS and turns off UAC prompts on Windows. Fork it first, then:
 
-1. Replace [`home/.data/key.txt.age`](home/.data/key.txt.age) with a passphrase-encrypted copy of your own age identity, set your recipient in [`home/.chezmoi.toml.tmpl`](home/.chezmoi.toml.tmpl), and replace the other encrypted files with yours.
-2. Prune [`home/.data/packages.yaml`](home/.data/packages.yaml) down to what you actually use.
+1. Prune [`home/.data/packages.yaml`](home/.data/packages.yaml) down to what you actually use.
+2. Make sure your GitHub account has at least one SSH key: commits are signed with the first one, and `chezmoi init` fails without it.
+
+A fork skips what only my secrets can produce: the encrypted SSH config, the age-key decryption and four personal SSH public keys. It also skips my personal setup: my keyboard layouts and my macOS trackpad, shortcut, Dock and Finder settings. To use your own, replace [`home/.data/key.txt.age`](home/.data/key.txt.age) with a passphrase-encrypted copy of your age identity, set your recipient in [`home/.chezmoi.toml.tmpl`](home/.chezmoi.toml.tmpl), replace the encrypted files and change `KapJI` in [`home/.chezmoiignore`](home/.chezmoiignore).
 
 Git identity is not baked in: `chezmoi init` asks for a name and email, and the signing key is looked up on the GitHub account the repo was cloned from.
 
