@@ -10,6 +10,16 @@ if [ -e /nix/var/nix/profiles/default/bin/nix ]; then
     exit 0
 fi
 
+{{ if eq .chezmoi.os "darwin" -}}
+# Migration Assistant carries over the Nix Store volume's password in the System
+# keychain but not the volume itself, and the installer refuses to run while
+# that password exists. Without a "Nix Store" volume it guards nothing.
+if ! diskutil list | grep -q "APFS Volume Nix Store " \
+    && security find-generic-password -s "Nix Store" /Library/Keychains/System.keychain >/dev/null 2>&1; then
+    echo "Removing the stale Nix Store volume password from the System keychain"
+    sudo security delete-generic-password -s "Nix Store" /Library/Keychains/System.keychain >/dev/null
+fi
+{{ end }}
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix \
     | sh -s -- install --determinate --no-confirm
 {{ end -}}

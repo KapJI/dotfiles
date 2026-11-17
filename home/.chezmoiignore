@@ -117,6 +117,16 @@ bin
 .config/kxkbrc
 {{ end }}
 
+{{ $kapji := regexMatch `[:/]KapJI/[^/]+$` (output "git" "-C" .chezmoi.sourceDir "remote" "get-url" "origin" | trim) }}
+{{ if not $kapji }}
+# These four render from keys named in KapJI's 1Password; a fork's agent has
+# none of them, so its apply would fail. github_key.pub is the fork's own.
+.ssh/pubkeys/personal_key.pub
+.ssh/pubkeys/sudo_key.pub
+.ssh/pubkeys/hetzner_key.pub
+.ssh/pubkeys/scaleway_key.pub
+{{ end }}
+
 {{ if not (or (has .osid (list "darwin" "windows")) (eq .chezmoi.hostname "homeserver" )) }}
 # Non-primary SSH pubkeys: only synced on macOS, Windows, or homeserver.
 # Re-include the directory itself so the negation for github_key.pub takes
@@ -124,7 +134,7 @@ bin
 .ssh/pubkeys/**
 !.ssh/pubkeys
 !.ssh/pubkeys/github_key.pub
-{{ if and (eq .chezmoi.os "linux") (ne .chezmoi.username "root") }}
+{{ if and $kapji (eq .chezmoi.os "linux") (ne .chezmoi.username "root") }}
 # Any Linux host where sudo is actually used needs sudo_key.pub for
 # pam_ssh_agent_auth (see linux/after_50-configure-pam-auth.sh). Gated on the
 # login user rather than is_desktop: servers reached as root never invoke sudo,

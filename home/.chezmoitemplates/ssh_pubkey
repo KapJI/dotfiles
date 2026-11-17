@@ -18,7 +18,10 @@
 {{- if eq (env "OS") "Windows_NT" -}}
 {{-   $output = output "ssh-add" "-L" | trim -}}
 {{- else -}}
-{{-   $output = output "sh" "-c" "ssh-add -L 2>/dev/null || true" | trim -}}
+{{- /* Ask 1Password's agent directly when its socket exists: before the zsh
+       config is live (a fresh Mac), SSH_AUTH_SOCK is whatever launched the
+       shell, e.g. WezTerm's own agent socket, which has none of these keys. */ -}}
+{{-   $output = output "sh" "-c" `for s in "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" "$HOME/.1password/agent.sock"; do if [ -S "$s" ]; then SSH_AUTH_SOCK=$s; export SSH_AUTH_SOCK; break; fi; done; ssh-add -L 2>/dev/null || true` | trim -}}
 {{- end -}}
 {{- if eq $output "" -}}
 {{-   fail (printf "ssh-add -L returned no keys; cannot render pubkey %q. Ensure the SSH agent is running (on macOS, the 1Password app must be open with SSH agent enabled — it stops after an app update), SSH_AUTH_SOCK is reachable, and the agent has the needed key loaded." $name) -}}

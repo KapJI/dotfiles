@@ -15,6 +15,10 @@ if ! command -v rustup >/dev/null 2>&1; then
   exit 0
 fi
 
+# A fresh rustup (or a migrated ~/.cargo without ~/.rustup) has no default
+# toolchain, and component add then fails.
+rustup default >/dev/null 2>&1 || rustup default stable
+
 # Idempotent: rustup component add is a no-op if already present.
 rustup component add rust-analyzer
 {{ end }}
