@@ -136,25 +136,31 @@
     url = "{{ gitHubLatestReleaseAssetURL "ryanoasis/nerd-fonts" "NerdFontsSymbolsOnly.tar.xz" }}"
     path = "SymbolsNerdFontMono-Regular.ttf"
     refreshPeriod = {{ $default_refresh }}
+{{ end }}
 
-# Powerlevel10k-recommended MesloLGS NF (Powerline + small Nerd Font subset).
-# romkatv/powerlevel10k-media is a fonts-only mirror; no tagged releases exist.
-[".local/share/fonts/MesloLGS NF Regular.ttf"]
+{{ $fonts := "" }}
+{{ if eq .chezmoi.os "darwin" }}{{ $fonts = "Library/Fonts" }}
+{{ else if and (eq .chezmoi.os "linux") .is_desktop }}{{ $fonts = ".local/share/fonts" }}{{ end }}
+{{ if $fonts }}
+# Powerlevel10k-recommended MesloLGS NF (Powerline + small Nerd Font subset),
+# WezTerm's primary font. Not in Homebrew: its Meslo cask is a different
+# family. romkatv/powerlevel10k-media is a fonts-only mirror; no tagged releases.
+["{{ $fonts }}/MesloLGS NF Regular.ttf"]
     type = "file"
     url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf"
     refreshPeriod = {{ $default_refresh }}
 
-[".local/share/fonts/MesloLGS NF Bold.ttf"]
+["{{ $fonts }}/MesloLGS NF Bold.ttf"]
     type = "file"
     url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf"
     refreshPeriod = {{ $default_refresh }}
 
-[".local/share/fonts/MesloLGS NF Italic.ttf"]
+["{{ $fonts }}/MesloLGS NF Italic.ttf"]
     type = "file"
     url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf"
     refreshPeriod = {{ $default_refresh }}
 
-[".local/share/fonts/MesloLGS NF Bold Italic.ttf"]
+["{{ $fonts }}/MesloLGS NF Bold Italic.ttf"]
     type = "file"
     url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf"
     refreshPeriod = {{ $default_refresh }}
