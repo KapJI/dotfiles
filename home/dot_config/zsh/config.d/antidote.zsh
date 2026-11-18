@@ -19,8 +19,8 @@ zstyle ':omz:update' mode disabled
 
 # Static-load mode (antidote's recommended fast path, ~30ms saving vs
 # `antidote load`):
-#   1. Regenerate the static bundle (.zsh_plugins.zsh) only when the
-#      plugin list (.zsh_plugins.txt) is newer than it.
+#   1. Regenerate the static bundle (.zsh_plugins.zsh) when it is
+#      missing or the plugin list (.zsh_plugins.txt) is newer.
 #   2. Compile the bundle to .zwc on change so zsh reads bytecode
 #      directly on subsequent startups (~30-60ms additional saving).
 #   3. Source the bundle. zsh prefers .zwc when it's newer than the
@@ -37,9 +37,22 @@ autoload -Uz antidote
 # those callers never hit command-not-found. Idempotent and fork-free.
 autoload -Uz add-zsh-hook
 
-zsh_plugins=$ZDOTDIR/.zsh_plugins.zsh
+# Keep the generated loader with its clones so backups skip both together.
+# shortcut: assumes the cache is restored as a unit, add validation if partial restores need repair.
+zsh_plugins=${ANTIDOTE_HOME:-}
+if [[ -z $zsh_plugins ]] && ! zstyle -s ':antidote:home' dir zsh_plugins; then
+    if [[ $OSTYPE == darwin* ]]; then
+        zsh_plugins=$HOME/Library/Caches/antidote
+    else
+        zsh_plugins=${XDG_CACHE_HOME:-$HOME/.cache}/antidote
+    fi
+    zstyle ':antidote:home' dir "$zsh_plugins"
+fi
+zsh_plugins+=/.zsh_plugins.zsh
+typeset -g _zsh_plugins_bundle=$zsh_plugins
 zsh_plugins_txt=$ZDOTDIR/.zsh_plugins.txt
 
+zsh_plugins_ready=1
 if [[ ! -e $zsh_plugins || $zsh_plugins_txt -nt $zsh_plugins ]]; then
     # Generate into a temp file and rename atomically. Writing the live
     # bundle in place means an interrupted `antidote bundle` (or two
@@ -48,11 +61,13 @@ if [[ ! -e $zsh_plugins || $zsh_plugins_txt -nt $zsh_plugins ]]; then
     # and `source`s the broken bundle on every subsequent startup. The
     # per-PID temp keeps racing shells from clobbering each other; mv
     # picks one winner atomically. Keep the previous bundle on failure.
-    # The mv is checked too (read-only ZDOTDIR, full disk): an unchecked
+    # The mv is checked too (read-only cache, full disk): an unchecked
     # mv failure would drop the compdump for a plugin set that never
     # actually changed and pretend the regen landed.
-    if antidote bundle <"$zsh_plugins_txt" >| "$zsh_plugins.tmp.$$" \
+    if mkdir -p -- "$zsh_plugins:h" \
+            && antidote bundle <"$zsh_plugins_txt" >| "$zsh_plugins.tmp.$$" \
             && mv -f -- "$zsh_plugins.tmp.$$" "$zsh_plugins"; then
+        rm -f -- "$zsh_plugins.zwc"
         # Plugin set changed (added/removed/reordered) — the cached
         # compdump may reference completion functions from plugins that
         # are no longer loaded. Drop it so zephyr's run_compinit does a
@@ -66,16 +81,16 @@ if [[ ! -e $zsh_plugins || $zsh_plugins_txt -nt $zsh_plugins ]]; then
         rm -rf -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*(N)
     else
         rm -f -- "$zsh_plugins.tmp.$$"
-        print -u2 "antidote: bundle regen failed; keeping previous $zsh_plugins"
+        if [[ -e $zsh_plugins ]]; then
+            print -u2 "antidote: bundle regen failed; loading previous $zsh_plugins"
+        else
+            zsh_plugins_ready=0
+            print -u2 "antidote: bundle regen failed; starting without plugins"
+        fi
     fi
 fi
 
-# On a fresh host (or after bundle loss) a failed regen leaves nothing to
-# load. Skip compile+source with one clear message instead of cascading a
-# zcompile error, a source error, and undefined-function noise from every
-# later config file that assumes the plugins loaded. The bundle stays
-# absent, so the next shell retries the regen from scratch.
-if [[ -e $zsh_plugins ]]; then
+if (( zsh_plugins_ready )); then
     # Recompile when the source is newer OR the existing .zwc can't be loaded
     # by the running zsh. zsh embeds its full version in the .zwc and silently
     # ignores a mismatched one — reparsing the .zsh text every startup, no
@@ -104,10 +119,8 @@ if [[ -e $zsh_plugins ]]; then
         fi
     fi
     source $zsh_plugins
-else
-    print -u2 "antidote: no plugin bundle to load; starting without plugins"
 fi
-unset zsh_plugins zsh_plugins_txt
+unset zsh_plugins zsh_plugins_txt zsh_plugins_ready
 
 # Stretch zephyr's compinit cache window from the hardcoded 20 hours
 # to 1 week. The chezmoi run_onchange hooks already invalidate the

@@ -13,7 +13,7 @@ prompt_zsh_stale() {
     local age=$(( EPOCHSECONDS - _zsh_config_loaded_at ))
     # (ms-N): modified less than N seconds ago, i.e. after this shell started.
     local -a changed=(
-        $HOME/.zshenv $ZDOTDIR/.zshrc $ZDOTDIR/.zsh_plugins.zsh
+        $HOME/.zshenv $ZDOTDIR/.zshrc $_zsh_plugins_bundle
         $ZDOTDIR/{config.d,custom_completion}/**/*
     )
     changed=( ${^changed}(N.ms-$age) )
