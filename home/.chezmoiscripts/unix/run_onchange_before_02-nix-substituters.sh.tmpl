@@ -31,6 +31,9 @@ echo "==> container: binary caches come from the host's nix daemon; skipping"
 exit 0
 {{- end }}
 
+{{ if not (lookPath (joinPath .chezmoi.homeDir ".nix-profile/bin/nvim")) -}}
+# Recheck binary caches before repairing the Nix profile: {{ randAlphaNum 16 }}
+{{ end -}}
 . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
 
 command -v nix >/dev/null 2>&1 || exit 0

@@ -2,11 +2,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+{{ if not (or (lookPath "nix") (lookPath "/nix/var/nix/profiles/default/bin/nix")) -}}
+# Force installation while Nix is unavailable: {{ randAlphaNum 16 }}
+{{ end -}}
 if command -v nix >/dev/null 2>&1; then
     exit 0
 fi
 
-if [ -e /nix/var/nix/profiles/default/bin/nix ]; then
+if [ -x /nix/var/nix/profiles/default/bin/nix ]; then
     exit 0
 fi
 

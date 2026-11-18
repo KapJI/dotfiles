@@ -6,6 +6,9 @@ set -euo pipefail
 # packages.yaml hash: {{ include ".data/packages.yaml" | sha256sum }}
 # flake.lock hash:    {{ include "dot_config/nix-profile/flake.lock" | sha256sum }}
 
+{{ if not (lookPath (joinPath .chezmoi.homeDir ".nix-profile/bin/nvim")) -}}
+# Force profile sync while its Neovim executable is unavailable: {{ randAlphaNum 16 }}
+{{ end -}}
 . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh 2>/dev/null || true
 
 mkdir -p "$HOME/.config/nix-profile"
@@ -153,6 +156,11 @@ nix profile remove nix-profile          2>/dev/null || true
 
 nix profile add --priority 5 \
     "path:$HOME/.config/nix-profile#${profile_target}"
+
+if [ ! -x "$HOME/.nix-profile/bin/nvim" ]; then
+    echo "Nix profile sync did not restore $HOME/.nix-profile/bin/nvim" >&2
+    exit 1
+fi
 
 profile_after=$(readlink -f "$HOME/.nix-profile" 2>/dev/null || true)
 
