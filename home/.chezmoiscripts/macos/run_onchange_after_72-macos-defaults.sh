@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 #
 # Custom macOS settings, captured from the main Mac: trackpad, keyboard,
-# system shortcuts, Dock, Finder, screenshots, menu-bar clock. Only values that
-# differ from a fresh install are written. Re-runs when this file changes; to
-# capture a new setting, find its key (`defaults read <domain>` before and after
-# changing it in System Settings) and add a line here.
+# system shortcuts, Dock, Finder, screenshots, menu-bar clock, Time Machine
+# exclusions. Only values that differ from a fresh install are written. Re-runs
+# when this file changes; to capture a new setting, find its key (`defaults
+# read <domain>` before and after changing it in System Settings) and add a
+# line here.
 #
 # The Мефодица layout and the input-source list are set by
 # run_onchange_after_71-setup-keyboard-layout; press-and-hold by before_60.
@@ -85,6 +86,13 @@ defaults write com.apple.screencapture location -string "$HOME/Pictures/Screensh
 defaults write com.apple.menuextra.clock IsAnalog -bool true
 defaults write com.apple.menuextra.clock ShowDate -int 2
 defaults write com.apple.menuextra.clock ShowDayOfWeek -bool false
+
+# Time Machine skips ~/.cache, which holds only caches. chezmoi's httpcache
+# there names files after base64-encoded download URLs, and signed GitHub
+# release URLs make full paths longer than macOS's 1024-byte limit, which
+# Time Machine reports as "could not be backed up". The exclusion is sticky.
+mkdir -p "$HOME/.cache"
+tmutil addexclusion "$HOME/.cache"
 
 # Apply without logging out: shortcuts and keyboard via activateSettings, the
 # rest by restarting the apps that read them. Trackpad clicking and key repeat
