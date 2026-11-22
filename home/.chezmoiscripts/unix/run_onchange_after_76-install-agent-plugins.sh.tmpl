@@ -13,15 +13,14 @@
 # Every step is non-fatal. A marketplace being unreachable, or one agent's
 # registry being down, must never fail the whole `chezmoi apply`.
 #
-# Run weekly to pick up new plugin versions. claude and codex `install`/`add`
-# skip or reinstall what is already there, so each needs its marketplaces
-# refreshed first; claude also needs an explicit `update`. omp installs latest.
+# Run weekly to pick up new plugin versions. claude `install` skips what is
+# already there, so it refreshes its marketplaces and runs `update`. omp
+# installs latest. codex is pinned to release tags, see its section.
 # Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 
 {{- $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml -}}
 {{- $claudeMarkets := list -}}
 {{- $claudePlugins := list -}}
-{{- $codexMarkets := list -}}
 {{- $codexPlugins := list -}}
 {{- $ompPlugins := list -}}
 {{- $herdrPlugins := list -}}
@@ -35,8 +34,7 @@
         {{- if $market -}}{{- $claudeMarkets = append $claudeMarkets $market -}}{{- end -}}
     {{- end -}}
     {{- if hasKey . "codex-plugin" -}}
-        {{- $codexPlugins = append $codexPlugins (get . "codex-plugin") -}}
-        {{- if $market -}}{{- $codexMarkets = append $codexMarkets $market -}}{{- end -}}
+        {{- $codexPlugins = append $codexPlugins (dict "plugin" (get . "codex-plugin") "market" $market "trust" (get . "codex-trust-hooks")) -}}
     {{- end -}}
     {{- if hasKey . "omp-plugin" -}}
         {{- $ompPlugins = append $ompPlugins (get . "omp-plugin") -}}
@@ -72,19 +70,94 @@ fi
 {{ end }}
 
 {{- if $codexPlugins }}
+# codex upgrades every git marketplace to the tip of its ref at each startup,
+# and an upgrade reinstalls its plugins, whose hooks then wait for review. So
+# each marketplace is pinned to the commit of its newest release tag and moved
+# here, weekly: startups find nothing to upgrade. The pin is the commit, not
+# the tag name, because codex resolves a name with `git ls-remote <url> <name>`
+# and takes the first match, and ponytail's release/vX.Y.Z branch matches
+# before the tag: a tag pin would look outdated at every startup. Changing the
+# ref takes a remove and add.
+# `plugin add` runs only when the tag moved, since it re-fetches every time:
+# ponytail's codex manifest installs the plugin from its `main` branch, not
+# from the tag, so the tag only gates when an update is taken.
+#
+# codex_trust_hooks <plugin> approves that plugin's new or changed hooks, as
+# the review screen would: `hooks/list` reports each hook's status and current
+# hash, and `config/batchWrite` records the hash as trusted in config.toml.
+# Only for entries with `codex-trust-hooks: true`; other plugins go to review.
+codex_trust_hooks() {
+    python3 - "$1" <<'EOF'
+import json, os, subprocess, sys
+
+# stderr: startup warnings (e.g. no bubblewrap sandbox); failures exit below.
+server = subprocess.Popen(["codex", "app-server"], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                          stderr=subprocess.DEVNULL, text=True)
+
+def call(request_id, method, params):
+    server.stdin.write(json.dumps({"id": request_id, "method": method, "params": params}) + "\n")
+    server.stdin.flush()
+    for line in server.stdout:
+        message = json.loads(line)
+        if message.get("id") == request_id:
+            if "error" in message:
+                sys.exit(f"{method}: {message['error']}")
+            return message["result"]
+    sys.exit(f"app-server exited during {method}")
+
+try:
+    call(1, "initialize", {"clientInfo": {"name": "chezmoi", "version": "1"}})
+    server.stdin.write(json.dumps({"method": "initialized"}) + "\n")
+    listing = call(2, "hooks/list", {"cwds": [os.environ["HOME"]]})
+    approve = {
+        hook["key"]: {"trusted_hash": hook["currentHash"]}
+        for entry in listing["data"]
+        for hook in entry["hooks"]
+        if hook.get("pluginId") == sys.argv[1] and hook["trustStatus"] in ("untrusted", "modified")
+    }
+    if approve:
+        edit = {"keyPath": "hooks.state", "value": approve, "mergeStrategy": "upsert"}
+        call(3, "config/batchWrite", {"edits": [edit], "reloadUserConfig": True})
+finally:
+    server.stdin.close()
+    server.wait()
+EOF
+}
+
 if command -v codex >/dev/null 2>&1; then
-{{- range (uniq $codexMarkets) }}
-    # Re-adding a configured marketplace succeeds. "already added from a
-    # different source" means an older codex left a snapshot with no recorded
-    # source, which never upgrades: `codex plugin marketplace remove <name>` once.
-    codex plugin marketplace add {{ . | quote }} >/dev/null 2>&1 \
-        || echo "codex: marketplace {{ . }} unreachable or stale (see this script)"
-{{- end }}
-    codex plugin marketplace upgrade >/dev/null 2>&1 \
-        || echo "codex: marketplace refresh failed"
 {{- range $codexPlugins }}
-    codex plugin add {{ . | quote }} >/dev/null 2>&1 \
-        || echo "codex: {{ . }} already installed or unavailable"
+{{- $name := index (splitList "@" .plugin) 1 }}
+    url={{ printf "https://github.com/%s.git" .market | quote }}
+    tag=$(git ls-remote --tags --refs --sort=-v:refname "$url" "v*" 2>/dev/null | sed -n '1s|.*refs/tags/||p')
+    # An annotated tag lists its commit last, as <tag>^{}.
+    sha=$(git ls-remote "$url" "refs/tags/$tag" "refs/tags/$tag^{}" 2>/dev/null | tail -1 | cut -f1)
+    if [ -z "$tag" ] || [ -z "$sha" ]; then
+        echo "codex: no release tag found for {{ .market }}; left as it is"
+    else
+        out=$(codex plugin marketplace add {{ .market | quote }} --ref "$sha" 2>&1) || case $out in
+            # Configured at another ref (last week's tag), or an older codex's
+            # snapshot that recorded no source at all.
+            *"different source"*)
+                codex plugin marketplace remove {{ $name | quote }} >/dev/null 2>&1 || true
+                out=$(codex plugin marketplace add {{ .market | quote }} --ref "$sha" 2>&1) || true ;;
+        esac
+        case $out in
+            *"Added marketplace"*)
+                # The first upgrade after an add reinstalls the plugin once more
+                # (later ones find it current), so take it now, before approving.
+                if codex plugin add {{ .plugin | quote }} >/dev/null 2>&1 &&
+                    codex plugin marketplace upgrade {{ $name | quote }} >/dev/null 2>&1; then
+                    echo "codex: {{ .plugin }} updated to $tag"
+{{- if .trust }}
+                    codex_trust_hooks {{ .plugin | quote }} || echo "codex: could not approve {{ .plugin }} hooks"
+{{- end }}
+                else
+                    echo "codex: {{ .plugin }} failed to install"
+                fi ;;
+            *"already added"*) ;;
+            *) echo "codex: marketplace {{ .market }} at $tag failed: $out" ;;
+        esac
+    fi
 {{- end }}
 else
     echo "codex not on PATH; skipping its plugins"

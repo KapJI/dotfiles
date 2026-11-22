@@ -384,6 +384,8 @@
 #                                   marketplace, it installs the package direct.
 #   herdr-plugin:                   "<owner>/<repo>@<commit>", pinned like
 #                                   flake.lock; bump the sha to upgrade.
+#   codex-trust-hooks: true         approve the codex plugin's hooks after each
+#                                   weekly update instead of asking for review.
 
 # Audit and maintain CLAUDE.md files. Claude-only by nature — there is no
 # codex/omp analogue of CLAUDE.md to manage.
@@ -408,6 +410,7 @@
 # omp is the Pi harness, which takes the npm package rather than a marketplace.
 - claude-plugin: ponytail@ponytail
   codex-plugin: ponytail@ponytail
+  codex-trust-hooks: true
   omp-plugin: "@dietrichgebert/ponytail"
   agent-marketplace: DietrichGebert/ponytail
 
