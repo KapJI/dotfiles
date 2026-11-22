@@ -127,8 +127,10 @@ restart() {
 
 # One herdr workspace per agent, labelled with its name, so each gets its own
 # sidebar entry and status. A missing workspace is created; an existing one
-# with no live agent (its connection ended: an update restart, a sandbox
-# recreate, a herdr restart) is reattached in its first pane.
+# whose sandbox has no live `openshell sandbox connect` (it ended: an update
+# restart, a sandbox recreate, a herdr or VM restart) is reattached in its first
+# pane. The check is per sandbox, not per workspace: another agent the user
+# runs in a second tab of that workspace must not count as connected.
 attach() {
     local a ws pane
     for a in "$@"; do
@@ -136,7 +138,7 @@ attach() {
         if [[ -z $ws ]]; then
             echo "infra-agents: open $a"
             pane=$(herdr workspace create --label "$a" --cwd "$HOME" --no-focus | jq -r .result.root_pane.pane_id)
-        elif herdr agent list | jq -e --arg w "$ws" 'any(.result.agents[]; .workspace_id == $w)' >/dev/null; then
+        elif pgrep -f "openshell sandbox connect $a\$" >/dev/null; then
             continue
         else
             echo "infra-agents: reattach $a"
