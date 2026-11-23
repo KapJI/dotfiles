@@ -51,6 +51,10 @@
 
 - llm-agents: codex
 
+# Google's coding agent (`agy`). Its Gemini CLI no longer signs in personal
+# accounts (Google AI Pro included) since 2026-06-18; Antigravity replaced it.
+- llm-agents: antigravity-cli
+
 - brew-cask: google-chrome
   deb-desktop: google-chrome-stable
   winget: Google.Chrome
