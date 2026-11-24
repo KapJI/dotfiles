@@ -2,7 +2,11 @@
   Render a single ssh-agent-loaded public key whose comment ends with .name.
   Fails loudly (halting `chezmoi apply`) when:
     - ssh-add -L returns no keys (agent unreachable, empty, or stale socket)
+      and the key file does not exist yet
     - no loaded key matches the requested name suffix
+  With no agent, an existing non-empty key file is kept as is: the agent is
+  needed only to create it, so an apply without one still reaches the files and
+  scripts after this one.
   The previous version silently rendered empty in either case, which once
   caused chezmoi to write empty pubkey files on a host where the tmux
   session's SSH_AUTH_SOCK pointed at a dead socket.
@@ -23,10 +27,14 @@
        shell, e.g. WezTerm's own agent socket, which has none of these keys. */ -}}
 {{-   $output = output "sh" "-c" `for s in "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" "$HOME/.1password/agent.sock"; do if [ -S "$s" ]; then SSH_AUTH_SOCK=$s; export SSH_AUTH_SOCK; break; fi; done; ssh-add -L 2>/dev/null || true` | trim -}}
 {{- end -}}
-{{- if eq $output "" -}}
+{{- $found := "" -}}
+{{- $target := .context.chezmoi.targetFile -}}
+{{- if and (eq $output "") (stat $target) -}}
+{{-   $found = include $target | trim -}}
+{{- end -}}
+{{- if and (eq $output "") (eq $found "") -}}
 {{-   fail (printf "ssh-add -L returned no keys; cannot render pubkey %q. Ensure the SSH agent is running (on macOS, the 1Password app must be open with SSH agent enabled — it stops after an app update), SSH_AUTH_SOCK is reachable, and the agent has the needed key loaded." $name) -}}
 {{- end -}}
-{{- $found := "" -}}
 {{- range $output | splitList "\n" -}}
 {{-   $line := trimSuffix "\r" . -}}
 {{-   if hasSuffix $name $line -}}
