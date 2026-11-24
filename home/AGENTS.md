@@ -65,7 +65,7 @@ All packages are defined in a single central manifest: `.data/packages.yaml`. Ea
 - nix: ripgrep           # Nix (macOS arm64 + Linux x86_64/aarch64; cross-platform CLI tools)
   nix-desktop: ...       # Nix, included only when is_desktop=true
   nix-server: ...        # Nix, included only when is_desktop=false (Linux server)
-  llm-agents: omp        # numtide/llm-agents.nix flake (AI coding agents)
+  llm-agents: omp        # numtide/llm-agents.nix flake (AI coding agents; desktops + containers only)
   brew-cask: ...         # macOS GUI apps
   brew-cask-greedy: ...  # macOS GUI app, upgraded even at `version :latest`
   brew-tap: ...          # Homebrew taps
@@ -99,7 +99,8 @@ Default routing:
 - **Linux GUI apps / system libraries** → `deb:` / `deb-desktop:` (apt is intentionally retained for these).
 - **Windows** → `winget:` (preferred) / `scoop:` (fallback).
 - **AI coding agents** → `llm-agents:` — the `numtide/llm-agents.nix` flake, rebuilt daily and
-  prebuilt in `cache.numtide.com`. Prefer it over `nix:` for agents: nixpkgs lags upstream badly
+  prebuilt in `cache.numtide.com`. Installed only on desktops and Coder workspaces: headless
+  servers (vps, voron) skip them, and their profile sync collects garbage after each change. Prefer it over `nix:` for agents: nixpkgs lags upstream badly
   and some (`omp`) aren't packaged there at all.
 - **npm-only tools** (no nix/brew packaging) → `npm:` — installed by `unix/run_onchange_after_75-install-npm-packages.sh.tmpl` into the `~/.npm` prefix (the nix node's own global prefix is a read-only store path). `.chezmoiignore` gates the script, and `.claude/skills/agent-tty` with it, to desktop + container: headless servers have no TUI to drive.
 - **AI agent plugins** → `claude-plugin:` / `codex-plugin:` / `omp-plugin:` / `herdr-plugin:` / `agent-marketplace:` — installed by `unix/run_onchange_after_76-install-agent-plugins.sh.tmpl` for whichever agents the host has. One entry per logical plugin; the per-agent keys are install methods for the *same* plugin, exactly as `brew-cask`/`deb`/`winget` are for an OS package. Claude and Codex take `<plugin>@<marketplace>` and need `agent-marketplace:` (the source added first); omp has no marketplace and takes an npm spec or `git:` ref, which needs **`nix: bun`** — `omp install` shells out to bun and fails without it. herdr takes `<owner>/<repo>@<commit>`, pinned like `flake.lock`: bump the sha to upgrade, and a host already at that commit is skipped. A Codex marketplace (a GitHub `owner/repo`) is pinned to the commit of its newest `v*` tag and moved weekly, because Codex itself upgrades every git marketplace at startup; `codex-trust-hooks: true` approves that plugin's hooks after a move, so no review prompt follows (ponytail only). Every step in the script is non-fatal: a registry being down must never fail an apply.

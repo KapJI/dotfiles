@@ -45,10 +45,15 @@ cat > "$HOME/.config/nix-profile/flake.nix" <<'NIXEOF'
 
       defaultPaths = pkgs: system: with pkgs; [
 {{- $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml }}
+{{- /* Coding agents only where one is run: desktops and Coder workspaces.
+       Headless servers (vps, voron) are only ever reached over ssh, and the
+       agents cost them gigabytes. */}}
+{{- if or .is_desktop (index . "is_container" | default false) }}
 {{- range $packages }}
 {{-   if hasKey . "llm-agents" }}
         llm-agents.packages.${system}.{{ get . "llm-agents" }}
 {{-   end }}
+{{- end }}
 {{- end }}
 {{- range $packages }}
 {{-   if hasKey . "nix" }}
@@ -169,6 +174,12 @@ profile_after=$(readlink -f "$HOME/.nix-profile" 2>/dev/null || true)
 # (e.g. comment edit) but the resulting derivation is identical.
 if [ -n "$profile_after" ] && [ "$profile_before" != "$profile_after" ]; then
     rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*
+{{- if not (or .is_desktop (index . "is_container" | default false)) }}
+    # Headless servers are short on disk: drop the replaced generations and
+    # collect what they held, or a removed package still occupies the store.
+    nix profile wipe-history || true
+    nix-collect-garbage >/dev/null || echo "note: nix garbage collection failed"
+{{- end }}
 fi
 {{- if index . "is_container" | default false }}
 
