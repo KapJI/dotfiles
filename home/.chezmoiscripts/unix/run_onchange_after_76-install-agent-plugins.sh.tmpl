@@ -82,12 +82,14 @@ fi
 # ponytail's codex manifest installs the plugin from its `main` branch, not
 # from the tag, so the tag only gates when an update is taken.
 #
-# codex_trust_hooks <plugin> approves that plugin's new or changed hooks, as
-# the review screen would: `hooks/list` reports each hook's status and current
-# hash, and `config/batchWrite` records the hash as trusted in config.toml.
-# Only for entries with `codex-trust-hooks: true`; other plugins go to review.
+# codex_trust_hooks <field> <value> approves the new or changed hooks whose
+# `hooks/list` <field> equals <value> (pluginId, or command), as the review
+# screen would: `hooks/list` reports each hook's status and current hash, and
+# `config/batchWrite` records the hash as trusted in config.toml. Only for
+# plugins with `codex-trust-hooks: true` and our own AWF Writer guard; anything
+# else goes to review.
 codex_trust_hooks() {
-    python3 - "$1" <<'EOF'
+    python3 - "$1" "$2" <<'EOF'
 import json, os, subprocess, sys
 
 # stderr: startup warnings (e.g. no bubblewrap sandbox); failures exit below.
@@ -113,7 +115,7 @@ try:
         hook["key"]: {"trusted_hash": hook["currentHash"]}
         for entry in listing["data"]
         for hook in entry["hooks"]
-        if hook.get("pluginId") == sys.argv[1] and hook["trustStatus"] in ("untrusted", "modified")
+        if hook.get(sys.argv[1]) == sys.argv[2] and hook["trustStatus"] in ("untrusted", "modified")
     }
     if approve:
         edit = {"keyPath": "hooks.state", "value": approve, "mergeStrategy": "upsert"}
@@ -149,7 +151,7 @@ if command -v codex >/dev/null 2>&1; then
                     codex plugin marketplace upgrade {{ $name | quote }} >/dev/null 2>&1; then
                     echo "codex: {{ .plugin }} updated to $tag"
 {{- if .trust }}
-                    codex_trust_hooks {{ .plugin | quote }} || echo "codex: could not approve {{ .plugin }} hooks"
+                    codex_trust_hooks pluginId {{ .plugin | quote }} || echo "codex: could not approve {{ .plugin }} hooks"
 {{- end }}
                 else
                     echo "codex: {{ .plugin }} failed to install"
@@ -158,6 +160,16 @@ if command -v codex >/dev/null 2>&1; then
             *) echo "codex: marketplace {{ .market }} at $tag failed: $out" ;;
         esac
     fi
+{{- end }}
+{{- if index . "is_container" | default false }}
+
+    # The AWF Codex Writer guard that dot_codex/modify_hooks.json registers. It
+    # only denies (pushes to main/master, force pushes, merges) and only in
+    # sessions started with AWF_CODEX_WRITER=1, so approve it here rather than
+    # leave Writers unguarded until someone reviews it in the TUI.
+    # Hook entry hash: {{ include "dot_codex/modify_hooks.json.tmpl" | sha256sum }}
+    codex_trust_hooks command {{ printf "python3 %s/.codex/awf-writer-guard.py" .chezmoi.homeDir | quote }} \
+        || echo "codex: could not approve the AWF Writer guard hook"
 {{- end }}
 else
     echo "codex not on PATH; skipping its plugins"

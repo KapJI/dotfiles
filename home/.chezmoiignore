@@ -23,6 +23,13 @@ Library
 .claude/skills/agent-tty
 {{ end }}
 
+{{ if not (and (index . "is_container" | default false) (lookPath "codex")) }}
+# The AWF Codex Writer guard and its PreToolUse hook: Writers run only in the
+# Coder workspace (unix/after_76 approves the hook there).
+.codex/awf-writer-guard.py
+.codex/hooks.json
+{{ end }}
+
 {{ if not (lookPath "codex") }}
 # codex's config.toml is codex-owned state; a modify_ script asserts three keys
 # in it (see dot_codex/) rather than managing the file. Skip where codex isn't

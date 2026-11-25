@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Register the AWF Codex Writer guard (awf-writer-guard.py) as a PreToolUse hook
+# without owning ~/.codex/hooks.json: herdr's `integration install codex` keeps
+# its SessionStart hook there and merges, so this script does the same. It drops
+# any earlier entry running the guard and appends the current one. Codex runs a
+# hook only once trusted; unix/after_76 approves exactly this command.
+set -euo pipefail
+input=$(cat)
+printf '%s' "${input:-{\}}" | jq --arg cmd {{ printf "python3 %s/.codex/awf-writer-guard.py" .chezmoi.homeDir | quote }} '
+  .hooks.PreToolUse = ([.hooks.PreToolUse // [] | .[]
+      | select(all(.hooks[]?; .command != $cmd))]
+    + [{hooks: [{type: "command", command: $cmd, timeout: 10}]}])'
