@@ -60,6 +60,13 @@ Library
 .agents/AGENTS.md
 {{ end }}
 
+{{ if not (stat (joinPath .chezmoi.homeDir ".config/anthropic-credit/api-key")) }}
+# omp's `anthropic-credit` provider (the API-credit tier for AWF Opus agents)
+# reads its key from this unmanaged file at request time. Without the key the
+# provider cannot authenticate, so hosts without it get no models.yml.
+.omp/agent/models.yml
+{{ end }}
+
 {{ if or (ne .chezmoi.os "linux") (not (lookPath "omp")) (not (stat (joinPath .chezmoi.homeDir (includeTemplate "github-checkout" (dict "home" .chezmoi.homeDir "repo" "agent-workflow")) "integrations/omp-input-state.ts"))) }}
 # The native input-state bridge supports Linux OMP only. Skip this sibling when
 # its shared asset or OMP is absent; leave Herdr's extension and settings alone.

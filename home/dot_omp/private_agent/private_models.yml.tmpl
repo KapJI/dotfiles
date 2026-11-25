@@ -1,0 +1,14 @@
+# auth: apiKey makes omp send the key as X-Api-Key (without it, omp treats it as an OAuth token).
+providers:
+  anthropic-credit:
+    baseUrl: https://api.anthropic.com
+    api: anthropic-messages
+    auth: apiKey
+    apiKey: "!cat {{ joinPath .chezmoi.homeDir ".config/anthropic-credit/api-key" }}"
+    models:
+      - id: claude-opus-5-5
+        name: Claude Opus 5.5 (API credit)
+        reasoning: true
+        input: [text, image]
+        contextWindow: 1000000
+        maxTokens: 128000
