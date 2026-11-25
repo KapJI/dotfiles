@@ -403,13 +403,6 @@
 - claude-plugin: code-review@claude-plugins-official
   agent-marketplace: anthropics/claude-plugins-official
 
-# Official GitHub MCP server: issues, PRs, code review, search. Claude-only
-# here on purpose — codex ships its own GitHub integration, and wiring this one
-# in would mean re-adding the whole 290-plugin claude-plugins-official snapshot
-# to codex for a single entry.
-- claude-plugin: github@claude-plugins-official
-  agent-marketplace: anthropics/claude-plugins-official
-
 # Biases the agent toward writing less code. Ships adapters for 14 harnesses;
 # omp is the Pi harness, which takes the npm package rather than a marketplace.
 - claude-plugin: ponytail@ponytail
