@@ -21,6 +21,12 @@ fi
 
 # Update nvim plugins + refresh treesitter parsers. Re-runs weekly.
 # Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
+# A failure is non-fatal, so the apply goes on, but it leaves a marker file.
+# While the marker exists, the line below renders new text on every apply,
+# so chezmoi sees changed content and runs this script again on the next one.
+{{ if stat (joinPath .chezmoi.homeDir ".cache/chezmoi-retry/ts-parsers") -}}
+# Retrying the missing treesitter parsers: {{ randAlphaNum 16 }}
+{{ end -}}
 
 # Drive parser installation from here rather than letting the plugin's startup
 # config do it: nvim-treesitter's install() is async, so the config's fire-and-
@@ -64,3 +70,13 @@ nvim --headless "+Lazy! sync" +qall
 # The parser list is the single source of truth in lua/config/ts-parsers.lua,
 # shared with the plugin config (lua/plugins/treesitter.lua).
 nvim --headless "+lua local ts = require('nvim-treesitter'); local want = require('config.ts-parsers'); local opts = { summary = true, max_jobs = 4 }; ts.install(want, opts):wait(600000); ts.install(want, opts):wait(600000); ts.update({ summary = true }):wait(600000)" +qall
+
+# nvim exits 0 whatever install() hit (a corrupt download, a failed compile),
+# so check the result: any manifest parser still missing means a retry.
+retry_marker="$HOME/.cache/chezmoi-retry/ts-parsers"
+if nvim --headless "+lua local have = {}; for _, l in ipairs(require('nvim-treesitter').get_installed()) do have[l] = true end; local miss = {}; for _, l in ipairs(require('config.ts-parsers')) do if not have[l] then miss[#miss + 1] = l end end; if #miss > 0 then io.stderr:write('missing treesitter parsers: ' .. table.concat(miss, ' ') .. '\\n'); vim.cmd('cquit 1') end" +qall; then
+    rm -f -- "$retry_marker"
+else
+    mkdir -p "${retry_marker%/*}" && : > "$retry_marker"
+    echo "warning: some treesitter parsers failed to install; they are retried on the next chezmoi apply" >&2
+fi

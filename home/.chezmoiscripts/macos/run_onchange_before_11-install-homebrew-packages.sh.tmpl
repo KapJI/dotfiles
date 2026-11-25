@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
 # Run weekly. Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
+# A failure is non-fatal, so the apply goes on, but it leaves a marker file.
+# While the marker exists, the line below renders new text on every apply,
+# so chezmoi sees changed content and runs this script again on the next one.
+{{ if stat (joinPath .chezmoi.homeDir ".cache/chezmoi-retry/brew-bundle") -}}
+# Retrying the failed brew bundle: {{ randAlphaNum 16 }}
+{{ end -}}
 
 {{- $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml -}}
 {{ $taps := list -}}
@@ -44,7 +50,9 @@ hash_completions() {
 }
 hash_before=$(hash_completions "$brew_completions_dir")
 
-brew bundle --verbose --file=/dev/stdin <<EOF
+retry_marker="$HOME/.cache/chezmoi-retry/brew-bundle"
+bundle_status=0
+brew bundle --verbose --file=/dev/stdin <<EOF || bundle_status=$?
 {{ range $taps -}}
 tap "{{ . }}"
 {{ end -}}
@@ -70,4 +78,11 @@ EOF
 hash_after=$(hash_completions "$brew_completions_dir")
 if [ "$hash_before" != "$hash_after" ]; then
     rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/"zcompdump*
+fi
+
+if [ "$bundle_status" -ne 0 ]; then
+    mkdir -p "${retry_marker%/*}" && : > "$retry_marker"
+    echo "warning: brew bundle failed (exit $bundle_status); it runs again on the next chezmoi apply" >&2
+else
+    rm -f -- "$retry_marker"
 fi
