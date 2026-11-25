@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Install AI-agent plugins from packages.yaml (`claude-plugin:` / `codex-plugin:`
-# / `omp-plugin:` / `herdr-plugin:` / `agent-marketplace:` keys) for whichever
-# of claude, codex, omp and herdr exist on this host. Without this, plugins live
+# / `omp-plugin:` / `agy-plugin:` / `herdr-plugin:` / `agent-marketplace:` keys)
+# for whichever of claude, codex, omp, agy and herdr exist on this host. Without this, plugins live
 # only in each agent's own state dir — hand-installed per machine, never
 # reaching a rebuilt container.
 #
@@ -15,7 +15,7 @@
 #
 # Run weekly to pick up new plugin versions. claude `install` skips what is
 # already there, so it refreshes its marketplaces and runs `update`. omp
-# installs latest. codex is pinned to release tags, see its section.
+# and agy install latest. codex is pinned to release tags, see its section.
 # Current week: {{ div now.YearDay 7 }}, {{ now.Year }}
 
 {{- $packages := joinPath .chezmoi.sourceDir ".data/packages.yaml" | include | fromYaml -}}
@@ -24,6 +24,7 @@
 {{- $codexPlugins := list -}}
 {{- $ompPlugins := list -}}
 {{- $herdrPlugins := list -}}
+{{- $agyPlugins := list -}}
 {{- range $packages -}}
     {{- $market := "" -}}
     {{- if hasKey . "agent-marketplace" -}}
@@ -38,6 +39,9 @@
     {{- end -}}
     {{- if hasKey . "omp-plugin" -}}
         {{- $ompPlugins = append $ompPlugins (get . "omp-plugin") -}}
+    {{- end -}}
+    {{- if hasKey . "agy-plugin" -}}
+        {{- $agyPlugins = append $agyPlugins (get . "agy-plugin") -}}
     {{- end -}}
     {{- if hasKey . "herdr-plugin" -}}
         {{- $herdrPlugins = append $herdrPlugins (get . "herdr-plugin") -}}
@@ -190,6 +194,18 @@ else
     omp install {{ . | quote }} >/dev/null 2>&1 \
         || echo "omp: {{ . }} already installed or unavailable"
 {{- end }}
+fi
+{{ end }}
+
+{{- if $agyPlugins }}
+if command -v agy >/dev/null 2>&1; then
+    # Takes a git URL and replaces an existing install, so this also updates.
+{{- range $agyPlugins }}
+    agy plugin install {{ . | quote }} >/dev/null 2>&1 \
+        || echo "agy: {{ . }} failed to install"
+{{- end }}
+else
+    echo "agy not on PATH; skipping its plugins"
 fi
 {{ end }}
 

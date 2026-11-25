@@ -53,6 +53,7 @@ Library
 # config a fresh host needs before it can clone the checkout.
 .claude/CLAUDE.md
 .codex/AGENTS.md
+.gemini/config/AGENTS.md
 .agents
 .claude/skills/test-quality
 .claude/skills/pr-writing
@@ -87,6 +88,11 @@ Library
 # on Windows, where the script is bash and the status line it sets is a POSIX
 # sh + jq one-liner that would not run there anyway.
 .claude/settings.json
+{{ end }}
+
+{{ if not (lookPath "agy") }}
+# agy's global rules (shared rules, host rules and ponytail's ruleset).
+.gemini/config/AGENTS.md
 {{ end }}
 
 {{ if not (lookPath "herdr") }}

@@ -220,7 +220,7 @@ Plugins roll forward on their own: `unix/run_onchange_after_90-install-vim-plugi
 
 ### Agent startup instructions
 
-Claude, Codex and omp start from the shared rules in
+Claude, Codex, omp and agy start from the shared rules in
 `~/github/agent-workflow/instructions/global.md` plus the host rules in
 `.chezmoitemplates/agent-host-rules.md` (domain agents, project routing). The
 agent-workflow repo owns the shared rules and skills; edit them there, not here.
@@ -230,6 +230,7 @@ capital-gains-calculator one the host rules name): `~/github/<repo>`, or
 
 - `dot_claude/CLAUDE.md.tmpl` imports `global.md` with `@`, so Claude always reads the current file.
 - `dot_codex/AGENTS.md.tmpl` copies `global.md` in at apply time, because Codex has no include. omp reads the same file through the `~/.agents/AGENTS.md` link. **After changing `global.md`, run `chezmoi apply ~/.codex/AGENTS.md`**, or Codex and omp keep the old copy.
+- `dot_gemini/config/AGENTS.md.tmpl` is agy's (Antigravity's) global rules file. It includes `global.md` and ponytail's ruleset live with agy's `@[label](path)` syntax and renders the host rules in; agy loads nothing from a plugin's root AGENTS.md, so ponytail's rules come in here.
 - Skills are links, not copies: `~/.agents/skills` (Codex and omp) and `~/.claude/skills/<name>` point into the checkout's `skills/`. A new shared skill needs its own `dot_claude/skills/symlink_<name>.tmpl` and an entry in the `.chezmoiignore` block that skips them where the checkout is absent.
 - On a host without the checkout, `.chezmoiignore` skips all of these and `chezmoi apply` prints a warning naming the clone to make. Existing instruction files stay as they are, so their approval rules remain loaded; the apply itself still succeeds.
 

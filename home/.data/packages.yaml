@@ -409,6 +409,7 @@
   codex-plugin: ponytail@ponytail
   codex-trust-hooks: true
   omp-plugin: "@dietrichgebert/ponytail"
+  agy-plugin: https://github.com/DietrichGebert/ponytail
   agent-marketplace: DietrichGebert/ponytail
 
 # Six specialist review agents (code-reviewer, comment-analyzer,
