@@ -90,6 +90,14 @@ Library
 .claude/settings.json
 {{ end }}
 
+{{ if not (and (index . "is_container" | default false) (lookPath "claude")) }}
+# A second Claude Code config dir for the AWF Claude Pro Writers, which run
+# with CLAUDE_CONFIG_DIR=~/.claude-pro on their own login (its .credentials.json
+# and session state stay its own). Settings, rules, skills and plugins are links
+# to ~/.claude, so both logins share one setup. Workspace only.
+.claude-pro
+{{ end }}
+
 {{ if not (lookPath "agy") }}
 # agy's global rules (shared rules, host rules and ponytail's ruleset).
 .gemini/config/AGENTS.md
